@@ -12,8 +12,8 @@ import {
 import { Avatar } from "./UIComponents";
 import { useNavigate } from "react-router-dom";
 
-export default function Header({ 
-  role = "mr", 
+export default function Header({
+  role = "mr",
   onMenuClick,
   isSidebarOpen = true,
   isMobile = false,
@@ -22,9 +22,29 @@ export default function Header({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const name = user?.mrName || user?.flmName || user?.slmName || user?.tlmName || "User";
-  const designation = user?.role === "mr" ? "MR" : user?.role === "flm" ? "FLM" : user?.role === "slm" ? "SLM" : user?.role === "tlm" ? "TLM" : "Manager";
+
+  const name =
+    user?.mrName ||
+    user?.flmName ||
+    user?.slmName ||
+    user?.tlmName ||
+    "User";
+
+  const designation =
+    user?.role === "mr"
+      ? "MR"
+      : user?.role === "flm"
+        ? "FLM"
+        : user?.role === "slm"
+          ? "SLM"
+          : user?.role === "tlm"
+            ? "TLM"
+            : "Manager";
+
   const loc = user?.hq || "Mumbai West (Area)";
+
+  const notificationCount =
+    role === "ho" ? 18 : role === "manager" ? 12 : 8;
 
   const handleProfileClick = () => {
     setIsProfileOpen(false);
@@ -44,132 +64,350 @@ export default function Header({
     <header
       className="topbar"
       style={{
-        height: isMobile ? "60px" : undefined,
-        padding: isMobile ? "0 12px" : undefined,
-        gap: isMobile ? "10px" : undefined,
-        flexWrap: isMobile ? "nowrap" : undefined,
+        position: "relative",
+        width: "100%",
+        height: isMobile ? "58px" : "64px",
+        minHeight: isMobile ? "58px" : "64px",
+        padding: isMobile ? "0 14px" : "0 22px",
+        display: "flex",
+        alignItems: "center",
+        gap: isMobile ? "10px" : "14px",
+        background: "#ffffff",
+        borderBottom: "1px solid #e5ebf4",
+        boxShadow: "0 1px 5px rgba(15, 35, 70, 0.045)",
+        boxSizing: "border-box",
+        flexWrap: "nowrap",
+        zIndex: 1000,
       }}
     >
-      {/* Hamburger / close menu — mobile only, this is what opens & closes the sidebar drawer */}
+      {/* =====================================================
+          MOBILE MENU
+      ===================================================== */}
       {isMobile && (
         <button
+          type="button"
           onClick={onMenuClick}
+          aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
           style={{
-            background: "none",
+            width: "34px",
+            height: "34px",
+            padding: 0,
             border: "none",
-            cursor: "pointer",
-            padding: "4px",
+            background: "transparent",
             display: "flex",
             alignItems: "center",
-            color: "#374151",
+            justifyContent: "center",
+            color: "#334155",
+            cursor: "pointer",
             flexShrink: 0,
+            borderRadius: "8px",
           }}
-          aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
         >
-          {isSidebarOpen ? <X size={22} /> : <Menu size={22} />}
+          {isSidebarOpen ? (
+            <X size={21} strokeWidth={2} />
+          ) : (
+            <Menu size={21} strokeWidth={2} />
+          )}
         </button>
       )}
 
-      {/* Back Button */}
+      {/* =====================================================
+          BACK BUTTON
+      ===================================================== */}
       <button
+        type="button"
         onClick={handleGoBack}
+        aria-label="Go back"
         style={{
-          background: "none",
+          width: "34px",
+          height: "34px",
+          padding: 0,
           border: "none",
-          cursor: "pointer",
-          padding: "4px",
+          background: "transparent",
           display: "flex",
           alignItems: "center",
-          color: "#374151",
+          justifyContent: "center",
+          color: "#334155",
+          cursor: "pointer",
           flexShrink: 0,
+          borderRadius: "8px",
+          transition: "background 0.15s ease",
         }}
-        aria-label="Go back"
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "#f4f7fb";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "transparent";
+        }}
       >
-        <ArrowLeft size={20} />
+        <ArrowLeft size={20} strokeWidth={2} />
       </button>
 
-      <div className="spacer" />
+      {/* =====================================================
+          SPACER
+      ===================================================== */}
+      <div
+        style={{
+          flex: 1,
+          minWidth: "20px",
+        }}
+      />
 
+      {/* =====================================================
+          LOCATION
+      ===================================================== */}
       {!isMobile && (
-        <div className="location">
-          <MapPin size={18} />
-          {loc}
+        <div
+          style={{
+            height: "36px",
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            padding: "0 12px",
+            borderRadius: "9px",
+            background: "#f8faff",
+            border: "1px solid #e5ecf7",
+            color: "#475569",
+            fontSize: "12px",
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+            maxWidth: "220px",
+            boxSizing: "border-box",
+          }}
+        >
+          <MapPin
+            size={16}
+            strokeWidth={2}
+            style={{
+              color: "#0758f7",
+              flexShrink: 0,
+            }}
+          />
+
+          <span
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {loc}
+          </span>
         </div>
       )}
 
-      <div className="bell" style={{ flexShrink: 0 }}>
-        <Bell size={isMobile ? 20 : 24} />
-        <span>
-          {role === "ho" ? 18 : role === "manager" ? 12 : 8}
-        </span>
-      </div>
-
-      <div 
-        onClick={() => setIsProfileOpen(!isProfileOpen)} 
-        style={{ 
-          cursor: "pointer", 
-          display: "flex", 
-          alignItems: "center", 
-          gap: "8px",
+      {/* =====================================================
+          NOTIFICATION
+      ===================================================== */}
+      <button
+        type="button"
+        aria-label="Notifications"
+        style={{
           position: "relative",
+          width: "36px",
+          height: "36px",
+          padding: 0,
+          border: "none",
+          background: "transparent",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#334155",
+          cursor: "pointer",
+          borderRadius: "9px",
+          flexShrink: 0,
+          transition: "background 0.15s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "#f4f7fb";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "transparent";
+        }}
+      >
+        <Bell
+          size={isMobile ? 20 : 21}
+          strokeWidth={2}
+        />
+
+        <span
+          style={{
+            position: "absolute",
+            top: "1px",
+            right: "0px",
+            minWidth: "16px",
+            height: "16px",
+            padding: "0 4px",
+            borderRadius: "999px",
+            background: "#0758f7",
+            color: "#ffffff",
+            fontSize: "9px",
+            lineHeight: "16px",
+            fontWeight: 700,
+            textAlign: "center",
+            boxSizing: "border-box",
+          }}
+        >
+          {notificationCount}
+        </span>
+      </button>
+
+      {/* =====================================================
+          PROFILE
+      ===================================================== */}
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
           flexShrink: 0,
         }}
       >
-        <Avatar name={name} role={designation} />
-        {!isMobile && <ChevronDown size={18} />}
-      </div>
-
-      {isProfileOpen && (
-        <div
+        <button
+          type="button"
+          onClick={() => setIsProfileOpen((prev) => !prev)}
+          aria-label="Open profile menu"
           style={{
-            position: "absolute",
-            top: isMobile ? "56px" : "60px",
-            right: isMobile ? "12px" : "20px",
-            background: "white",
-            borderRadius: "8px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            padding: "8px",
-            minWidth: "180px",
-            zIndex: 1100,
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            padding: "0",
+            border: "none",
+            background: "transparent",
+            cursor: "pointer",
+            flexShrink: 0,
           }}
         >
+          {/* Do NOT scale Avatar.
+              Let UIComponents control its normal size. */}
+          <Avatar
+            name={name}
+            role={designation}
+          />
+
+          {!isMobile && (
+            <ChevronDown
+              size={16}
+              strokeWidth={2}
+              style={{
+                color: "#64748b",
+                transition: "transform 0.15s ease",
+                transform: isProfileOpen
+                  ? "rotate(180deg)"
+                  : "rotate(0deg)",
+              }}
+            />
+          )}
+        </button>
+
+        {/* =====================================================
+            PROFILE DROPDOWN
+        ===================================================== */}
+        {isProfileOpen && (
           <div
-            onClick={handleProfileClick}
             style={{
-              padding: "8px 12px",
-              cursor: "pointer",
-              borderRadius: "4px",
-              fontSize: "14px",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
+              position: "absolute",
+              top: "47px",
+              right: 0,
+              width: "205px",
+              padding: "6px",
+              background: "#ffffff",
+              border: "1px solid #e3e9f2",
+              borderRadius: "11px",
+              boxShadow: "0 12px 32px rgba(15, 35, 70, 0.13)",
+              zIndex: 1200,
+              boxSizing: "border-box",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#f3f4f6"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
           >
-            <User size={16} />
-            Edit Profile
+            {/* USER INFO */}
+            <div
+              style={{
+                padding: "10px 11px 11px",
+                borderBottom: "1px solid #edf1f6",
+                marginBottom: "5px",
+              }}
+            >
+              <div
+                style={{
+                  color: "#172554",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  lineHeight: "18px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {name}
+              </div>
+
+              <div
+                style={{
+                  marginTop: "2px",
+                  color: "#94a3b8",
+                  fontSize: "11px",
+                  fontWeight: 500,
+                }}
+              >
+                {designation}
+              </div>
+            </div>
+
+            {/* EDIT PROFILE */}
+            <div
+              onClick={handleProfileClick}
+              style={{
+                minHeight: "38px",
+                padding: "0 10px",
+                display: "flex",
+                alignItems: "center",
+                gap: "9px",
+                cursor: "pointer",
+                borderRadius: "8px",
+                color: "#334155",
+                fontSize: "12px",
+                fontWeight: 500,
+                transition: "background 0.15s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#f5f8fc";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+              <User size={15} strokeWidth={2} />
+              <span>Edit Profile</span>
+            </div>
+
+            {/* LOGOUT */}
+            <div
+              onClick={handleLogout}
+              style={{
+                minHeight: "38px",
+                padding: "0 10px",
+                display: "flex",
+                alignItems: "center",
+                gap: "9px",
+                cursor: "pointer",
+                borderRadius: "8px",
+                color: "#dc2626",
+                fontSize: "12px",
+                fontWeight: 500,
+                transition: "background 0.15s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#fff1f2";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+              <LogOut size={15} strokeWidth={2} />
+              <span>Logout</span>
+            </div>
           </div>
-          <div
-            onClick={handleLogout}
-            style={{
-              padding: "8px 12px",
-              cursor: "pointer",
-              borderRadius: "4px",
-              fontSize: "14px",
-              color: "#dc2626",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#fee2e2"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-          >
-            <LogOut size={16} />
-            Logout
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 }
