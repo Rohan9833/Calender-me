@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 
 const authRoutes = require("./routes/authRoutes");
+const profileRoutes = require("./routes/profileRoutes");
 const hierarchyroutes = require("./routes/hierarchyRoutes");
 const doctorroutes = require("./routes/doctorRoutes");
 const managerRoutes = require("./routes/managerRoutes");
@@ -17,8 +18,6 @@ console.log("Current Directory:", process.cwd());
 console.log("EMAIL_USER:", process.env.EMAIL_USER);
 console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
 
-// console.log(process.env);
-
 connectDB();
 
 const app = express();
@@ -27,6 +26,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
 
 app.use("/api/hierarchy", hierarchyroutes);
 
