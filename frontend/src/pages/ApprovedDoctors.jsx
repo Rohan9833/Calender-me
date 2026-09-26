@@ -1,4 +1,6 @@
 import React from "react";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import { useEffect, useState } from "react";
 import { getApprovedDoctors, sendConsent } from "../api/doctorAPI";
 import {
@@ -235,7 +237,7 @@ export default function ApprovedDoctors() {
       const folder = zip.folder(`${doctorName.replace(/\s/g, "_")}_photos`);
 
       const downloadPromises = photos.map(async (photo, index) => {
-        const response = await fetch(`https://calendarme.digilateral.com${photo.url}`);
+        const response = await fetch(`${API_BASE_URL}${photo.url}`);
         const blob = await response.blob();
         const ext = photo.url.split(".").pop() || "jpg";
         folder.file(`photo_${index + 1}.${ext}`, blob);
