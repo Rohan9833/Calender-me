@@ -246,8 +246,18 @@ export default function DraftDoctors() {
         ===================================================== */}
 
         <div className="draft-breadcrumb">
-          <span>My Doctors</span>
+          <button type="button" onClick={() => navigate("/mr-dashboard")}>
+            Dashboard
+          </button>
+
           <ChevronRight size={15} />
+
+          {/* <button type="button" onClick={() => navigate("/draft-doctors")}>
+            My Doctors
+          </button> */}
+
+          {/* <ChevronRight size={15} /> */}
+
           <strong>Draft Doctors</strong>
         </div>
 
@@ -659,21 +669,37 @@ export default function DraftDoctors() {
         ===================================================== */
 
         .draft-breadcrumb {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          margin-bottom: 14px;
-          color: #9aa8bd;
-          font-size: 13px;
-        }
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  color: #9aa8bd;
+  font-size: 13px;
+}
 
-        .draft-breadcrumb svg {
-          color: #b9c5d7;
-        }
+.draft-breadcrumb button {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: #9aa8bd;
+  font: inherit;
+  cursor: pointer;
+}
 
-        .draft-breadcrumb strong {
-          color: #172554;
-        }
+.draft-breadcrumb button:hover {
+  color: #0758f7;
+}
+
+.draft-breadcrumb svg {
+  color: #b9c5d7;
+  flex-shrink: 0;
+}
+
+.draft-breadcrumb strong {
+  color: #172554;
+  font-weight: 700;
+}
 
         /* =====================================================
            HEADER
