@@ -80,16 +80,12 @@ export default function DraftDoctors() {
           doctor.mobile,
         ]
           .filter(Boolean)
-          .some((value) =>
-            String(value).toLowerCase().includes(search)
-          )
+          .some((value) => String(value).toLowerCase().includes(search)),
       );
     }
 
     if (specialtyFilter) {
-      result = result.filter(
-        (doctor) => doctor.speciality === specialtyFilter
-      );
+      result = result.filter((doctor) => doctor.speciality === specialtyFilter);
     }
 
     if (dateFilter) {
@@ -109,7 +105,7 @@ export default function DraftDoctors() {
         weekAgo.setDate(now.getDate() - 7);
 
         result = result.filter(
-          (doctor) => new Date(doctor.createdAt) >= weekAgo
+          (doctor) => new Date(doctor.createdAt) >= weekAgo,
         );
       }
 
@@ -208,7 +204,7 @@ export default function DraftDoctors() {
       await deleteDoctor(doctorId);
 
       setDoctorData((current) =>
-        current.filter((doctor) => doctor._id !== doctorId)
+        current.filter((doctor) => doctor._id !== doctorId),
       );
 
       closeDeletePopup();
@@ -245,7 +241,6 @@ export default function DraftDoctors() {
   return (
     <Layout active="My Doctors">
       <div className="draft-page">
-
         {/* =====================================================
             BREADCRUMB
         ===================================================== */}
@@ -269,9 +264,7 @@ export default function DraftDoctors() {
 
             <h1>Draft Doctors</h1>
 
-            <p>
-              Manage and continue editing doctor profiles saved as drafts.
-            </p>
+            <p>Manage and continue editing doctor profiles saved as drafts.</p>
           </div>
 
           <button
@@ -330,9 +323,8 @@ export default function DraftDoctors() {
           <div className="draft-panel-header">
             <div>
               <h2>Saved Doctor Profiles</h2>
-              <p>
-                Search your drafts and continue where you left off.
-              </p>
+
+              <p>Search your drafts and continue where you left off.</p>
             </div>
 
             <span className="draft-count">
@@ -357,10 +349,7 @@ export default function DraftDoctors() {
               />
 
               {searchTerm && (
-                <button
-                  type="button"
-                  onClick={() => setSearchTerm("")}
-                >
+                <button type="button" onClick={() => setSearchTerm("")}>
                   <X size={17} />
                 </button>
               )}
@@ -432,9 +421,7 @@ export default function DraftDoctors() {
                     : () => navigate("/add-doctor")
                 }
               >
-                {doctorData.length
-                  ? "Clear Filters"
-                  : "Add New Doctor"}
+                {doctorData.length ? "Clear Filters" : "Add New Doctor"}
               </button>
             </div>
           ) : (
@@ -444,10 +431,7 @@ export default function DraftDoctors() {
 
             <div className="draft-doctors">
               {filteredData.map((doctor) => (
-                <div
-                  className="draft-doctor"
-                  key={doctor._id}
-                >
+                <div className="draft-doctor" key={doctor._id}>
                   {/* -----------------------------------------
                       DOCTOR
                   ----------------------------------------- */}
@@ -459,24 +443,15 @@ export default function DraftDoctors() {
 
                     <div className="draft-doctor-name">
                       <div className="draft-name-line">
-                        <h3>
-                          {doctor.doctorName || "Unnamed Doctor"}
-                        </h3>
+                        <h3>{doctor.doctorName || "Unnamed Doctor"}</h3>
 
-                        <span className="draft-badge">
-                          Draft
-                        </span>
+                        <span className="draft-badge">Draft</span>
                       </div>
 
-                      <p>
-                        {doctor.speciality ||
-                          "Speciality not specified"}
-                      </p>
+                      <p>{doctor.speciality || "Speciality not specified"}</p>
 
                       {doctor.mclCode && (
-                        <span className="draft-mcl">
-                          MCL {doctor.mclCode}
-                        </span>
+                        <span className="draft-mcl">MCL {doctor.mclCode}</span>
                       )}
                     </div>
                   </div>
@@ -493,20 +468,14 @@ export default function DraftDoctors() {
                     <div className="draft-field-content">
                       <label>CLINIC</label>
 
-                      <strong>
-                        {doctor.clinicName ||
-                          "Not specified"}
-                      </strong>
+                      <strong>{doctor.clinicName || "Not specified"}</strong>
 
                       <span>
                         {doctor.area
                           ? `${doctor.area}${
-                              doctor.city
-                                ? `, ${doctor.city}`
-                                : ""
+                              doctor.city ? `, ${doctor.city}` : ""
                             }`
-                          : doctor.city ||
-                            "Location not specified"}
+                          : doctor.city || "Location not specified"}
                       </span>
                     </div>
                   </div>
@@ -523,16 +492,12 @@ export default function DraftDoctors() {
                     <div className="draft-field-content">
                       <label>CONTACT</label>
 
-                      <strong>
-                        {doctor.mobile ||
-                          "No mobile number"}
-                      </strong>
+                      <strong>{doctor.mobile || "No mobile number"}</strong>
 
                       <span className="draft-mail">
                         <Mail size={15} />
 
-                        {doctor.email ||
-                          "No email address"}
+                        {doctor.email || "No email address"}
                       </span>
                     </div>
                   </div>
@@ -543,9 +508,7 @@ export default function DraftDoctors() {
 
                   <div className="draft-field">
                     <div className="draft-field-icon">
-                      <span className="draft-rupee">
-                        ₹
-                      </span>
+                      <span className="draft-rupee">₹</span>
                     </div>
 
                     <div className="draft-field-content">
@@ -555,17 +518,13 @@ export default function DraftDoctors() {
                         <div>
                           <span>Current</span>
 
-                          <strong>
-                            {doctor.currentBusiness || "0"}
-                          </strong>
+                          <strong>{doctor.currentBusiness || "0"}</strong>
                         </div>
 
                         <div>
                           <span>Expected</span>
 
-                          <strong>
-                            {doctor.expectedBusiness || "0"}
-                          </strong>
+                          <strong>{doctor.expectedBusiness || "0"}</strong>
                         </div>
                       </div>
                     </div>
@@ -583,16 +542,11 @@ export default function DraftDoctors() {
                     <div className="draft-field-content">
                       <label>SAVED</label>
 
-                      <strong>
-                        {formatDate(doctor.createdAt)}
-                      </strong>
+                      <strong>{formatDate(doctor.createdAt)}</strong>
 
                       <span>
                         Modified{" "}
-                        {formatDate(
-                          doctor.updatedAt ||
-                            doctor.createdAt
-                        )}
+                        {formatDate(doctor.updatedAt || doctor.createdAt)}
                       </span>
                     </div>
                   </div>
@@ -605,11 +559,7 @@ export default function DraftDoctors() {
                     <button
                       type="button"
                       className="draft-edit"
-                      onClick={() =>
-                        navigate(
-                          `/edit-doctor/${doctor._id}`
-                        )
-                      }
+                      onClick={() => navigate(`/edit-doctor/${doctor._id}`)}
                     >
                       <Pencil size={17} />
                       Edit
@@ -619,10 +569,7 @@ export default function DraftDoctors() {
                       type="button"
                       className="draft-delete"
                       onClick={() =>
-                        openDeletePopup(
-                          doctor._id,
-                          doctor.doctorName
-                        )
+                        openDeletePopup(doctor._id, doctor.doctorName)
                       }
                     >
                       <Trash2 size={17} />
@@ -639,14 +586,8 @@ export default function DraftDoctors() {
         ===================================================== */}
 
         {deletePopup.isOpen && (
-          <div
-            className="draft-modal-overlay"
-            onClick={closeDeletePopup}
-          >
-            <div
-              className="draft-modal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="draft-modal-overlay" onClick={closeDeletePopup}>
+            <div className="draft-modal" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
                 className="draft-modal-close"
@@ -663,9 +604,7 @@ export default function DraftDoctors() {
 
               <p>
                 Are you sure you want to delete{" "}
-                <strong>
-                  {deletePopup.doctorName}
-                </strong>
+                <strong>{deletePopup.doctorName}</strong>
                 ?
                 <br />
                 This action cannot be undone.
@@ -699,7 +638,6 @@ export default function DraftDoctors() {
       ======================================================= */}
 
       <style>{`
-
         /* =====================================================
            PAGE
         ===================================================== */
@@ -712,9 +650,7 @@ export default function DraftDoctors() {
 
           width: 100%;
           max-width: 1450px;
-
           margin: 0 auto;
-
           animation: draftIn .25s ease;
         }
 
@@ -725,13 +661,9 @@ export default function DraftDoctors() {
         .draft-breadcrumb {
           display: flex;
           align-items: center;
-
           gap: 6px;
-
           margin-bottom: 14px;
-
           color: #9aa8bd;
-
           font-size: 13px;
         }
 
@@ -751,92 +683,66 @@ export default function DraftDoctors() {
           display: flex;
           align-items: flex-end;
           justify-content: space-between;
-
           gap: 20px;
-
           margin-bottom: 20px;
         }
 
         .draft-eyebrow {
           display: flex;
           align-items: center;
-
           gap: 8px;
-
           margin-bottom: 7px;
-
           color: var(--blue);
-
           font-size: 11px;
           font-weight: 850;
-
           letter-spacing: .09em;
         }
 
         .draft-eyebrow span {
           width: 8px;
           height: 8px;
-
           border-radius: 50%;
-
           background: var(--blue);
-
           box-shadow:
             0 0 0 4px rgba(7, 88, 247, .08);
         }
 
         .draft-header h1 {
           margin: 0;
-
           color: var(--navy);
-
           font-size: 30px;
           font-weight: 800;
-
           line-height: 1.1;
           letter-spacing: -.03em;
         }
 
         .draft-header p {
           margin: 8px 0 0;
-
           color: var(--muted);
-
           font-size: 14px;
         }
 
         .draft-add {
           height: 44px;
-
           display: inline-flex;
           align-items: center;
           justify-content: center;
-
           gap: 8px;
-
           padding: 0 18px;
-
           border: 1px solid var(--blue);
           border-radius: 9px;
-
           background: var(--blue);
-
           color: white;
-
           font-size: 13px;
           font-weight: 750;
-
           cursor: pointer;
-
           box-shadow:
             0 7px 18px rgba(7, 88, 247, .15);
-
           transition: .2s ease;
         }
 
         .draft-add:hover {
           transform: translateY(-1px);
-
           box-shadow:
             0 10px 24px rgba(7, 88, 247, .2);
         }
@@ -847,27 +753,21 @@ export default function DraftDoctors() {
 
         .draft-stats {
           display: grid;
-
           grid-template-columns:
             1.3fr
             1fr
             1fr;
-
           gap: 12px;
-
           margin-bottom: 18px;
         }
 
         .draft-stat {
-          min-height: 94px;
-
-          padding: 16px 18px;
-
+          min-height: 82px;
+          box-sizing: border-box;
+          padding: 11px 16px;
           border: 1px solid var(--border);
           border-radius: 12px;
-
           background: white;
-
           box-shadow:
             0 4px 16px rgba(24, 55, 112, .04);
         }
@@ -875,53 +775,40 @@ export default function DraftDoctors() {
         .draft-stat-main {
           display: flex;
           align-items: center;
-
-          gap: 13px;
+          gap: 11px;
         }
 
         .draft-stat-icon {
-          width: 45px;
-          height: 45px;
-
-          flex: 0 0 45px;
-
+          width: 40px;
+          height: 40px;
+          flex: 0 0 40px;
           display: grid;
           place-items: center;
-
           border: 1px solid #dce8ff;
           border-radius: 11px;
-
           background: #eef4ff;
-
           color: var(--blue);
         }
 
         .draft-stat span {
           color: var(--muted);
-
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 700;
         }
 
         .draft-stat strong {
           display: block;
-
-          margin-top: 5px;
-
+          margin-top: 4px;
           color: var(--navy);
-
-          font-size: 26px;
+          font-size: 23px;
           line-height: 1;
         }
 
         .draft-stat small {
           display: block;
-
-          margin-top: 6px;
-
+          margin-top: 4px;
           color: #9aa8bd;
-
-          font-size: 11px;
+          font-size: 10px;
         }
 
         .draft-stat-heading {
@@ -940,12 +827,9 @@ export default function DraftDoctors() {
 
         .draft-panel {
           overflow: hidden;
-
           border: 1px solid var(--border);
           border-radius: 14px;
-
           background: white;
-
           box-shadow:
             0 6px 22px rgba(24, 55, 112, .05);
         }
@@ -954,36 +838,27 @@ export default function DraftDoctors() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-
           padding: 19px 21px 15px;
         }
 
         .draft-panel-header h2 {
           margin: 0;
-
           color: var(--navy);
-
           font-size: 18px;
           font-weight: 800;
         }
 
         .draft-panel-header p {
           margin: 5px 0 0;
-
           color: var(--muted);
-
           font-size: 12px;
         }
 
         .draft-count {
           padding: 7px 11px;
-
           border-radius: 999px;
-
           background: #eef4ff;
-
           color: var(--blue);
-
           font-size: 11px;
           font-weight: 800;
         }
@@ -994,15 +869,12 @@ export default function DraftDoctors() {
 
         .draft-filters {
           display: grid;
-
           grid-template-columns:
             minmax(300px, 1fr)
             190px
             175px
             auto;
-
           gap: 9px;
-
           padding: 0 21px 18px;
         }
 
@@ -1010,27 +882,19 @@ export default function DraftDoctors() {
         .draft-filters select,
         .draft-date {
           height: 42px;
-
           border: 1px solid var(--border);
           border-radius: 9px;
-
           background: #fbfdff;
-
           color: #475569;
-
           font-size: 12px;
-
           outline: none;
         }
 
         .draft-search {
           display: flex;
           align-items: center;
-
           gap: 9px;
-
           padding: 0 11px;
-
           color: #8b9ab2;
         }
 
@@ -1038,23 +902,17 @@ export default function DraftDoctors() {
         .draft-filters select:focus,
         .draft-date:focus-within {
           border-color: #9ab8f7;
-
           background: white;
-
           box-shadow:
             0 0 0 3px rgba(7, 88, 247, .07);
         }
 
         .draft-search input {
           width: 100%;
-
           border: 0;
           outline: 0;
-
           background: transparent;
-
           color: #1e293b;
-
           font-size: 12px;
         }
 
@@ -1064,45 +922,32 @@ export default function DraftDoctors() {
 
         .draft-search button {
           border: 0;
-
           background: transparent;
-
           color: #94a3b8;
-
           cursor: pointer;
         }
 
         .draft-filters > select {
           width: 100%;
-
           padding: 0 11px;
-
           cursor: pointer;
         }
 
         .draft-date {
           display: flex;
           align-items: center;
-
           gap: 7px;
-
           padding: 0 10px;
-
           color: #8b9ab2;
         }
 
         .draft-date select {
           width: 100%;
-
           border: 0;
           outline: 0;
-
           background: transparent;
-
           color: #475569;
-
           font-size: 12px;
-
           cursor: pointer;
         }
 
@@ -1110,23 +955,15 @@ export default function DraftDoctors() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-
           gap: 7px;
-
           height: 42px;
-
           padding: 0 12px;
-
           border: 1px solid var(--border);
           border-radius: 9px;
-
           background: white;
-
           color: #64748b;
-
           font-size: 11px;
           font-weight: 700;
-
           cursor: pointer;
         }
 
@@ -1142,13 +979,9 @@ export default function DraftDoctors() {
         .draft-doctors {
           display: flex;
           flex-direction: column;
-
           gap: 9px;
-
           padding: 0 21px 21px;
-
           background: #f8faff;
-
           border-top: 1px solid #edf2fa;
         }
 
@@ -1159,25 +992,16 @@ export default function DraftDoctors() {
         .draft-doctor {
           display: flex;
           align-items: center;
-
           width: 100%;
-
           min-height: 124px;
-
           margin-top: 9px;
-
           padding: 16px;
-
           box-sizing: border-box;
-
           border: 1px solid #dfe8f6;
           border-radius: 12px;
-
           background: white;
-
           box-shadow:
             0 2px 8px rgba(24, 55, 112, .03);
-
           transition:
             border-color .18s ease,
             box-shadow .18s ease;
@@ -1185,7 +1009,6 @@ export default function DraftDoctors() {
 
         .draft-doctor:hover {
           border-color: #c9d8ed;
-
           box-shadow:
             0 5px 15px rgba(24, 55, 112, .06);
         }
@@ -1197,33 +1020,23 @@ export default function DraftDoctors() {
         .draft-doctor-identity {
           width: 260px;
           min-width: 260px;
-
           display: flex;
           align-items: center;
-
           gap: 12px;
-
           padding-right: 17px;
-
           border-right: 1px solid #edf2f8;
         }
 
         .draft-avatar {
           width: 48px;
           height: 48px;
-
           flex: 0 0 48px;
-
           display: grid;
           place-items: center;
-
           border: 1px solid #d8e5ff;
           border-radius: 12px;
-
           background: #eef4ff;
-
           color: var(--blue);
-
           font-size: 13px;
           font-weight: 850;
         }
@@ -1235,68 +1048,47 @@ export default function DraftDoctors() {
         .draft-name-line {
           display: flex;
           align-items: center;
-
           gap: 7px;
         }
 
         .draft-doctor-name h3 {
           margin: 0;
-
           overflow: hidden;
-
           color: #172554;
-
           font-size: 15px;
           font-weight: 800;
-
           line-height: 1.3;
-
           text-overflow: ellipsis;
           white-space: nowrap;
         }
 
         .draft-doctor-name p {
           margin: 5px 0 0;
-
           overflow: hidden;
-
           color: #64748b;
-
           font-size: 12px;
           line-height: 1.35;
-
           text-overflow: ellipsis;
           white-space: nowrap;
         }
 
         .draft-badge {
           flex: 0 0 auto;
-
           padding: 4px 8px;
-
           border-radius: 999px;
-
           background: #fff7ed;
-
           color: #c2410c;
-
           font-size: 10px;
           font-weight: 800;
         }
 
         .draft-mcl {
           display: inline-block;
-
           margin-top: 5px;
-
           padding: 3px 7px;
-
           border-radius: 5px;
-
           background: #f3f6fb;
-
           color: #7b8aa2;
-
           font-size: 10px;
           font-weight: 700;
         }
@@ -1307,33 +1099,23 @@ export default function DraftDoctors() {
 
         .draft-field {
           flex: 1 1 0;
-
           min-width: 0;
-
           display: flex;
           align-items: center;
-
           gap: 10px;
-
           padding: 0 15px;
-
           border-right: 1px solid #edf2f8;
         }
 
         .draft-field-icon {
           width: 34px;
           height: 34px;
-
           flex: 0 0 34px;
-
           display: grid;
           place-items: center;
-
           border: 1px solid #e1e9f6;
           border-radius: 9px;
-
           background: #f6f8fc;
-
           color: #8092b3;
         }
 
@@ -1343,46 +1125,31 @@ export default function DraftDoctors() {
 
         .draft-field-content label {
           display: block;
-
           margin-bottom: 5px;
-
           color: #8b9ab2;
-
           font-size: 10px;
           font-weight: 850;
-
           letter-spacing: .06em;
         }
 
         .draft-field-content strong {
           display: block;
-
           overflow: hidden;
-
           color: #334155;
-
           font-size: 13px;
           font-weight: 750;
-
           line-height: 1.4;
-
           text-overflow: ellipsis;
           white-space: nowrap;
         }
 
         .draft-field-content span {
           display: block;
-
           margin-top: 4px;
-
           overflow: hidden;
-
           color: #7d8da6;
-
           font-size: 11px;
-
           line-height: 1.4;
-
           text-overflow: ellipsis;
           white-space: nowrap;
         }
@@ -1390,9 +1157,7 @@ export default function DraftDoctors() {
         .draft-mail {
           display: flex !important;
           align-items: center;
-
           gap: 4px;
-
           font-size: 11px !important;
         }
 
@@ -1402,35 +1167,29 @@ export default function DraftDoctors() {
 
         .draft-business {
           display: flex;
-
           gap: 18px;
         }
 
         .draft-business > div {
           display: flex;
           flex-direction: column;
-
           gap: 2px;
         }
 
         .draft-business span {
           margin: 0;
-
           color: #8b9ab2;
-
           font-size: 9px !important;
         }
 
         .draft-business strong {
           color: #243b72;
-
           font-size: 13px !important;
           font-weight: 800;
         }
 
         .draft-rupee {
           color: #627cae;
-
           font-size: 17px;
           font-weight: 800;
         }
@@ -1442,33 +1201,23 @@ export default function DraftDoctors() {
         .draft-actions {
           display: flex;
           align-items: center;
-
           gap: 7px;
-
           padding-left: 15px;
         }
 
         .draft-edit {
           height: 36px;
-
           display: inline-flex;
           align-items: center;
           justify-content: center;
-
           gap: 6px;
-
           padding: 0 12px;
-
           border: 1px solid #d7e4ff;
           border-radius: 8px;
-
           background: #eef4ff;
-
           color: var(--blue);
-
           font-size: 11px;
           font-weight: 750;
-
           cursor: pointer;
         }
 
@@ -1479,17 +1228,12 @@ export default function DraftDoctors() {
         .draft-delete {
           width: 36px;
           height: 36px;
-
           display: grid;
           place-items: center;
-
           border: 1px solid #fee2e2;
           border-radius: 8px;
-
           background: #fff7f7;
-
           color: #dc2626;
-
           cursor: pointer;
         }
 
@@ -1503,69 +1247,49 @@ export default function DraftDoctors() {
 
         .draft-empty {
           min-height: 280px;
-
           margin: 0 21px 21px;
-
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-
           text-align: center;
-
           border: 1px dashed #cbd8ed;
           border-radius: 11px;
-
           background: #fbfdff;
         }
 
         .draft-empty-icon {
           width: 54px;
           height: 54px;
-
           display: grid;
           place-items: center;
-
           margin-bottom: 12px;
-
           border-radius: 13px;
-
           background: #eef4ff;
-
           color: var(--blue);
         }
 
         .draft-empty h3 {
           margin: 0;
-
           color: #1e293b;
-
           font-size: 16px;
         }
 
         .draft-empty p {
           margin: 7px 0 15px;
-
           color: #8a98ad;
-
           font-size: 12px;
         }
 
         .draft-outline {
           min-height: 38px;
-
           padding: 0 15px;
-
           border: 1px solid var(--border);
           border-radius: 8px;
-
           background: white;
-
           color: #475569;
-
           font-size: 11px;
           font-weight: 700;
-
           cursor: pointer;
         }
 
@@ -1575,27 +1299,20 @@ export default function DraftDoctors() {
 
         .draft-loading {
           min-height: 60vh;
-
           display: grid;
           place-items: center;
           align-content: center;
-
           gap: 10px;
-
           color: var(--muted);
-
           font-size: 13px;
         }
 
         .draft-spinner {
           width: 29px;
           height: 29px;
-
           border: 3px solid #dbe5f6;
           border-top-color: var(--blue);
-
           border-radius: 50%;
-
           animation: draftSpin .7s linear infinite;
         }
 
@@ -1605,91 +1322,62 @@ export default function DraftDoctors() {
 
         .draft-modal-overlay {
           position: fixed;
-
           inset: 0;
-
           z-index: 9999;
-
           display: grid;
           place-items: center;
-
           padding: 20px;
-
           background: rgba(6, 24, 95, .35);
-
           backdrop-filter: blur(4px);
         }
 
         .draft-modal {
           position: relative;
-
           width: min(420px, 100%);
-
           padding: 30px;
-
           border-radius: 16px;
-
           background: white;
-
           box-shadow:
             0 25px 70px rgba(6, 24, 95, .23);
-
           text-align: center;
         }
 
         .draft-modal-close {
           position: absolute;
-
           top: 12px;
           right: 12px;
-
           width: 32px;
           height: 32px;
-
           display: grid;
           place-items: center;
-
           border: 0;
           border-radius: 8px;
-
           background: transparent;
-
           color: #94a3b8;
-
           cursor: pointer;
         }
 
         .draft-warning {
           width: 60px;
           height: 60px;
-
           display: grid;
           place-items: center;
-
           margin: 0 auto 15px;
-
           border-radius: 15px;
-
           background: #fff1f2;
-
           color: #dc2626;
         }
 
         .draft-modal h2 {
           margin: 0;
-
           color: #172554;
-
           font-size: 20px;
         }
 
         .draft-modal p {
           margin: 9px auto 22px;
-
           color: #64748b;
-
           font-size: 13px;
-
           line-height: 1.6;
         }
 
@@ -1699,31 +1387,23 @@ export default function DraftDoctors() {
 
         .draft-modal-actions {
           display: flex;
-
           justify-content: center;
-
           gap: 9px;
         }
 
         .draft-cancel,
         .draft-confirm {
           min-height: 40px;
-
           border-radius: 9px;
-
           font-size: 12px;
           font-weight: 750;
-
           cursor: pointer;
         }
 
         .draft-cancel {
           padding: 0 17px;
-
           border: 1px solid var(--border);
-
           background: white;
-
           color: #475569;
         }
 
@@ -1731,15 +1411,10 @@ export default function DraftDoctors() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-
           gap: 7px;
-
           padding: 0 16px;
-
           border: 1px solid #dc2626;
-
           background: #dc2626;
-
           color: white;
         }
 
@@ -1785,7 +1460,6 @@ export default function DraftDoctors() {
 
           .draft-field {
             flex: 1 1 180px;
-
             min-height: 52px;
           }
 
@@ -1805,7 +1479,6 @@ export default function DraftDoctors() {
         @media (max-width: 800px) {
           .draft-header {
             align-items: flex-start;
-
             flex-direction: column;
           }
 
@@ -1831,40 +1504,30 @@ export default function DraftDoctors() {
 
           .draft-doctor {
             display: grid;
-
             grid-template-columns: 1fr 1fr;
-
             gap: 0;
-
             padding: 14px;
           }
 
           .draft-doctor-identity {
             width: auto;
             min-width: 0;
-
             grid-column: 1 / -1;
-
             padding: 0 0 13px;
-
             border-right: 0;
             border-bottom: 1px solid #edf2f8;
-
             margin-bottom: 4px;
           }
 
           .draft-field {
             padding: 12px 9px;
-
             border-right: 0;
             border-bottom: 1px solid #edf2f8;
           }
 
           .draft-actions {
             grid-column: 1 / -1;
-
             padding: 12px 0 0;
-
             margin: 0;
           }
 
@@ -1892,9 +1555,7 @@ export default function DraftDoctors() {
 
           .draft-panel-header {
             align-items: flex-start;
-
             flex-direction: column;
-
             gap: 10px;
           }
 
@@ -1914,7 +1575,6 @@ export default function DraftDoctors() {
             grid-column: auto;
           }
         }
-
       `}</style>
     </Layout>
   );
