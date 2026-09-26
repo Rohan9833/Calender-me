@@ -34,6 +34,7 @@ app.use("/api/createdoc", doctorroutes);
 app.use("/api/doctors", doctorroutes);
 app.use("/api/manager", managerRoutes);
 app.use("/api/calendar", calendarRoutes);
+
 app.use("/uploads/doctors", express.static(path.join(__dirname, "uploads/doctors")));
 app.get("/", (req, res) => {
   res.send("API Running...");
