@@ -46,6 +46,7 @@ export default function ProfileEdit() {
     region: "",
     zone: "",
   });
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -71,13 +72,21 @@ export default function ProfileEdit() {
 
   useEffect(() => {
     const loadProfile = async () => {
-      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const storedUser = JSON.parse(
+        localStorage.getItem("user") || "{}",
+      );
 
       setUser(storedUser);
 
-      const storedRole = String(storedUser?.role || "mr").toLowerCase();
-      const storedConfig = ROLE_CONFIG[storedRole] || ROLE_CONFIG.mr;
-      const storedUserId = storedUser?.[storedConfig.idField];
+      const storedRole = String(
+        storedUser?.role || "mr",
+      ).toLowerCase();
+
+      const storedConfig =
+        ROLE_CONFIG[storedRole] || ROLE_CONFIG.mr;
+
+      const storedUserId =
+        storedUser?.[storedConfig.idField];
 
       if (!storedUserId) {
         setForm({
@@ -86,16 +95,22 @@ export default function ProfileEdit() {
           region: storedUser?.region || "",
           zone: storedUser?.zone || "",
         });
+
         setLoading(false);
         setError("User ID was not found.");
         return;
       }
 
       try {
-        const response = await getProfile(storedRole, storedUserId);
+        const response = await getProfile(
+          storedRole,
+          storedUserId,
+        );
+
         const profile = response?.user || storedUser;
 
         setUser(profile);
+
         setForm({
           name: profile?.[storedConfig.nameField] || "",
           hq: profile?.hq || "",
@@ -103,7 +118,10 @@ export default function ProfileEdit() {
           zone: profile?.zone || "",
         });
 
-        localStorage.setItem("user", JSON.stringify(profile));
+        localStorage.setItem(
+          "user",
+          JSON.stringify(profile),
+        );
       } catch (err) {
         console.error("Failed to load profile:", err);
 
@@ -114,7 +132,9 @@ export default function ProfileEdit() {
           zone: storedUser?.zone || "",
         });
 
-        setError("Could not load the latest profile data.");
+        setError(
+          "Could not load the latest profile data.",
+        );
       } finally {
         setLoading(false);
       }
@@ -143,7 +163,12 @@ export default function ProfileEdit() {
       return;
     }
 
-    if (!form.name.trim() || !form.hq.trim() || !form.region.trim() || !form.zone.trim()) {
+    if (
+      !form.name.trim() ||
+      !form.hq.trim() ||
+      !form.region.trim() ||
+      !form.zone.trim()
+    ) {
       setError("Please fill in all four fields.");
       return;
     }
@@ -153,18 +178,26 @@ export default function ProfileEdit() {
     setError("");
 
     try {
-      const response = await updateProfile(role, userId, {
-        name: form.name.trim(),
-        hq: form.hq.trim(),
-        region: form.region.trim(),
-        zone: form.zone.trim(),
-      });
+      const response = await updateProfile(
+        role,
+        userId,
+        {
+          name: form.name.trim(),
+          hq: form.hq.trim(),
+          region: form.region.trim(),
+          zone: form.zone.trim(),
+        },
+      );
 
       const updatedUser = response?.user;
 
       if (updatedUser) {
         setUser(updatedUser);
-        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify(updatedUser),
+        );
       } else {
         const localUser = {
           ...user,
@@ -175,7 +208,11 @@ export default function ProfileEdit() {
         };
 
         setUser(localUser);
-        localStorage.setItem("user", JSON.stringify(localUser));
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify(localUser),
+        );
       }
 
       setSaved(true);
@@ -196,60 +233,35 @@ export default function ProfileEdit() {
   return (
     <Layout active="Profile">
       <div className="profile-page">
-        <div className="profile-topbar">
+        {/* TOP NAVIGATION */}
+
+
+        {/* BREADCRUMB */}
+        <div className="profile-breadcrumb">
           <button
             type="button"
-            className="profile-back"
             onClick={goToDashboard}
           >
-            <ArrowLeft size={16} />
             Dashboard
           </button>
 
-          <nav className="profile-nav">
-            <button type="button" onClick={goToDashboard}>
-              <LayoutDashboard size={15} />
-              Dashboard
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigate("/all-doctors")}
-            >
-              <Users size={15} />
-              My Doctors
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigate("/input-given")}
-            >
-              <MapPin size={15} />
-              Input Given
-            </button>
-
-            <button type="button" className="active">
-              <User size={15} />
-              Profile
-            </button>
-          </nav>
-        </div>
-
-        <div className="profile-breadcrumb">
-          <button type="button" onClick={goToDashboard}>
-            Dashboard
-          </button>
           <span>/</span>
+
           <strong>Profile</strong>
         </div>
 
+        {/* HERO */}
         <section className="profile-hero">
           <div>
-            <span className="profile-eyebrow">ACCOUNT SETTINGS</span>
+            <span className="profile-eyebrow">
+              ACCOUNT SETTINGS
+            </span>
+
             <h1>Edit Profile</h1>
+
             <p>
-              Update your basic workspace information. Only these four fields
-              can be edited.
+              Update your  workspace information.
+            
             </p>
           </div>
 
@@ -258,23 +270,34 @@ export default function ProfileEdit() {
           </div>
         </section>
 
+        {/* SUCCESS MESSAGE */}
         {saved && (
           <div className="profile-message success">
             <CheckCircle2 size={17} />
-            <span>Profile updated successfully.</span>
+
+            <span>
+              Profile updated successfully.
+            </span>
           </div>
         )}
 
+        {/* ERROR MESSAGE */}
         {error && (
           <div className="profile-message error">
             <span>{error}</span>
           </div>
         )}
 
+        {/* CONTENT */}
         <div className="profile-content">
+          {/* SUMMARY */}
           <aside className="profile-summary">
-            <div className="summary-avatar">{initials}</div>
+            <div className="summary-avatar">
+              {initials}
+            </div>
+
             <h2>{displayName}</h2>
+
             <span className="summary-role">
               {role.toUpperCase()}
             </span>
@@ -283,31 +306,48 @@ export default function ProfileEdit() {
 
             <div className="summary-item">
               <span>Employee ID</span>
-              <strong>{user?.[config.idField] || "—"}</strong>
+
+              <strong>
+                {user?.[config.idField] || "—"}
+              </strong>
             </div>
 
             <div className="summary-item">
               <span>HQ</span>
-              <strong>{form.hq || "—"}</strong>
+
+              <strong>
+                {form.hq || "—"}
+              </strong>
             </div>
 
             <div className="summary-item">
               <span>Region</span>
-              <strong>{form.region || "—"}</strong>
+
+              <strong>
+                {form.region || "—"}
+              </strong>
             </div>
 
             <div className="summary-item">
               <span>Zone</span>
-              <strong>{form.zone || "—"}</strong>
+
+              <strong>
+                {form.zone || "—"}
+              </strong>
             </div>
           </aside>
 
+          {/* EDIT CARD */}
           <main className="profile-card">
             <div className="profile-card-header">
               <div>
                 <h2>Profile Information</h2>
-                <p>Edit the four profile fields below.</p>
+
+                <p>
+                  Edit the four profile fields below.
+                </p>
               </div>
+
               <div className="profile-card-icon">
                 <User size={19} />
               </div>
@@ -315,10 +355,15 @@ export default function ProfileEdit() {
 
             <form onSubmit={handleSubmit}>
               <div className="profile-fields">
+                {/* NAME */}
                 <div className="profile-field">
-                  <label htmlFor="profile-name">Name</label>
+                  <label htmlFor="profile-name">
+                    Name
+                  </label>
+
                   <div className="profile-input">
                     <User size={17} />
+
                     <input
                       id="profile-name"
                       type="text"
@@ -331,10 +376,15 @@ export default function ProfileEdit() {
                   </div>
                 </div>
 
+                {/* HQ */}
                 <div className="profile-field">
-                  <label htmlFor="profile-hq">HQ</label>
+                  <label htmlFor="profile-hq">
+                    HQ
+                  </label>
+
                   <div className="profile-input">
                     <MapPin size={17} />
+
                     <input
                       id="profile-hq"
                       type="text"
@@ -347,10 +397,15 @@ export default function ProfileEdit() {
                   </div>
                 </div>
 
+                {/* REGION */}
                 <div className="profile-field">
-                  <label htmlFor="profile-region">Region</label>
+                  <label htmlFor="profile-region">
+                    Region
+                  </label>
+
                   <div className="profile-input">
                     <MapPin size={17} />
+
                     <input
                       id="profile-region"
                       type="text"
@@ -363,10 +418,15 @@ export default function ProfileEdit() {
                   </div>
                 </div>
 
+                {/* ZONE */}
                 <div className="profile-field">
-                  <label htmlFor="profile-zone">Zone</label>
+                  <label htmlFor="profile-zone">
+                    Zone
+                  </label>
+
                   <div className="profile-input">
                     <MapPin size={17} />
+
                     <input
                       id="profile-zone"
                       type="text"
@@ -380,6 +440,7 @@ export default function ProfileEdit() {
                 </div>
               </div>
 
+              {/* ACTIONS */}
               <div className="profile-actions">
                 <button
                   type="button"
@@ -395,7 +456,10 @@ export default function ProfileEdit() {
                   disabled={loading || saving}
                 >
                   <Save size={16} />
-                  {saving ? "Saving..." : "Save Changes"}
+
+                  {saving
+                    ? "Saving..."
+                    : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -411,6 +475,10 @@ export default function ProfileEdit() {
           padding: 8px 4px 40px;
         }
 
+        /* ==============================
+           TOP BAR
+        ============================== */
+
         .profile-topbar {
           display: flex;
           align-items: center;
@@ -418,8 +486,8 @@ export default function ProfileEdit() {
           gap: 18px;
           padding: 8px;
           margin-bottom: 14px;
-          background: #fff;
-          border: 1px solid #e8edf3;
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
           border-radius: 13px;
           box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
         }
@@ -438,18 +506,25 @@ export default function ProfileEdit() {
           font-size: 11px;
           font-weight: 650;
           cursor: pointer;
+          transition: all 0.18s ease;
         }
 
         .profile-back {
           padding: 0 11px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid #dbe4f0;
+        }
+
+        .profile-back:hover {
+          color: #2563eb;
+          border-color: #bfdbfe;
+          background: #eff6ff;
         }
 
         .profile-nav {
           display: flex;
           gap: 3px;
           padding: 3px;
-          background: #f8fafc;
+          background: #f1f5f9;
           border-radius: 9px;
         }
 
@@ -459,10 +534,14 @@ export default function ProfileEdit() {
 
         .profile-nav button:hover,
         .profile-nav button.active {
-          color: #c2410c;
-          background: #fff;
-          box-shadow: 0 2px 7px rgba(15, 23, 42, 0.07);
+          color: #2563eb;
+          background: #ffffff;
+          box-shadow: 0 2px 7px rgba(37, 99, 235, 0.12);
         }
+
+        /* ==============================
+           BREADCRUMB
+        ============================== */
 
         .profile-breadcrumb {
           display: flex;
@@ -482,9 +561,17 @@ export default function ProfileEdit() {
           font-size: 10px;
         }
 
+        .profile-breadcrumb button:hover {
+          color: #2563eb;
+        }
+
         .profile-breadcrumb strong {
           color: #475569;
         }
+
+        /* ==============================
+           HERO
+        ============================== */
 
         .profile-hero {
           display: flex;
@@ -493,13 +580,18 @@ export default function ProfileEdit() {
           min-height: 150px;
           padding: 28px 32px;
           margin-bottom: 14px;
-          border: 1px solid #e8edf3;
+          border: 1px solid #dbeafe;
           border-radius: 16px;
-          background: linear-gradient(135deg, #fff, #fff8f3);
+          background:
+            linear-gradient(
+              135deg,
+              #ffffff 0%,
+              #eff6ff 100%
+            );
         }
 
         .profile-eyebrow {
-          color: #f47a32;
+          color: #2563eb;
           font-size: 9px;
           font-weight: 800;
           letter-spacing: 0.12em;
@@ -515,10 +607,14 @@ export default function ProfileEdit() {
         .profile-hero p {
           max-width: 590px;
           margin: 0;
-          color: #7b8797;
+          color: #64748b;
           font-size: 11px;
           line-height: 1.7;
         }
+
+        /* ==============================
+           AVATARS
+        ============================== */
 
         .profile-avatar,
         .summary-avatar {
@@ -526,8 +622,12 @@ export default function ProfileEdit() {
           align-items: center;
           justify-content: center;
           border-radius: 50%;
-          color: #fff;
-          background: #f47a32;
+          color: #ffffff;
+          background: linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+          );
           font-weight: 800;
         }
 
@@ -535,8 +635,13 @@ export default function ProfileEdit() {
           width: 72px;
           height: 72px;
           font-size: 22px;
-          box-shadow: 0 10px 25px rgba(244, 122, 50, 0.2);
+          box-shadow:
+            0 10px 25px rgba(37, 99, 235, 0.22);
         }
+
+        /* ==============================
+           MESSAGES
+        ============================== */
 
         .profile-message {
           display: flex;
@@ -561,6 +666,10 @@ export default function ProfileEdit() {
           border: 1px solid #fecaca;
         }
 
+        /* ==============================
+           MAIN CONTENT
+        ============================== */
+
         .profile-content {
           display: grid;
           grid-template-columns: 250px minmax(0, 1fr);
@@ -569,11 +678,16 @@ export default function ProfileEdit() {
 
         .profile-summary,
         .profile-card {
-          background: #fff;
-          border: 1px solid #e8edf3;
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
           border-radius: 15px;
-          box-shadow: 0 4px 16px rgba(15, 23, 42, 0.035);
+          box-shadow:
+            0 4px 16px rgba(15, 23, 42, 0.035);
         }
+
+        /* ==============================
+           SUMMARY
+        ============================== */
 
         .profile-summary {
           padding: 22px;
@@ -593,7 +707,7 @@ export default function ProfileEdit() {
         }
 
         .summary-role {
-          color: #f47a32;
+          color: #2563eb;
           font-size: 9px;
           font-weight: 800;
           letter-spacing: 0.08em;
@@ -602,7 +716,7 @@ export default function ProfileEdit() {
         .summary-divider {
           height: 1px;
           margin: 20px 0 4px;
-          background: #edf0f4;
+          background: #e2e8f0;
         }
 
         .summary-item {
@@ -617,7 +731,7 @@ export default function ProfileEdit() {
         .summary-item span {
           display: block;
           margin-bottom: 4px;
-          color: #9aa4b2;
+          color: #94a3b8;
           font-size: 9px;
         }
 
@@ -627,12 +741,16 @@ export default function ProfileEdit() {
           font-size: 11px;
         }
 
+        /* ==============================
+           PROFILE CARD
+        ============================== */
+
         .profile-card-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 21px 23px;
-          border-bottom: 1px solid #edf0f4;
+          border-bottom: 1px solid #e2e8f0;
         }
 
         .profile-card-header h2 {
@@ -654,13 +772,20 @@ export default function ProfileEdit() {
           width: 38px;
           height: 38px;
           border-radius: 10px;
-          color: #f47a32;
-          background: #fff4ec;
+          color: #2563eb;
+          background: #eff6ff;
         }
+
+        /* ==============================
+           FIELDS
+        ============================== */
 
         .profile-fields {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(
+            2,
+            minmax(0, 1fr)
+          );
           gap: 18px;
           padding: 23px;
         }
@@ -679,24 +804,30 @@ export default function ProfileEdit() {
           gap: 9px;
           height: 42px;
           padding: 0 12px;
-          border: 1px solid #dfe5ec;
+          border: 1px solid #dbe2ea;
           border-radius: 9px;
-          background: #fff;
-          transition: border-color .18s ease, box-shadow .18s ease;
+          background: #ffffff;
+          transition:
+            border-color 0.18s ease,
+            box-shadow 0.18s ease,
+            background 0.18s ease;
         }
 
         .profile-input:focus-within {
-          border-color: #f47a32;
-          box-shadow: 0 0 0 3px rgba(244, 122, 50, .08);
+          border-color: #2563eb;
+          background: #ffffff;
+          box-shadow:
+            0 0 0 3px rgba(37, 99, 235, 0.10);
         }
 
         .profile-input svg {
           flex: 0 0 auto;
-          color: #a1acba;
+          color: #94a3b8;
+          transition: color 0.18s ease;
         }
 
         .profile-input:focus-within svg {
-          color: #f47a32;
+          color: #2563eb;
         }
 
         .profile-input input {
@@ -713,13 +844,17 @@ export default function ProfileEdit() {
           color: #b0b8c3;
         }
 
+        /* ==============================
+           ACTIONS
+        ============================== */
+
         .profile-actions {
           display: flex;
           justify-content: flex-end;
           gap: 9px;
           padding: 17px 23px;
-          border-top: 1px solid #edf0f4;
-          background: #fcfdfe;
+          border-top: 1px solid #e2e8f0;
+          background: #f8fafc;
           border-radius: 0 0 15px 15px;
         }
 
@@ -735,25 +870,49 @@ export default function ProfileEdit() {
           font-size: 10px;
           font-weight: 750;
           cursor: pointer;
+          transition: all 0.18s ease;
         }
 
         .profile-cancel {
           color: #475569;
-          background: #fff;
+          background: #ffffff;
           border: 1px solid #dce2e9;
         }
 
+        .profile-cancel:hover {
+          color: #2563eb;
+          border-color: #bfdbfe;
+          background: #eff6ff;
+        }
+
         .profile-save {
-          color: #fff;
-          background: #f47a32;
-          border: 1px solid #f47a32;
-          box-shadow: 0 5px 14px rgba(244, 122, 50, .18);
+          color: #ffffff;
+          background: #2563eb;
+          border: 1px solid #2563eb;
+          box-shadow:
+            0 5px 14px rgba(37, 99, 235, 0.20);
+        }
+
+        .profile-save:hover:not(:disabled) {
+          background: #1d4ed8;
+          border-color: #1d4ed8;
+          transform: translateY(-1px);
+          box-shadow:
+            0 7px 18px rgba(37, 99, 235, 0.25);
+        }
+
+        .profile-save:active:not(:disabled) {
+          transform: translateY(0);
         }
 
         .profile-save:disabled {
-          opacity: .6;
+          opacity: 0.6;
           cursor: not-allowed;
         }
+
+        /* ==============================
+           RESPONSIVE
+        ============================== */
 
         @media (max-width: 800px) {
           .profile-topbar {
