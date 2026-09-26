@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Pencil,
@@ -481,7 +483,7 @@ export default function DoctorDetail({ consentModal = false }) {
       );
       const downloadPromises = doctor.doctorPhotos.map(async (photo, index) => {
         const response = await fetch(
-          `https://calendarme.digilateral.com${photo.url}`,
+          `${API_BASE_URL}${photo.url}`,
         );
         const blob = await response.blob();
         const ext = photo.url.split(".").pop() || "jpg";
@@ -601,7 +603,7 @@ export default function DoctorDetail({ consentModal = false }) {
 
         const imagePromises = doctor.doctorPhotos.map((photo, index) => {
           return new Promise((resolve) => {
-            const imgUrl = `https://calendarme.digilateral.com${photo.url}`;
+            const imgUrl = `${API_BASE_URL}${photo.url}`;
             fetch(imgUrl)
               .then((res) => {
                 if (!res.ok) throw new Error("Failed to load");
@@ -972,13 +974,13 @@ export default function DoctorDetail({ consentModal = false }) {
                           }}
                           onClick={() =>
                             window.open(
-                              `https://calendarme.digilateral.com${photo.url}`,
+                              `${API_BASE_URL}${photo.url}`,
                               "_blank",
                             )
                           }
                         >
                           <img
-                            src={`https://calendarme.digilateral.com${photo.url}`}
+                            src={`${API_BASE_URL}${photo.url}`}
                             alt={`Photo ${idx + 1}`}
                             style={{
                               width: "100%",
