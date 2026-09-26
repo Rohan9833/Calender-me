@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import { FileText, Send, RotateCcw, UserPlus, X, CheckCircle, AlertCircle } from "lucide-react";
 import Layout from "../components/Layout";
 import {
@@ -71,7 +73,7 @@ export default function AddDoctor() {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
 
-      const response = await axios.post("https://calendarme.digilateral.com/api/createdoc", {
+      const response = await axios.post("${API_BASE_URL}/api/createdoc", {
         ...formData,
         mrId: user.mrId,
         status: "pending",
@@ -115,7 +117,7 @@ export default function AddDoctor() {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
 
-      await axios.post("https://calendarme.digilateral.com/api/createdoc", {
+      await axios.post("${API_BASE_URL}/api/createdoc", {
         ...formData,
         mrId: user.mrId,
         status: "draft",
