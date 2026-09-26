@@ -560,7 +560,7 @@ export default function AddDoctor() {
 
         .add-doctor-breadcrumb a { color: #0758f7; text-decoration: none; transition: color 0.2s ease, transform 0.2s ease; }
 
-        .add-doctor-breadcrumb a:hover { color: #0645c7; transform: translateX(2px); }
+        .add-doctor-breadcrumb a:hover { color: var(--navy); transform: translateX(2px); }
 
         .add-doctor-breadcrumb > span:last-child { color: #334155; }
 
