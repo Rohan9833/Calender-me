@@ -167,7 +167,7 @@ export default function Sidebar({
      <div 
         className="brand"
         style={{
-          padding: isOpen ? "20px 16px" : "20px 8px",
+          padding: isOpen ? "16px 16px" : "20px 8px",
           borderBottom: "1px solid #e5e7eb",
           display: "flex",
           alignItems: "center",
