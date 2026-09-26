@@ -1,11 +1,11 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import { FileText, Send, RotateCcw, UserPlus, X, CheckCircle, AlertCircle } from "lucide-react";
 import Layout from "../components/Layout";
 import {
-  Crumbs,
   Button,
   Field,
   SectionTitle,
@@ -161,7 +161,12 @@ export default function AddDoctor() {
 
   return (
     <Layout active="Add Doctor">
-      <Crumbs items={["Add Doctor"]} />
+      <div className="add-doctor-page">
+        <div className="add-doctor-breadcrumb" aria-label="Breadcrumb">
+          <Link to="/mr-dashboard">Dashboard</Link>
+          <span aria-hidden="true">›</span>
+          <span>Add Doctor</span>
+        </div>
       <h1>Add Doctor</h1>
       <p className="subtitle">Enter doctor details and campaign information.</p>
       <div className="formLayout">
@@ -548,7 +553,60 @@ export default function AddDoctor() {
     padding: 24px !important;
   }
 }
+      `}
+              .add-doctor-page { max-width: 1480px; margin: 0 auto; animation: addDoctorPageIn 0.45s ease-out both; }
+
+        .add-doctor-breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: #64748b; font-size: 12px; font-weight: 650; }
+
+        .add-doctor-breadcrumb a { color: #0758f7; text-decoration: none; transition: color 0.2s ease, transform 0.2s ease; }
+
+        .add-doctor-breadcrumb a:hover { color: #0645c7; transform: translateX(2px); }
+
+        .add-doctor-breadcrumb > span:last-child { color: #334155; }
+
+        .add-doctor-page > h1 { font-size: 26px; margin-bottom: 6px; }
+
+        .add-doctor-page > .subtitle { font-size: 14px; margin-bottom: 18px; }
+
+        .add-doctor-page .formLayout { grid-template-columns: minmax(0, 1fr) 280px; gap: 18px; }
+
+        .add-doctor-page .formCard { border-radius: 13px; padding: 18px; }
+
+        .add-doctor-page .sectionTitle { font-size: 15px; margin-bottom: 13px; }
+
+        .add-doctor-page .formGrid { gap: 14px; }
+
+        .add-doctor-page .field { gap: 6px; margin-bottom: 12px; }
+
+        .add-doctor-page .field span:first-child { font-size: 12px; }
+
+        .add-doctor-page .fakeInput { height: 40px; padding: 0 12px; font-size: 13px; }
+
+        .add-doctor-page .fakeInput.area { height: 76px; padding-top: 11px; }
+
+        .add-doctor-page .radio { padding-top: 7px; gap: 12px; font-size: 13px; }
+
+        .add-doctor-page .footerActions { gap: 10px; margin-top: 14px; }
+
+        .add-doctor-page .footerActions .btn { padding: 9px 14px; font-size: 13px; }
+
+        .add-doctor-page .rightInfo { gap: 12px; }
+
+        .add-doctor-page .infoCard { border-radius: 12px; padding: 15px; }
+
+        .add-doctor-page .infoCard h3 { font-size: 15px; margin-bottom: 9px; }
+
+        .add-doctor-page .infoCard p { font-size: 12px; margin: 8px 0; line-height: 1.45; }
+
+        .add-doctor-page .popup-container { max-width: 420px !important; padding: 26px !important; }
+
+        @keyframes addDoctorPageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 1200px) { .add-doctor-page .formLayout { grid-template-columns: minmax(0, 1fr) 250px; } }
+
+        @media (max-width: 768px) { .add-doctor-page .formLayout { grid-template-columns: 1fr !important; gap: 14px; } .add-doctor-page .formGrid.threeCol { grid-template-columns: 1fr !important; } }
       `}</style>
+      </div>
     </Layout>
   );
 }
