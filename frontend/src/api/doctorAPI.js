@@ -1,6 +1,8 @@
 import axios from "axios";
 import api from "./axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export const getDashboardData = async (mrId) => {
   const response = await api.get(`/doctors/dashboard/${mrId}`);
   return response.data;
@@ -62,6 +64,6 @@ export const getFrozenDoctors = async (mrId) => {
 };
 
 export const deleteDoctorPhoto = async (doctorId, photoId) => {
-  const response = await axios.delete(`https://calendarme.digilateral.com/api/doctors/${doctorId}/photos/${photoId}`);
+  const response = await axios.delete(`${API_BASE_URL}/api/doctors/${doctorId}/photos/${photoId}`);
   return response.data;
 };
