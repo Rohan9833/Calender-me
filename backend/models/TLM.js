@@ -19,7 +19,10 @@ const tlmSchema = new mongoose.Schema(
 
     hq: String,
 
+    region: String,
+
     zone: String,
+
     role: {
       type: String,
       default: "tlm",
