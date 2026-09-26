@@ -184,7 +184,8 @@ import jsPDF from "jspdf";
 import CalendarMonthGrid from "../components/CalendarMonthGrid";
 import { designAssets } from "../utils/designAssets";
 const CALENDAR_YEAR = 2027;
-const API_BASE = "https://calendarme.digilateral.com/api/calendar";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = `${API_BASE_URL}/api/calendar`;
 
 // ─── Popup Component ────────────────────────────────────
 // ─── Popup Component ────────────────────────────────────
@@ -2070,7 +2071,7 @@ console.log("🔍 filteredDesigns:", filteredDesigns);
   // Fetch doctor name
   useEffect(() => {
     if (CURRENT_DOCTOR_ID) {
-      fetch(`https://calendarme.digilateral.com/api/doctors/${CURRENT_DOCTOR_ID}`)
+      fetch(`${API_BASE_URL}/api/doctors/${CURRENT_DOCTOR_ID}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.doctorName) setDoctorName(data.doctorName);
@@ -2690,7 +2691,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
 
           // Fetch doctor details
           const doctorRes = await fetch(
-            `https://calendarme.digilateral.com/api/doctors/${CURRENT_DOCTOR_ID}`
+            `${API_BASE_URL}/api/doctors/${CURRENT_DOCTOR_ID}`
           );
           const doctorData = await doctorRes.json();
           setDoctorInfo(doctorData.doctor);
@@ -3075,7 +3076,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
 
           // Fetch doctor details
           const doctorRes = await fetch(
-            `https://calendarme.digilateral.com/api/doctors/${CURRENT_DOCTOR_ID}`,
+            `${API_BASE_URL}/api/doctors/${CURRENT_DOCTOR_ID}`,
           );
           const doctorData = await doctorRes.json();
           setDoctorInfo(doctorData.doctor); 

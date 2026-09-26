@@ -14,7 +14,8 @@ import { cls, months } from "../utils/helpers";
 import { designAssets } from "../utils/designAssets";
 
 const CALENDAR_YEAR = 2027;
-const API_BASE = "https://calendarme.digilateral.com/api/calendar";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = `${API_BASE_URL}/api/calendar`;
 
 export default function CalendarMonthGrid({ doctorId, mrId, isFrozen = false }) {
   const navigate = useNavigate();

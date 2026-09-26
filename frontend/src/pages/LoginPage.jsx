@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -21,7 +23,7 @@ export default function LoginPage({ forgot = false }) {
 const handleLogin = async () => {
   try {
     const response = await axios.post(
-      "https://calendarme.digilateral.com/api/auth/login",
+      `${API_BASE_URL}/api/auth/login`,
       {
         userId,
         password,

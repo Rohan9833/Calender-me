@@ -1,5 +1,7 @@
 // pages/EditDoctor.jsx
 import React, { useEffect, useState } from "react";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { Save, X, ArrowLeft } from "lucide-react";
@@ -83,7 +85,7 @@ export default function EditDoctor() {
       const user = JSON.parse(localStorage.getItem("user"));
       
       await axios.put(
-        `https://calendarme.digilateral.com/api/doctors/${doctorId}`,
+        `${API_BASE_URL}/api/doctors/${doctorId}`,
         {
           ...formData,
           mrId: user.mrId,
