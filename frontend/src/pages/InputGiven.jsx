@@ -4,7 +4,8 @@ import { CalendarDays, CheckCircle2, Clock3, Box, Info, ArrowLeft, Download, X, 
 import Layout from "../components/Layout";
 import { StatCard, Badge, Button, DataTable, Crumbs, SuccessBlock } from "../components/UIComponents";
 
-const API_BASE = "https://calendarme.digilateral.com/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = `${API_BASE_URL}/api`;
 
 export default function InputGiven({ modal = false, success = false }) {
   const navigate = useNavigate();
