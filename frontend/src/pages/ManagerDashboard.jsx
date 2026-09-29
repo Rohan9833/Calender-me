@@ -265,6 +265,7 @@ export default function ManagerDashboard() {
   const [loading, setLoading] = useState(true);
 
   const [refreshing, setRefreshing] = useState(false);
+  const [showAllMRs, setShowAllMRs] = useState(false);
 
   // ============================================================
   // FETCH DASHBOARD
@@ -596,7 +597,7 @@ export default function ManagerDashboard() {
 
                 <tbody>
                   {dashboard.mrPerformance?.length > 0 ? (
-                    dashboard.mrPerformance.map((mr, idx) => (
+                    (showAllMRs ? dashboard.mrPerformance : dashboard.mrPerformance.slice(0, 5)).map((mr, idx) => (
                       <tr key={idx}>
                         <td>
                           <div className="mr-name-cell">
@@ -645,6 +646,26 @@ export default function ManagerDashboard() {
                 </tbody>
               </table>
             </div>
+
+            {dashboard.mrPerformance?.length > 5 && (
+              <div className="mr-performance-more">
+                <button
+                  type="button"
+                  className="mr-performance-more-button"
+                  onClick={() => setShowAllMRs((prev) => !prev)}
+                >
+                  {showAllMRs
+                    ? "Show Less"
+                    : "View More (" + (dashboard.mrPerformance.length - 5) + ")"}
+                  <ArrowUpRight
+                    size={14}
+                    style={{
+                      transform: showAllMRs ? "rotate(-90deg)" : "rotate(90deg)",
+                    }}
+                  />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1042,6 +1063,37 @@ export default function ManagerDashboard() {
         }
 
         /* ================= CARDS ================= */
+
+        .mr-performance-more {
+          display: flex;
+          justify-content: center;
+          padding: 8px 12px 10px;
+          border-top: 1px solid #eef2f7;
+          background: #ffffff;
+        }
+
+        .mr-performance-more-button {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          border: 0;
+          background: transparent;
+          color: #2563eb;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          padding: 5px 10px;
+          border-radius: 7px;
+        }
+
+        .mr-performance-more-button:hover {
+          background: #eff6ff;
+        }
+
+        .mr-performance-more-button svg {
+          transition: transform .2s ease;
+        }
 
         .dashboard-grid {
           display: grid;
