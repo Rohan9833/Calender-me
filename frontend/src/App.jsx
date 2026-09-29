@@ -19,6 +19,7 @@ import {
   CalendarSummary,
 } from "./pages/CalendarSelect";
 import InputGiven from "./pages/InputGiven";
+import CalendarSelectionEntry from "./pages/CalendarSelectionEntry";
 
 // Manager Pages
 import ManagerDashboard from "./pages/ManagerDashboard";
@@ -66,7 +67,7 @@ function App() {
           element={<CalendarDesigns role="ho" />}
         />
         <Route path="/edit-doctor/:doctorId" element={<EditDoctor />} />
-        <Route path="/calendar-selection" element={<CalendarMonth />} />
+        <Route path="/calendar-selection" element={<CalendarSelectionEntry />} />
         <Route path="/calendar-design" element={<DesignSelect />} />
         <Route path="/calendar-summary" element={<CalendarSummary />} />
         <Route
