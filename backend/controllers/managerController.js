@@ -524,6 +524,24 @@ const getFLMDashboard = async (req, res) => {
     });
   }
 };
+const MANAGER_APPROVAL_LEVEL = {
+  flm: 1,
+  slm: 2,
+  tlm: 3,
+  ho: 4,
+};
+
+const canManagerOverrideDecision = (actorRole, decisionRole) => {
+  if (!decisionRole) return true;
+
+  const actorLevel = MANAGER_APPROVAL_LEVEL[actorRole];
+  const decisionLevel = MANAGER_APPROVAL_LEVEL[decisionRole];
+
+  if (!actorLevel || !decisionLevel) return false;
+
+  return actorLevel >= decisionLevel;
+};
+
 const updateDoctorApproval = async (req, res) => {
   try {
     const { doctorId } = req.params;
@@ -536,6 +554,20 @@ const updateDoctorApproval = async (req, res) => {
       });
     }
 
+    if (!approvedBy || !approvedByRole) {
+      return res.status(400).json({
+        success: false,
+        message: "Manager identity is required",
+      });
+    }
+
+    if (!MANAGER_APPROVAL_LEVEL[approvedByRole]) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid manager role",
+      });
+    }
+
     const doctor = await Doctor.findById(doctorId);
 
     if (!doctor) {
@@ -545,26 +577,36 @@ const updateDoctorApproval = async (req, res) => {
       });
     }
 
-    // Update approval status
+    // A higher-level manager's latest decision is authoritative for
+    // lower-level managers. They cannot approve or disapprove it again.
+    if (
+      doctor.approvedByRole &&
+      !canManagerOverrideDecision(approvedByRole, doctor.approvedByRole)
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: \`This doctor was already \${doctor.approvalStatus} by a \${doctor.approvedByRole.toUpperCase()}. Only that manager or a higher-level manager can change the decision.\`,
+        lockedByRole: doctor.approvedByRole,
+      });
+    }
+
     doctor.approvalStatus = approvalStatus;
     doctor.approvedAt = new Date();
     doctor.approvedBy = approvedBy;
     doctor.approvedByRole = approvedByRole;
-    
+
     if (approvalStatus === "approved") {
       doctor.status = "approved";
-    } else if (approvalStatus === "rejected") {
+    } else {
       doctor.status = "rejected";
     }
-    
+
     await doctor.save();
-    
+
     // ─── CREATE ACTIVITY LOG ──────────────────────────
     try {
-      // Get user name
       let userName = "Manager";
-      let userRole = approvedByRole;
-      
+
       if (approvedByRole === "flm") {
         const flm = await FLM.findById(approvedBy);
         if (flm) userName = flm.flmName;
@@ -574,32 +616,39 @@ const updateDoctorApproval = async (req, res) => {
       } else if (approvedByRole === "tlm") {
         const tlm = await TLM.findById(approvedBy);
         if (tlm) userName = tlm.tlmName;
-      } else {
-        const mr = await MR.findById(approvedBy);
-        if (mr) userName = mr.mrName;
       }
-      
+
       await Activity.create({
-        action: `${approvalStatus.charAt(0).toUpperCase() + approvalStatus.slice(1)}: ${doctor.doctorName}`,
+        action: \`\${approvalStatus.charAt(0).toUpperCase() + approvalStatus.slice(1)}: \${doctor.doctorName}\`,
         doctor: doctor._id,
         mr: doctor.mr,
         flm: approvedByRole === "flm" ? approvedBy : null,
         performedBy: approvedBy,
+        performedByModel:
+          approvedByRole === "flm"
+            ? "FLM"
+            : approvedByRole === "slm"
+              ? "SLM"
+              : approvedByRole === "tlm"
+                ? "TLM"
+                : "User",
         role: approvedByRole,
         status: approvalStatus === "approved" ? "Completed" : "Rejected",
-        details: `Doctor ${approvalStatus} by ${userName} (${approvedByRole.toUpperCase()})`
+        details: \`Doctor \${approvalStatus} by \${userName} (\${approvedByRole.toUpperCase()})\`,
       });
-      
-      console.log(`✅ Activity logged: ${approvalStatus} - ${doctor.doctorName}`);
+
+      console.log(
+        \`✅ Activity logged: \${approvalStatus} - \${doctor.doctorName}\`,
+      );
     } catch (err) {
       console.log("⚠️ Error logging activity:", err.message);
     }
-    
-    await doctor.populate('mr', 'mrName mrId');
+
+    await doctor.populate("mr", "mrName mrId");
 
     res.status(200).json({
       success: true,
-      message: `Doctor ${approvalStatus}`,
+      message: \`Doctor \${approvalStatus}\`,
       doctor,
     });
   } catch (error) {
