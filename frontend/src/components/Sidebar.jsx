@@ -228,7 +228,7 @@ export default function Sidebar({
             return (
               <React.Fragment key={title}>
                 <div
-                  className={cls("navitem", isDoctorOrCalendarPage && "active")}
+                  className={cls("navitem", isDoctorPage && "active")}
                   onClick={() => {
                     if (isOpen) {
                       setDoctorMenuOpen(!doctorMenuOpen);
@@ -245,14 +245,14 @@ export default function Sidebar({
                     borderRadius: "8px",
                     cursor: "pointer",
                     transition: "all 0.2s",
-                    backgroundColor: isDoctorOrCalendarPage
+                    backgroundColor: isDoctorPage
                       ? "#eff6ff"
                       : "transparent",
-                    color: isDoctorOrCalendarPage ? "#0b55f4" : "#4b5563",
+                    color: isDoctorPage ? "#0b55f4" : "#4b5563",
                     justifyContent: isOpen ? "flex-start" : "center",
                   }}
                   onMouseEnter={(e) => {
-                    if (!isDoctorOrCalendarPage) {
+                    if (!isDoctorPage) {
                       e.currentTarget.style.backgroundColor = "#f3f4f6";
                     }
                   }}
