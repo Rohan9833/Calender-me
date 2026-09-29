@@ -12,6 +12,7 @@ const {
   getSLMDashboard,
   getTLMDashboard,
   getPendingActionsCount,
+  getPendingActions,
 } = require("../controllers/managerController");
 
 router.get("/flm/:flmId/doctors", getFLMDoctors);
@@ -27,5 +28,6 @@ router.get("/slm/:slmId/dashboard", getSLMDashboard);
 
 router.get("/tlm/:tlmId/dashboard", getTLMDashboard);
 router.get("/pending-actions-count", getPendingActionsCount);
+router.get("/pending-actions", getPendingActions);
 
 module.exports = router;
