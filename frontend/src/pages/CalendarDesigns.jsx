@@ -459,33 +459,34 @@ export default function CalendarDesigns({ role: propRole }) {
         ))
       ) : (
         <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table style={{ width: '100%', minWidth: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Preview</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Design Name</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Month</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Code</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Year</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Actions</th>
+                <th style={{ width: '18%', padding: '14px 16px', textAlign: 'left' }}>Preview</th>
+                <th style={{ width: '22%', padding: '14px 16px', textAlign: 'left' }}>Design Name</th>
+                <th style={{ width: '17%', padding: '14px 16px', textAlign: 'left' }}>Month</th>
+                <th style={{ width: '17%', padding: '14px 16px', textAlign: 'left' }}>Code</th>
+                <th style={{ width: '12%', padding: '14px 16px', textAlign: 'left' }}>Year</th>
+                <th style={{ width: '14%', padding: '14px 16px', textAlign: 'left' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredDesigns.map((design, idx) => (
                 <tr key={`${design.month}-${design.id}-${idx}`} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <td style={{ padding: '12px' }}>
+                  <td style={{ padding: '10px 16px' }}>
                     <img src={design.file} alt={design.label} style={{
-                      width: '60px',
-                      height: '45px',
+                      width: '96px',
+                      height: '64px',
                       objectFit: 'cover',
-                      borderRadius: '4px'
+                      borderRadius: '6px',
+                      display: 'block'
                     }} />
                   </td>
-                  <td style={{ padding: '12px', fontWeight: '500' }}>{design.label}</td>
-                  <td style={{ padding: '12px' }}>{design.month}</td>
-                  <td style={{ padding: '12px' }}>{design.id}</td>
-                  <td style={{ padding: '12px' }}>{currentYear}</td>
-                  <td style={{ padding: '12px' }}>
+                  <td style={{ padding: '10px 16px', fontWeight: '600', whiteSpace: 'nowrap' }}>{design.label}</td>
+                  <td style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}>{design.month}</td>
+                  <td style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}>{design.id}</td>
+                  <td style={{ padding: '10px 16px' }}>{currentYear}</td>
+                  <td style={{ padding: '10px 16px' }}>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <Button size="small" variant="outline" icon={Eye} onClick={() => setPreviewDesign(design)} />
                       <Button size="small" variant="primary" icon={Download} onClick={() => handleDownload(design)} />
