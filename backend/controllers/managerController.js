@@ -545,6 +545,21 @@ const updateDoctorApproval = async (req, res) => {
       });
     }
 
+    // A TLM rejection is final for lower-level managers.
+    // TLM itself (and any higher level such as HO) may still override it.
+    if (
+      doctor.approvalStatus === "rejected" &&
+      doctor.approvedByRole === "tlm" &&
+      approvedByRole !== "tlm" &&
+      approvedByRole !== "ho"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "This doctor was disapproved by TLM. FLM and SLM cannot approve it again.",
+        lockedByRole: "tlm",
+      });
+    }
+
     // Update approval status
     doctor.approvalStatus = approvalStatus;
     doctor.approvedAt = new Date();
