@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import Layout from "../components/Layout";
+import { getFLMDoctors, getSLMDoctors, getTLMDoctors } from "../api/managerAPI";
 
 import {
   StatCard,
@@ -61,68 +62,51 @@ export default function InputGiven({
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const user = JSON.parse(
-          localStorage.getItem("user") || "{}"
-        );
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        let data;
 
-        const mrId = user.mrId;
+        if (["flm", "slm", "tlm"].includes(user.role)) {
+          if (user.role === "flm") {
+            data = await getFLMDoctors(user.flmId);
+          } else if (user.role === "slm") {
+            data = await getSLMDoctors(user.slmId);
+          } else {
+            data = await getTLMDoctors(user.tlmId);
+          }
+        } else {
+          if (!user.mrId) {
+            console.error("No MR ID found");
+            setLoading(false);
+            return;
+          }
 
-        if (!mrId) {
-          console.error("No MR ID found");
-          setLoading(false);
-          return;
+          const response = await fetch(`${API_BASE}/doctors/mr/${user.mrId}`);
+          data = await response.json();
         }
 
-        const response = await fetch(
-          `${API_BASE}/doctors/mr/${mrId}`
-        );
-
-        const data = await response.json();
-
-        if (data.success && data.doctors) {
-          // Filter only approved doctors
-          const approvedDoctors =
-            data.doctors.filter(
-              (d) =>
-                d.approvalStatus === "approved"
-            );
+        if (data?.success && data?.doctors) {
+          const approvedDoctors = data.doctors.filter(
+            (d) => d.approvalStatus === "approved"
+          );
 
           setDoctors(approvedDoctors);
 
-          // Recalculate stats based on approved doctors only
-          const ready =
-            approvedDoctors.filter(
-              (d) =>
-                d.calendarStatus === "frozen" &&
-                !d.inputGiven
-            ).length;
+          const ready = approvedDoctors.filter(
+            (d) => d.calendarFrozen === true && !d.inputGiven
+          ).length;
 
-          const pending =
-            approvedDoctors.filter(
-              (d) =>
-                d.calendarStatus === "frozen" &&
-                !d.inputGiven
-            ).length;
+          const pending = approvedDoctors.filter(
+            (d) => d.calendarFrozen === true && !d.inputGiven
+          ).length;
 
-          const delivered =
-            approvedDoctors.filter(
-              (d) => d.inputGiven === true
-            ).length;
+          const delivered = approvedDoctors.filter(
+            (d) => d.inputGiven === true
+          ).length;
 
-          const today =
-            approvedDoctors.filter((d) => {
-              if (!d.inputGivenAt) return false;
-
-              const todayDate =
-                new Date().toDateString();
-
-              const inputDate =
-                new Date(
-                  d.inputGivenAt
-                ).toDateString();
-
-              return todayDate === inputDate;
-            }).length;
+          const today = approvedDoctors.filter((d) => {
+            if (!d.inputGivenAt) return false;
+            return new Date().toDateString() === new Date(d.inputGivenAt).toDateString();
+          }).length;
 
           setStats({
             readyForHandover: ready,
@@ -132,10 +116,7 @@ export default function InputGiven({
           });
         }
       } catch (err) {
-        console.error(
-          "Error fetching doctors:",
-          err
-        );
+        console.error("Error fetching doctors:", err);
       } finally {
         setLoading(false);
       }
@@ -174,6 +155,12 @@ export default function InputGiven({
         localStorage.getItem("user") || "{}"
       );
 
+      const mrId = user.mrId || selectedDoctor?.mr?.mrId;
+
+      if (!mrId) {
+        throw new Error("MR information is missing for this doctor");
+      }
+
       const response = await fetch(
         `${API_BASE}/calendar/mark-input-given`,
         {
@@ -182,10 +169,12 @@ export default function InputGiven({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            mrId: user.mrId,
+            mrId,
             doctorId: selectedDoctor._id,
             year: 2027,
             remarks: remarks,
+            inputGivenBy: user._id || user.id,
+            inputGivenByRole: user.role,
           }),
         }
       );
@@ -219,7 +208,7 @@ export default function InputGiven({
 
   if (success) {
     return (
-      <Layout active="Input Given">
+      <Layout role={["flm", "slm", "tlm"].includes((JSON.parse(localStorage.getItem("user") || "{}")).role) ? "manager" : "mr"} active="Input Given">
         <Crumbs
           items={[
             "Input Given",
@@ -477,7 +466,7 @@ export default function InputGiven({
 
   if (loading) {
     return (
-      <Layout active="Input Given">
+      <Layout role={["flm", "slm", "tlm"].includes((JSON.parse(localStorage.getItem("user") || "{}")).role) ? "manager" : "mr"} active="Input Given">
         <div className="input-loading-page">
           <div className="loading-orbit">
             <div className="loading-orbit-dot" />
@@ -547,7 +536,7 @@ export default function InputGiven({
   ========================================================= */
 
   return (
-    <Layout active="Input Given">
+    <Layout role={["flm", "slm", "tlm"].includes((JSON.parse(localStorage.getItem("user") || "{}")).role) ? "manager" : "mr"} active="Input Given">
       <Crumbs items={["Input Given"]} />
 
       <div className="input-given-page">
