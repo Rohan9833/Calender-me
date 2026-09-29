@@ -148,6 +148,148 @@ const getTLMDoctors = async (req, res) => {
 
 // api/managerAPI.js - Add this function
 // Add this CORRECT function to managerController.js (replace the incorrect one)
+const getPendingActions = async (req, res) => {
+  try {
+    const userRole = req.headers["x-user-role"];
+    const userId = req.headers["x-user-id"];
+
+    if (!userRole || !userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User role and user id are required",
+        actions: [],
+      });
+    }
+
+    let mrIds = [];
+
+    if (userRole === "flm") {
+      const flm = await FLM.findOne({ flmId: userId });
+      if (!flm) return res.status(404).json({ success: false, message: "FLM not found", actions: [] });
+
+      const mrs = await MR.find({ flm: flm._id });
+      mrIds = mrs.map((mr) => mr._id);
+    } else if (userRole === "slm") {
+      const slm = await SLM.findOne({ slmId: userId });
+      if (!slm) return res.status(404).json({ success: false, message: "SLM not found", actions: [] });
+
+      const flms = await FLM.find({ slm: slm._id });
+      const flmIds = flms.map((flm) => flm._id);
+      const mrs = await MR.find({ flm: { $in: flmIds } });
+      mrIds = mrs.map((mr) => mr._id);
+    } else if (userRole === "tlm") {
+      const tlm = await TLM.findOne({ tlmId: userId });
+      if (!tlm) return res.status(404).json({ success: false, message: "TLM not found", actions: [] });
+
+      const slms = await SLM.find({ tlm: tlm._id });
+      const slmIds = slms.map((slm) => slm._id);
+      const flms = await FLM.find({ slm: { $in: slmIds } });
+      const flmIds = flms.map((flm) => flm._id);
+      const mrs = await MR.find({ flm: { $in: flmIds } });
+      mrIds = mrs.map((mr) => mr._id);
+    } else if (userRole === "ho") {
+      const doctors = await Doctor.find({ status: { $ne: "draft" } })
+        .select("doctorName speciality city approvalStatus calendarSelected calendarFrozen inputGivenStatus")
+        .sort({ updatedAt: -1 });
+
+      return res.status(200).json({
+        success: true,
+        actions: buildPendingActions(doctors),
+      });
+    } else {
+      return res.status(200).json({ success: true, actions: [] });
+    }
+
+    const doctors = await Doctor.find({
+      mr: { $in: mrIds },
+      status: { $ne: "draft" },
+    })
+      .select("doctorName speciality city approvalStatus calendarSelected calendarFrozen inputGivenStatus")
+      .sort({ updatedAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      actions: buildPendingActions(doctors),
+    });
+  } catch (error) {
+    console.error("Error getting pending actions:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      actions: [],
+    });
+  }
+};
+
+function buildPendingActions(doctors) {
+  const pendingApprovals = doctors.filter(
+    (doctor) => doctor.approvalStatus === "pending",
+  );
+
+  const pendingFreeze = doctors.filter(
+    (doctor) => doctor.calendarSelected === true && doctor.calendarFrozen !== true,
+  );
+
+  const inputGivenPending = doctors.filter(
+    (doctor) => doctor.calendarFrozen === true && doctor.inputGivenStatus === "pending",
+  );
+
+  const actions = [];
+
+  if (pendingApprovals.length > 0) {
+    actions.push({
+      id: "pending-approvals",
+      title: "Doctors awaiting approval",
+      description: "Submitted by MRs and waiting for manager approval",
+      count: pendingApprovals.length,
+      route: "/manager/approvals",
+      icon: "approval",
+      items: pendingApprovals.slice(0, 10).map((doctor) => ({
+        id: doctor._id,
+        name: doctor.doctorName,
+        speciality: doctor.speciality,
+        city: doctor.city,
+      })),
+    });
+  }
+
+  if (pendingFreeze.length > 0) {
+    actions.push({
+      id: "pending-freeze",
+      title: "Calendars pending freeze",
+      description: "Calendar selections are complete but not frozen",
+      count: pendingFreeze.length,
+      route: "/manager/calendar-designs",
+      icon: "calendar",
+      items: pendingFreeze.slice(0, 10).map((doctor) => ({
+        id: doctor._id,
+        name: doctor.doctorName,
+        speciality: doctor.speciality,
+        city: doctor.city,
+      })),
+    });
+  }
+
+  if (inputGivenPending.length > 0) {
+    actions.push({
+      id: "input-given-pending",
+      title: "Input given pending",
+      description: "Frozen calendars are waiting to be marked as input given",
+      count: inputGivenPending.length,
+      route: "/input-given",
+      icon: "input",
+      items: inputGivenPending.slice(0, 10).map((doctor) => ({
+        id: doctor._id,
+        name: doctor.doctorName,
+        speciality: doctor.speciality,
+        city: doctor.city,
+      })),
+    });
+  }
+
+  return actions;
+}
+
 const getPendingActionsCount = async (req, res) => {
   try {
     // Get user info from headers (sent from frontend)
