@@ -11,7 +11,6 @@ import {
   ClipboardCheck,
   CalendarClock,
   Hand,
-  X,
 } from "lucide-react";
 import { Avatar } from "./UIComponents";
 import { useNavigate } from "react-router-dom";
