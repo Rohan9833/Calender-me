@@ -496,7 +496,9 @@ const getFLMDashboard = async (req, res) => {
         };
       }),
     );
-    const recentActivities = await Activity.find()
+    const recentActivities = await Activity.find({
+      doctor: { $in: doctors.map((doctor) => doctor._id) },
+    })
       .populate("doctor", "doctorName")
       .sort({
         createdAt: -1,
@@ -513,7 +515,8 @@ const getFLMDashboard = async (req, res) => {
 
       inputGiven: inputGivenDoctors.length,
 
-      pendingActions: pendingDoctors.length,
+      pendingActions:
+        pendingDoctors.length + pendingFreeze.length + inputGivenPending.length,
 
       rejectedDoctors: rejectedDoctors.length,
 
@@ -785,7 +788,9 @@ const getSLMDashboard = async (req, res) => {
       }),
     );
 
-    const recentActivities = await Activity.find()
+    const recentActivities = await Activity.find({
+      doctor: { $in: doctors.map((doctor) => doctor._id) },
+    })
       .populate("doctor", "doctorName")
       .sort({
         createdAt: -1,
@@ -803,7 +808,8 @@ const getSLMDashboard = async (req, res) => {
 
       inputGiven: inputGivenDoctors.length,
 
-      pendingActions: pendingDoctors.length,
+      pendingActions:
+        pendingDoctors.length + pendingFreeze.length + inputGivenPending.length,
 
       rejectedDoctors: rejectedDoctors.length,
 
@@ -902,7 +908,9 @@ const getTLMDashboard = async (req, res) => {
       (d) => d.calendarFrozen === true && d.inputGivenStatus === "pending",
     );
 
-    const recentActivities = await Activity.find()
+    const recentActivities = await Activity.find({
+      doctor: { $in: doctors.map((doctor) => doctor._id) },
+    })
       .populate("doctor", "doctorName")
       .sort({
         createdAt: -1,
@@ -920,7 +928,8 @@ const getTLMDashboard = async (req, res) => {
 
       inputGiven: inputGivenDoctors.length,
 
-      pendingActions: pendingDoctors.length,
+      pendingActions:
+        pendingDoctors.length + pendingFreeze.length + inputGivenPending.length,
 
       rejectedDoctors: rejectedDoctors.length,
 
