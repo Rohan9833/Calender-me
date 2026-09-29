@@ -450,7 +450,7 @@ export default function DoctorDetail({ consentModal = false }) {
       showPopup("success", "Photos Uploaded!", "Photos uploaded successfully!");
     } catch (error) {
       console.log(error);
-      showPopup("error", "Upload Failed", "Failed to upload photos");
+      showPopup("error", "Upload Failed", "Failed to upload photos Doctor havent approved yet");
     }
   };
 

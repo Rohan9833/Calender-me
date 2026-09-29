@@ -15,7 +15,7 @@ console.log("🔑 Brevo API Key:", process.env.EMAIL_PASS ? "✅ Set" : "❌ Mis
 
 const sendConsentMail = async (doctor) => {
   try {
-    const consentLink = `https://calendarme.digilateral.com/api/doctors/consent/${doctor._id}`;
+    const consentLink = `${process.env.API_BASE_URL}/api/doctors/consent/${doctor._id}`;
 
     // Create email using object literal (simpler)
     const sendSmtpEmail = {
