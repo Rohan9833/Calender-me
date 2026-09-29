@@ -9,10 +9,14 @@ import { CalendarMonth } from "./CalendarSelect";
 export default function CalendarSelectionEntry() {
   const [searchParams] = useSearchParams();
   const doctorId = searchParams.get("doctorId");
-  const navigate = useNavigate();
 
   if (doctorId) return <CalendarMonth />;
 
+  return <CalendarDoctorPicker />;
+}
+
+function CalendarDoctorPicker() {
+  const navigate = useNavigate();
   const [doctors, setDoctors] = useState([]);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [search, setSearch] = useState("");
