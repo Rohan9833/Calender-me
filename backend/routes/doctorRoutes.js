@@ -6,6 +6,7 @@ const {
   giveConsent,
   getDoctors,
   getDoctorById,
+  getDoctorTimeline,
   uploadDoctorPhotos,
   getDoctorsByMR,
   sendConsentToDoctor,
@@ -22,6 +23,7 @@ router.get("/dashboard/:mrId", getDashboardData);
 router.get("/consent/:doctorId", giveConsent);
 router.get("/:mrId", getDoctors);
 router.get("/:doctorId/details", getDoctorById);
+router.get("/:doctorId/timeline", getDoctorTimeline);
 router.post("/:doctorId/photos", upload.array("photos", 5), uploadDoctorPhotos);
 router.get("/mr/:mrId", getDoctorsByMR);
 router.delete("/:doctorId", deleteDoctor);
