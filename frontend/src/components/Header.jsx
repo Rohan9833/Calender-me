@@ -107,10 +107,13 @@ export default function Header({
     // backend response can contain an MR route such as /mr-dashboard.
     const actualRole = user?.role;
 
+    const isManagerRole = ["flm", "slm", "tlm", "ho"].includes(actualRole);
+    const isMRRole = actualRole === "mr";
+
     const managerRoutes = {
       "pending-approvals": "/manager/approvals",
       "pending-freeze": "/manager/calendar-designs",
-      "input-given-pending": "/input-given",
+      "input-given-pending": "/manager/input-given",
     };
 
     const hoRoutes = {
