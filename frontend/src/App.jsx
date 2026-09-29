@@ -75,6 +75,7 @@ function App() {
           element={<CalendarSummary finalized />}
         />
         <Route path="/input-given" element={<InputGiven />} />
+        <Route path="/manager/input-given" element={<InputGiven />} />
         <Route path="/input-given/modal" element={<InputGiven modal />} />
         <Route path="/input-given/success" element={<InputGiven success />} />
 

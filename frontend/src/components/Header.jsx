@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Avatar } from "./UIComponents";
 import { useNavigate } from "react-router-dom";
-import { getPendingActions } from "../api/managerAPI";
+import { getPendingActions, getMRPendingActions } from "../api/managerAPI";
 
 export default function Header({
   role = "mr",
@@ -61,7 +61,10 @@ export default function Header({
     const loadPendingActions = async () => {
       const actualRole = user?.role;
 
-      if (!["flm", "slm", "tlm", "ho"].includes(actualRole)) {
+      const isManagerRole = ["flm", "slm", "tlm", "ho"].includes(actualRole);
+      const isMRRole = actualRole === "mr";
+
+      if (!isManagerRole && !isMRRole) {
         if (mounted) setPendingActions([]);
         return;
       }
@@ -69,7 +72,9 @@ export default function Header({
       setPendingLoading(true);
 
       try {
-        const response = await getPendingActions();
+        const response = isManagerRole
+          ? await getPendingActions()
+          : await getMRPendingActions();
 
         if (mounted) {
           setPendingActions(response?.success ? response.actions || [] : []);
@@ -94,7 +99,38 @@ export default function Header({
 
   const handlePendingActionClick = (action) => {
     setIsNotificationOpen(false);
-    if (action?.route) navigate(action.route);
+
+    if (!action) return;
+
+    // Manager notifications must always stay inside the manager flow.
+    // Do not blindly trust a route returned by the API because an older
+    // backend response can contain an MR route such as /mr-dashboard.
+    const actualRole = user?.role;
+
+    const isManagerRole = ["flm", "slm", "tlm", "ho"].includes(actualRole);
+    const isMRRole = actualRole === "mr";
+
+    const managerRoutes = {
+      "pending-approvals": "/manager/approvals",
+      "pending-freeze": "/manager/calendar-designs",
+      "input-given-pending": "/manager/input-given",
+    };
+
+    if (isManagerRole && managerRoutes[action.id]) {
+      navigate(managerRoutes[action.id]);
+      return;
+    }
+
+    if (isMRRole && action.id === "mr-input-given-pending") {
+      navigate("/input-given");
+      return;
+    }
+
+    // Fallback for any future notification type that has its own route.
+    // Never fall back to /mr-dashboard from a manager notification.
+    if (action.route && action.route !== "/mr-dashboard") {
+      navigate(action.route);
+    }
   };
 
   const handleProfileClick = () => {

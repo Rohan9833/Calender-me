@@ -714,6 +714,21 @@ export default function ManagerDashboard() {
 
               <div
                 className={`pending-action-item ${
+                  (dashboard.inputGivenPending || 0) > 0 ? "is-clickable" : ""
+                }`}
+              >
+                <ListLine
+                  icon={Hand}
+                  title="Input given pending"
+                  sub="Frozen calendars not marked input"
+                  value={dashboard.inputGivenPending || 0}
+                  onClick={() => navigate("/manager/input-given")}
+                  clickable={(dashboard.inputGivenPending || 0) > 0}
+                />
+              </div>
+
+              <div
+                className={`pending-action-item ${
                   (dashboard.pendingFreeze || 0) > 0 ? "is-clickable" : ""
                 }`}
               >
@@ -727,20 +742,6 @@ export default function ManagerDashboard() {
                 />
               </div>
 
-              <div
-                className={`pending-action-item ${
-                  (dashboard.inputGivenPending || 0) > 0 ? "is-clickable" : ""
-                }`}
-              >
-                <ListLine
-                  icon={Hand}
-                  title="Input given pending"
-                  sub="Frozen calendars not marked input"
-                  value={dashboard.inputGivenPending || 0}
-                  onClick={() => navigate("/input-given")}
-                  clickable={(dashboard.inputGivenPending || 0) > 0}
-                />
-              </div>
             </div>
           </div>
 
@@ -1423,13 +1424,17 @@ export default function ManagerDashboard() {
           cursor: pointer;
         }
 
-        .pending-action-item.is-clickable:hover {
+        .pending-action-item:hover {
           background: #f8fbff;
           border-color: #dbeafe;
           transform: translateX(3px);
           box-shadow:
             0 4px 14px
             rgba(37, 99, 235, 0.08);
+        }
+
+        .pending-action-item.is-clickable {
+          cursor: pointer;
         }
 
         .pending-action-item.is-clickable:active {
@@ -1443,7 +1448,7 @@ export default function ManagerDashboard() {
          * Add a blue indicator on hover.
          */
 
-        .pending-action-item.is-clickable::before {
+        .pending-action-item::before {
           content: "";
           position: absolute;
           left: 0;
@@ -1460,7 +1465,7 @@ export default function ManagerDashboard() {
           z-index: 2;
         }
 
-        .pending-action-item.is-clickable:hover::before {
+        .pending-action-item:hover::before {
           opacity: 1;
           transform: scaleY(1);
         }
@@ -1830,14 +1835,14 @@ export default function ManagerDashboard() {
             border-radius: 11px;
           }
 
-          .pending-action-item.is-clickable:hover {
+          .pending-action-item:hover {
             transform: translateX(2px);
             box-shadow:
               0 3px 10px
               rgba(37, 99, 235, 0.07);
           }
 
-          .pending-action-item.is-clickable::before {
+          .pending-action-item::before {
             top: 8px;
             bottom: 8px;
           }

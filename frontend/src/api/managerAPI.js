@@ -86,6 +86,22 @@ export const updateDoctorStatus = async (doctorId, approvalStatus, approvedBy, a
   });
   return response.data;
 };
+export const getMRPendingActions = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    if (user.role !== "mr" || !user.mrId) {
+      return { success: true, actions: [] };
+    }
+
+    const response = await api.get(`/doctors/mr/${user.mrId}/pending-actions`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching MR pending actions:", error);
+    return { success: false, actions: [] };
+  }
+};
+
 export const getPendingActions = async () => {
   try {
     const user = JSON.parse(localStorage.getItem("user") || "{}");

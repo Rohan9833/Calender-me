@@ -4,6 +4,29 @@ const FLM = require("../models/FLM");
 const MR = require("../models/MR");
 const Doctor = require("../models/Doctor");
 const Activity = require("../models/activitymodel");
+const CalendarSelection = require("../models/CalendarSelection");
+
+
+const attachCalendarStatus = async (doctors) => {
+  return Promise.all(
+    doctors.map(async (doctor) => {
+      const calendar = await CalendarSelection.findOne({
+        doctor: doctor._id,
+        year: 2027,
+      });
+
+      return {
+        ...doctor.toObject(),
+        calendarStatus: calendar ? calendar.status : "not_started",
+        calendarFrozen: calendar
+          ? calendar.status === "frozen" || doctor.calendarFrozen === true
+          : doctor.calendarFrozen === true,
+        inputGiven: calendar?.inputGiven || doctor.inputGiven || false,
+        inputGivenAt: calendar?.inputGivenAt || doctor.inputGivenAt || null,
+      };
+    })
+  );
+};
 
 // =====================================
 // FLM DOCTORS
@@ -33,10 +56,12 @@ const getFLMDoctors = async (req, res) => {
       status: { $ne: "draft" },
     }).populate("mr", "mrName mrId");
 
+    const doctorsWithCalendar = await attachCalendarStatus(doctors);
+
     res.status(200).json({
       success: true,
-      count: doctors.length,
-      doctors,
+      count: doctorsWithCalendar.length,
+      doctors: doctorsWithCalendar,
     });
   } catch (error) {
     res.status(500).json({
@@ -80,10 +105,12 @@ const getSLMDoctors = async (req, res) => {
       status: { $ne: "draft" },
     }).populate("mr", "mrName mrId");
 
+    const doctorsWithCalendar = await attachCalendarStatus(doctors);
+
     res.status(200).json({
       success: true,
-      count: doctors.length,
-      doctors,
+      count: doctorsWithCalendar.length,
+      doctors: doctorsWithCalendar,
     });
   } catch (error) {
     res.status(500).json({
@@ -133,10 +160,12 @@ const getTLMDoctors = async (req, res) => {
       status: { $ne: "draft" },
     }).populate("mr", "mrName mrId");
 
+    const doctorsWithCalendar = await attachCalendarStatus(doctors);
+
     res.status(200).json({
       success: true,
-      count: doctors.length,
-      doctors,
+      count: doctorsWithCalendar.length,
+      doctors: doctorsWithCalendar,
     });
   } catch (error) {
     res.status(500).json({
@@ -230,10 +259,6 @@ function buildPendingActions(doctors) {
     (doctor) => doctor.calendarSelected === true && doctor.calendarFrozen !== true,
   );
 
-  const inputGivenPending = doctors.filter(
-    (doctor) => doctor.calendarFrozen === true && doctor.inputGivenStatus === "pending",
-  );
-
   const actions = [];
 
   if (pendingApprovals.length > 0) {
@@ -270,13 +295,17 @@ function buildPendingActions(doctors) {
     });
   }
 
+  const inputGivenPending = doctors.filter(
+    (doctor) => doctor.calendarFrozen === true && doctor.inputGivenStatus === "pending",
+  );
+
   if (inputGivenPending.length > 0) {
     actions.push({
       id: "input-given-pending",
       title: "Input given pending",
       description: "Frozen calendars are waiting to be marked as input given",
       count: inputGivenPending.length,
-      route: "/input-given",
+      route: "/manager/input-given",
       icon: "input",
       items: inputGivenPending.slice(0, 10).map((doctor) => ({
         id: doctor._id,
@@ -313,7 +342,6 @@ const getPendingActionsCount = async (req, res) => {
         const pendingApprovals = doctors.filter(d => d.approvalStatus === "pending").length;
         const pendingFreeze = doctors.filter(d => d.calendarSelected === true && d.calendarFrozen !== true).length;
         const inputGivenPending = doctors.filter(d => d.calendarFrozen === true && d.inputGivenStatus === "pending").length;
-        
         pendingCount = pendingApprovals + pendingFreeze + inputGivenPending;
       }
     } else if (userRole === "slm") {
@@ -331,7 +359,6 @@ const getPendingActionsCount = async (req, res) => {
         const pendingApprovals = doctors.filter(d => d.approvalStatus === "pending").length;
         const pendingFreeze = doctors.filter(d => d.calendarSelected === true && d.calendarFrozen !== true).length;
         const inputGivenPending = doctors.filter(d => d.calendarFrozen === true && d.inputGivenStatus === "pending").length;
-        
         pendingCount = pendingApprovals + pendingFreeze + inputGivenPending;
       }
     } else if (userRole === "tlm") {
@@ -351,7 +378,6 @@ const getPendingActionsCount = async (req, res) => {
         const pendingApprovals = doctors.filter(d => d.approvalStatus === "pending").length;
         const pendingFreeze = doctors.filter(d => d.calendarSelected === true && d.calendarFrozen !== true).length;
         const inputGivenPending = doctors.filter(d => d.calendarFrozen === true && d.inputGivenStatus === "pending").length;
-        
         pendingCount = pendingApprovals + pendingFreeze + inputGivenPending;
       }
     }
