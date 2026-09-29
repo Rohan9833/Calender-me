@@ -1448,7 +1448,7 @@ export default function ManagerDashboard() {
          * Add a blue indicator on hover.
          */
 
-        .pending-action-item.is-clickable::before {
+        .pending-action-item::before {
           content: "";
           position: absolute;
           left: 0;
@@ -1465,7 +1465,7 @@ export default function ManagerDashboard() {
           z-index: 2;
         }
 
-        .pending-action-item.is-clickable:hover::before {
+        .pending-action-item:hover::before {
           opacity: 1;
           transform: scaleY(1);
         }
@@ -1842,7 +1842,7 @@ export default function ManagerDashboard() {
               rgba(37, 99, 235, 0.07);
           }
 
-          .pending-action-item.is-clickable::before {
+          .pending-action-item::before {
             top: 8px;
             bottom: 8px;
           }
