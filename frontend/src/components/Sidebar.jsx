@@ -22,7 +22,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { cls } from "../utils/helpers";
 import { getPendingActionsCount } from "../api/managerAPI";
-import calendarmeLogo from "../assets/calendarme-logo.png"
+import calendarmeLogo from "../assets/calendarme-logo.png";
 const iconMap = {
   LayoutDashboard,
   UserPlus,
@@ -53,7 +53,7 @@ const navByRole = {
     ["Doctor Approvals", "ClipboardList", "/manager/approvals"],
     ["My Team", "Users", "/manager/mr-progress"],
     ["Reports", "BarChart3", "/manager/delay-report"],
-    ["Pending Actions", "Clock3", "/manager/delay-report"],
+    // ["Pending Actions", "Clock3", "/manager/delay-report"],
     ["Calendar Designs", "ImageIcon", "/manager/calendar-designs"],
   ],
   ho: [
@@ -70,14 +70,13 @@ const navByRole = {
   ],
 };
 
-export default function Sidebar({ 
-  role = "mr", 
+export default function Sidebar({
+  role = "mr",
   isOpen = true,
   toggleSidebar,
   isMobile = false,
 }) {
-   const user = JSON.parse(localStorage.getItem("user") || "{}");
- 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   // ✅ Override: if mrId exists, they are MR
   if (user.mrId) {
@@ -145,7 +144,7 @@ export default function Sidebar({
   };
 
   return (
-    <aside 
+    <aside
       className="sidebar"
       style={{
         width: isOpen ? "260px" : "70px",
@@ -164,7 +163,7 @@ export default function Sidebar({
       }}
     >
       {/* Brand */}
-     <div 
+      <div
         className="brand"
         style={{
           padding: isOpen ? "16px 16px" : "20px 8px",
@@ -177,16 +176,16 @@ export default function Sidebar({
         }}
       >
         {/* Icon – visible in both states */}
-       {isOpen ? (
-    <img 
-      src={calendarmeLogo} 
-      alt="Calendarme" 
-      style={{ height: "60px", width: "auto", objectFit: "contain" , }}
-    />
-  ) : (
-    <CalendarDays size={34} color="#0b55f4" />
-  )}
-        
+        {isOpen ? (
+          <img
+            src={calendarmeLogo}
+            alt="Calendarme"
+            style={{ height: "60px", width: "auto", objectFit: "contain" }}
+          />
+        ) : (
+          <CalendarDays size={34} color="#0b55f4" />
+        )}
+
         {/* ✅ Optional: keep "Personalized" text (if you want) */}
         {isOpen && (
           <div style={{ display: "flex", flexDirection: "column" }}>
@@ -199,22 +198,28 @@ export default function Sidebar({
 
         {/* Toggle button */}
         <button
-    onClick={toggleSidebar}
-    style={{
-      background: "none",
-      border: "none",
-      color: "#6b7280",
-      cursor: "pointer",
-      padding: "4px",
-      marginLeft: isOpen ? "0" : "0",
-    }}
-  >
-    {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-  </button>
+          onClick={toggleSidebar}
+          style={{
+            background: "none",
+            border: "none",
+            color: "#6b7280",
+            cursor: "pointer",
+            padding: "4px",
+            marginLeft: isOpen ? "0" : "0",
+          }}
+        >
+          {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+        </button>
       </div>
 
       {/* Navigation */}
-      <nav style={{ flex: 1, overflowY: "auto", padding: isOpen ? "12px 12px" : "12px 8px" }}>
+      <nav
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: isOpen ? "12px 12px" : "12px 8px",
+        }}
+      >
         {items.map(([title, iconName, path]) => {
           const Icon = iconMap[iconName] || CalendarDays;
 
@@ -240,7 +245,9 @@ export default function Sidebar({
                     borderRadius: "8px",
                     cursor: "pointer",
                     transition: "all 0.2s",
-                    backgroundColor: isDoctorOrCalendarPage ? "#eff6ff" : "transparent",
+                    backgroundColor: isDoctorOrCalendarPage
+                      ? "#eff6ff"
+                      : "transparent",
                     color: isDoctorOrCalendarPage ? "#0b55f4" : "#4b5563",
                     justifyContent: isOpen ? "flex-start" : "center",
                   }}
@@ -258,13 +265,17 @@ export default function Sidebar({
                   <Icon size={21} style={{ flexShrink: 0 }} />
                   {isOpen && (
                     <>
-                      <span style={{ fontSize: "14px", fontWeight: "500" }}>{title}</span>
+                      <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                        {title}
+                      </span>
                       <ChevronDown
                         size={16}
                         style={{
                           marginLeft: "auto",
                           transition: "transform 0.2s",
-                          transform: doctorMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                          transform: doctorMenuOpen
+                            ? "rotate(180deg)"
+                            : "rotate(0deg)",
                         }}
                       />
                     </>
@@ -280,7 +291,10 @@ export default function Sidebar({
                     ].map(([label, routePath]) => (
                       <div
                         key={label}
-                        className={cls("submenuItem", isActive(routePath) && "active")}
+                        className={cls(
+                          "submenuItem",
+                          isActive(routePath) && "active",
+                        )}
                         onClick={() => handleNavigation(routePath)}
                         style={{
                           display: "flex",
@@ -290,7 +304,9 @@ export default function Sidebar({
                           borderRadius: "6px",
                           cursor: "pointer",
                           transition: "all 0.2s",
-                          backgroundColor: isActive(routePath) ? "#eff6ff" : "transparent",
+                          backgroundColor: isActive(routePath)
+                            ? "#eff6ff"
+                            : "transparent",
                           color: isActive(routePath) ? "#0b55f4" : "#4b5563",
                           fontSize: "13px",
                         }}
@@ -301,11 +317,14 @@ export default function Sidebar({
                         }}
                         onMouseLeave={(e) => {
                           if (!isActive(routePath)) {
-                            e.currentTarget.style.backgroundColor = "transparent";
+                            e.currentTarget.style.backgroundColor =
+                              "transparent";
                           }
                         }}
                       >
-                        <span style={{ fontSize: "6px", color: "#9ca3af" }}>●</span>
+                        <span style={{ fontSize: "6px", color: "#9ca3af" }}>
+                          ●
+                        </span>
                         <span>{label}</span>
                       </div>
                     ))}
@@ -330,7 +349,9 @@ export default function Sidebar({
                   borderRadius: "8px",
                   cursor: "pointer",
                   transition: "all 0.2s",
-                  backgroundColor: isDoctorOrCalendarPage ? "#eff6ff" : "transparent",
+                  backgroundColor: isDoctorOrCalendarPage
+                    ? "#eff6ff"
+                    : "transparent",
                   color: isDoctorOrCalendarPage ? "#0b55f4" : "#4b5563",
                   justifyContent: isOpen ? "flex-start" : "center",
                 }}
@@ -347,7 +368,9 @@ export default function Sidebar({
               >
                 <Icon size={21} style={{ flexShrink: 0 }} />
                 {isOpen && (
-                  <span style={{ fontSize: "14px", fontWeight: "500" }}>{title}</span>
+                  <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                    {title}
+                  </span>
                 )}
               </div>
             );
@@ -358,7 +381,10 @@ export default function Sidebar({
           return (
             <div
               key={title}
-              className={cls("navitem", targetPath && isActive(targetPath) && "active")}
+              className={cls(
+                "navitem",
+                targetPath && isActive(targetPath) && "active",
+              )}
               onClick={() => targetPath && handleNavigation(targetPath)}
               style={{
                 display: "flex",
@@ -368,8 +394,12 @@ export default function Sidebar({
                 borderRadius: "8px",
                 cursor: "pointer",
                 transition: "all 0.2s",
-                backgroundColor: targetPath && isActive(targetPath) ? "#eff6ff" : "transparent",
-                color: targetPath && isActive(targetPath) ? "#0b55f4" : "#4b5563",
+                backgroundColor:
+                  targetPath && isActive(targetPath)
+                    ? "#eff6ff"
+                    : "transparent",
+                color:
+                  targetPath && isActive(targetPath) ? "#0b55f4" : "#4b5563",
                 justifyContent: isOpen ? "flex-start" : "center",
               }}
               onMouseEnter={(e) => {
@@ -386,7 +416,9 @@ export default function Sidebar({
               <Icon size={21} style={{ flexShrink: 0 }} />
               {isOpen && (
                 <>
-                  <span style={{ fontSize: "14px", fontWeight: "500" }}>{title}</span>
+                  <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                    {title}
+                  </span>
                   {title === "Pending Actions" && pendingCount > 0 && (
                     <em
                       style={{
@@ -409,7 +441,7 @@ export default function Sidebar({
         })}
 
         <hr style={{ borderColor: "#e5e7eb", margin: "8px 0" }} />
-
+        {/* 
         {isOpen && (
           <div
             className="navitem"
@@ -436,8 +468,42 @@ export default function Sidebar({
             <LogOut size={21} />
             <span style={{ fontSize: "14px", fontWeight: "500" }}>Logout</span>
           </div>
-        )}
+        )} */}
       </nav>
+
+      {/* Logout */}
+      <div
+        className="navitem"
+        onClick={handleLogout}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          padding: isOpen ? "10px 14px" : "10px 12px",
+          margin: isOpen ? "0 12px 8px" : "0 8px 8px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          transition: "all 0.2s",
+          color: "#4b5563",
+          justifyContent: isOpen ? "flex-start" : "center",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = "#fee2e2";
+          e.currentTarget.style.color = "#dc2626";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "transparent";
+          e.currentTarget.style.color = "#4b5563";
+        }}
+      >
+        <LogOut size={21} />
+
+        {isOpen && (
+          <span style={{ fontSize: "14px", fontWeight: "500" }}>Logout</span>
+        )}
+      </div>
+
+      {/* Campaign Period */}
 
       {/* Campaign Period */}
       {isOpen && (
@@ -453,7 +519,9 @@ export default function Sidebar({
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <CalendarDays size={18} color="#0b55f4" />
-            <b style={{ fontSize: "13px", color: "#1a1a2e" }}>Campaign Period</b>
+            <b style={{ fontSize: "13px", color: "#1a1a2e" }}>
+              Campaign Period
+            </b>
           </div>
           <span style={{ fontSize: "11px", color: "#6b7280" }}>
             01 Jan 2027 - 31 Dec 2027

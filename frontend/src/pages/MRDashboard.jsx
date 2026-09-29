@@ -617,7 +617,8 @@ const MRDashboard = () => {
 
           <div className="mr-hero-image">
             <img
-              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=85"
+              // src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=85"
+              src="/123.png"
               alt="Doctor"
             />
 
@@ -1034,7 +1035,7 @@ function DashboardStyles() {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 

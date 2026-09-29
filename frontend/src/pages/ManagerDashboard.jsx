@@ -38,9 +38,7 @@ import {
 
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined"
-      ? window.innerWidth <= breakpoint
-      : false
+    typeof window !== "undefined" ? window.innerWidth <= breakpoint : false,
   );
 
   useEffect(() => {
@@ -52,8 +50,7 @@ function useIsMobile(breakpoint = 768) {
 
     window.addEventListener("resize", handleResize);
 
-    return () =>
-      window.removeEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [breakpoint]);
 
   return isMobile;
@@ -94,9 +91,7 @@ function FunnelPanel({ funnel }) {
 
   const conversionRate =
     funnel?.registered > 0
-      ? Math.round(
-          ((funnel.inputGiven || 0) / funnel.registered) * 100
-        )
+      ? Math.round(((funnel.inputGiven || 0) / funnel.registered) * 100)
       : 0;
 
   const registered = funnel?.registered || 0;
@@ -107,9 +102,7 @@ function FunnelPanel({ funnel }) {
         <div>
           <div className="card-title">Design Progress</div>
 
-          <div className="card-subtitle">
-            Campaign funnel overview
-          </div>
+          <div className="card-subtitle">Campaign funnel overview</div>
         </div>
 
         <div className="header-icon blue">
@@ -121,19 +114,11 @@ function FunnelPanel({ funnel }) {
         {data.map((item) => {
           const percentage =
             registered > 0
-              ? Math.min(
-                  100,
-                  Math.round(
-                    (item.value / registered) * 100
-                  )
-                )
+              ? Math.min(100, Math.round((item.value / registered) * 100))
               : 0;
 
           return (
-            <div
-              className="funnel-item"
-              key={item.name}
-            >
+            <div className="funnel-item" key={item.name}>
               <div className="funnel-label-row">
                 <div className="funnel-label">
                   <span
@@ -146,9 +131,7 @@ function FunnelPanel({ funnel }) {
                   <span>{item.name}</span>
                 </div>
 
-                <div className="funnel-value">
-                  {item.value}
-                </div>
+                <div className="funnel-value">{item.value}</div>
               </div>
 
               <div className="funnel-track">
@@ -156,10 +139,8 @@ function FunnelPanel({ funnel }) {
                   className="funnel-progress"
                   style={{
                     width: `${Math.max(
-                      item.value > 0
-                        ? percentage
-                        : 0,
-                      item.value > 0 ? 3 : 0
+                      item.value > 0 ? percentage : 0,
+                      item.value > 0 ? 3 : 0,
                     )}%`,
                     background: item.color,
                   }}
@@ -176,9 +157,7 @@ function FunnelPanel({ funnel }) {
         </div>
 
         <div className="conversion-content">
-          <span>
-            Registered → Input Given
-          </span>
+          <span>Registered → Input Given</span>
 
           <strong>{conversionRate}%</strong>
         </div>
@@ -232,21 +211,14 @@ function DashboardStat({
     },
   };
 
-  const config =
-    toneConfig[tone] || toneConfig.blue;
+  const config = toneConfig[tone] || toneConfig.blue;
 
   return (
     <div
-      className={`dashboard-stat ${
-        route ? "clickable" : ""
-      }`}
-      onClick={() =>
-        route && onClick(route)
-      }
+      className={`dashboard-stat ${route ? "clickable" : ""}`}
+      onClick={() => route && onClick(route)}
       style={{
-        minWidth: isMobile
-          ? "154px"
-          : "0",
+        minWidth: isMobile ? "154px" : "0",
       }}
     >
       <div className="stat-top">
@@ -257,28 +229,17 @@ function DashboardStat({
             color: config.iconColor,
           }}
         >
-          <Icon
-            size={18}
-            strokeWidth={2.2}
-          />
+          <Icon size={18} strokeWidth={2.2} />
         </div>
 
         {route && (
-          <ArrowUpRight
-            className="stat-arrow"
-            size={16}
-            color="#94a3b8"
-          />
+          <ArrowUpRight className="stat-arrow" size={16} color="#94a3b8" />
         )}
       </div>
 
-      <div className="stat-value">
-        {value}
-      </div>
+      <div className="stat-value">{value}</div>
 
-      <div className="stat-title">
-        {title}
-      </div>
+      <div className="stat-title">{title}</div>
 
       <div
         className="stat-accent"
@@ -299,14 +260,11 @@ export default function ManagerDashboard() {
 
   const isMobile = useIsMobile(768);
 
-  const [dashboard, setDashboard] =
-    useState(null);
+  const [dashboard, setDashboard] = useState(null);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [refreshing, setRefreshing] =
-    useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // ============================================================
   // FETCH DASHBOARD
@@ -316,32 +274,21 @@ export default function ManagerDashboard() {
     try {
       setRefreshing(true);
 
-      const user = JSON.parse(
-        localStorage.getItem("user")
-      );
+      const user = JSON.parse(localStorage.getItem("user"));
 
       let data;
 
       if (user.role === "flm") {
-        data = await getFLMDashboard(
-          user.flmId
-        );
+        data = await getFLMDashboard(user.flmId);
       } else if (user.role === "slm") {
-        data = await getSLMDashboard(
-          user.slmId
-        );
+        data = await getSLMDashboard(user.slmId);
       } else if (user.role === "tlm") {
-        data = await getTLMDashboard(
-          user.tlmId
-        );
+        data = await getTLMDashboard(user.tlmId);
       }
 
       setDashboard(data);
     } catch (error) {
-      console.error(
-        "Error fetching dashboard:",
-        error
-      );
+      console.error("Error fetching dashboard:", error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -356,22 +303,16 @@ export default function ManagerDashboard() {
   // NAVIGATION
   // ============================================================
 
-  const handleRefresh = () =>
-    fetchDashboard();
+  const handleRefresh = () => fetchDashboard();
 
-  const handleViewAllMRs = () =>
-    navigate("/manager/mr-progress");
+  const handleViewAllMRs = () => navigate("/manager/mr-progress");
 
-  const handleViewPendingApprovals = () =>
-    navigate("/manager/approvals");
+  const handleViewPendingApprovals = () => navigate("/manager/approvals");
 
   const handleViewDoctor = (doctorId) =>
-    navigate(
-      `/doctor-details/${doctorId}`
-    );
+    navigate(`/doctor-details/${doctorId}`);
 
-  const handleViewAllActivities = () =>
-    navigate("/manager/activity-log");
+  const handleViewAllActivities = () => navigate("/manager/activity-log");
 
   // ============================================================
   // LOADING
@@ -379,10 +320,7 @@ export default function ManagerDashboard() {
 
   if (loading) {
     return (
-      <Layout
-        role="manager"
-        active="Dashboard"
-      >
+      <Layout role="manager" active="Dashboard">
         <Crumbs items={["Dashboard"]} />
 
         <div className="dashboard-loading">
@@ -392,10 +330,7 @@ export default function ManagerDashboard() {
 
           <h3>Loading dashboard</h3>
 
-          <p>
-            Please wait while we load your
-            campaign overview.
-          </p>
+          <p>Please wait while we load your campaign overview.</p>
         </div>
 
         <style>{`
@@ -453,10 +388,7 @@ export default function ManagerDashboard() {
 
   if (!dashboard) {
     return (
-      <Layout
-        role="manager"
-        active="Dashboard"
-      >
+      <Layout role="manager" active="Dashboard">
         <Crumbs items={["Dashboard"]} />
 
         <div className="dashboard-error">
@@ -464,19 +396,11 @@ export default function ManagerDashboard() {
             <XCircle size={28} />
           </div>
 
-          <h3>
-            Failed to load dashboard data
-          </h3>
+          <h3>Failed to load dashboard data</h3>
 
-          <p>
-            Something went wrong while loading
-            your dashboard.
-          </p>
+          <p>Something went wrong while loading your dashboard.</p>
 
-          <Button
-            onClick={handleRefresh}
-            variant="primary"
-          >
+          <Button onClick={handleRefresh} variant="primary">
             <RefreshCw size={16} />
             Retry
           </Button>
@@ -524,15 +448,10 @@ export default function ManagerDashboard() {
   // USER
   // ============================================================
 
-  const user = JSON.parse(
-    localStorage.getItem("user")
-  );
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const managerName =
-    user?.flmName ||
-    user?.slmName ||
-    user?.tlmName ||
-    "Manager";
+    user?.flmName || user?.slmName || user?.tlmName || "Manager";
 
   // ============================================================
   // STATS
@@ -556,8 +475,7 @@ export default function ManagerDashboard() {
 
     {
       title: "Approved Doctors",
-      value:
-        dashboard.approvedDoctors || 0,
+      value: dashboard.approvedDoctors || 0,
       icon: CheckCircle2,
       tone: "green",
     },
@@ -571,8 +489,7 @@ export default function ManagerDashboard() {
 
     {
       title: "Pending Actions",
-      value:
-        dashboard.pendingActions || 0,
+      value: dashboard.pendingActions || 0,
       icon: Clock3,
       tone: "orange",
       route: "/manager/approvals",
@@ -580,18 +497,14 @@ export default function ManagerDashboard() {
 
     {
       title: "Rejected Doctors",
-      value:
-        dashboard.rejectedDoctors || 0,
+      value: dashboard.rejectedDoctors || 0,
       icon: XCircle,
       tone: "red",
     },
   ];
 
   return (
-    <Layout
-      role="manager"
-      active="Dashboard"
-    >
+    <Layout role="manager" active="Dashboard">
       <div className="manager-dashboard">
         <Crumbs items={["Dashboard"]} />
 
@@ -609,12 +522,8 @@ export default function ManagerDashboard() {
             <h1>Manager Dashboard</h1>
 
             <p>
-              Welcome back,{" "}
-              <strong>
-                {managerName}
-              </strong>
-              . Here's an overview of your
-              team's campaign progress.
+              Welcome back, <strong>{managerName}</strong>. Here's an overview
+              of your team's campaign progress.
             </p>
           </div>
 
@@ -622,26 +531,14 @@ export default function ManagerDashboard() {
             variant="outline"
             onClick={handleRefresh}
             disabled={refreshing}
-            size={
-              isMobile
-                ? "small"
-                : "medium"
-            }
+            size={isMobile ? "small" : "medium"}
           >
             <RefreshCw
-              size={
-                isMobile ? 14 : 17
-              }
-              className={
-                refreshing
-                  ? "refreshing-icon"
-                  : ""
-              }
+              size={isMobile ? 14 : 17}
+              className={refreshing ? "refreshing-icon" : ""}
             />
 
-            {refreshing
-              ? "Refreshing..."
-              : "Refresh"}
+            {refreshing ? "Refreshing..." : "Refresh"}
           </Button>
         </div>
 
@@ -656,9 +553,7 @@ export default function ManagerDashboard() {
                 key={stat.title}
                 {...stat}
                 isMobile={isMobile}
-                onClick={(route) =>
-                  navigate(route)
-                }
+                onClick={(route) => navigate(route)}
               />
             ))}
           </div>
@@ -669,27 +564,19 @@ export default function ManagerDashboard() {
         ==================================================== */}
 
         <div className="dashboard-grid first-grid">
-          <FunnelPanel
-            funnel={dashboard.funnel}
-          />
+          <FunnelPanel funnel={dashboard.funnel} />
 
           <div className="dashboard-card">
             <div className="card-header">
               <div>
-                <div className="card-title">
-                  MR-wise Performance
-                </div>
+                <div className="card-title">MR-wise Performance</div>
 
                 <div className="card-subtitle">
-                  Performance breakdown by
-                  medical representative
+                  Performance breakdown by medical representative
                 </div>
               </div>
 
-              <button
-                className="card-action"
-                onClick={handleViewAllMRs}
-              >
+              <button className="card-action" onClick={handleViewAllMRs}>
                 View All
                 <ArrowUpRight size={14} />
               </button>
@@ -708,85 +595,50 @@ export default function ManagerDashboard() {
                 </thead>
 
                 <tbody>
-                  {dashboard.mrPerformance?.length >
-                  0 ? (
-                    dashboard.mrPerformance.map(
-                      (mr, idx) => (
-                        <tr key={idx}>
-                          <td>
-                            <div className="mr-name-cell">
-                              <div className="mr-avatar">
-                                {mr.mrName
-                                  ?.charAt(0)
-                                  ?.toUpperCase() ||
-                                  "M"}
-                              </div>
-
-                              <span>
-                                {mr.mrName}
-                              </span>
+                  {dashboard.mrPerformance?.length > 0 ? (
+                    dashboard.mrPerformance.map((mr, idx) => (
+                      <tr key={idx}>
+                        <td>
+                          <div className="mr-name-cell">
+                            <div className="mr-avatar">
+                              {mr.mrName?.charAt(0)?.toUpperCase() || "M"}
                             </div>
-                          </td>
 
-                          <td>
-                            <strong>
-                              {mr.totalDoctors ||
-                                0}
-                            </strong>
-                          </td>
+                            <span>{mr.mrName}</span>
+                          </div>
+                        </td>
 
-                          <td>
-                            <div className="metric-cell">
-                              <strong>
-                                {mr.approvedDoctors ||
-                                  0}
-                              </strong>
+                        <td>
+                          <strong>{mr.totalDoctors || 0}</strong>
+                        </td>
 
-                              <span>
-                                {mr.approvedPercentage ||
-                                  0}
-                                %
-                              </span>
-                            </div>
-                          </td>
+                        <td>
+                          <div className="metric-cell">
+                            <strong>{mr.approvedDoctors || 0}</strong>
 
-                          <td>
-                            <div className="metric-cell">
-                              <strong>
-                                {mr.inputGivenDoctors ||
-                                  0}
-                              </strong>
+                            <span>{mr.approvedPercentage || 0}%</span>
+                          </div>
+                        </td>
 
-                              <span>
-                                {mr.inputGivenPercentage ||
-                                  0}
-                                %
-                              </span>
-                            </div>
-                          </td>
+                        <td>
+                          <div className="metric-cell">
+                            <strong>{mr.inputGivenDoctors || 0}</strong>
 
-                          <td>
-                            <Badge
-                              tone="red"
-                              compact={
-                                isMobile
-                              }
-                            >
-                              {mr.pendingDoctors ||
-                                0}
-                            </Badge>
-                          </td>
-                        </tr>
-                      )
-                    )
+                            <span>{mr.inputGivenPercentage || 0}%</span>
+                          </div>
+                        </td>
+
+                        <td>
+                          <Badge tone="red" compact={isMobile}>
+                            {mr.pendingDoctors || 0}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))
                   ) : (
                     <tr>
-                      <td
-                        colSpan="5"
-                        className="empty-table"
-                      >
-                        No MR performance
-                        data available
+                      <td colSpan="5" className="empty-table">
+                        No MR performance data available
                       </td>
                     </tr>
                   )}
@@ -806,13 +658,10 @@ export default function ManagerDashboard() {
           <div className="dashboard-card">
             <div className="card-header">
               <div>
-                <div className="card-title">
-                  Pending Actions
-                </div>
+                <div className="card-title">Pending Actions</div>
 
                 <div className="card-subtitle">
-                  Items requiring your
-                  attention
+                  Items requiring your attention
                 </div>
               </div>
 
@@ -829,83 +678,46 @@ export default function ManagerDashboard() {
 
               <div
                 className={`pending-action-item ${
-                  (dashboard.pendingApprovals ||
-                    0) > 0
-                    ? "is-clickable"
-                    : ""
+                  (dashboard.pendingApprovals || 0) > 0 ? "is-clickable" : ""
                 }`}
               >
                 <ListLine
                   icon={Clock3}
                   title="Doctors awaiting approval"
                   sub="Submitted by MRs pending your approval"
-                  value={
-                    dashboard.pendingApprovals ||
-                    0
-                  }
-                  onClick={
-                    handleViewPendingApprovals
-                  }
-                  clickable={
-                    (dashboard.pendingApprovals ||
-                      0) > 0
-                  }
+                  value={dashboard.pendingApprovals || 0}
+                  onClick={handleViewPendingApprovals}
+                  clickable={(dashboard.pendingApprovals || 0) > 0}
                 />
               </div>
 
               <div
                 className={`pending-action-item ${
-                  (dashboard.pendingFreeze ||
-                    0) > 0
-                    ? "is-clickable"
-                    : ""
+                  (dashboard.pendingFreeze || 0) > 0 ? "is-clickable" : ""
                 }`}
               >
                 <ListLine
                   icon={CalendarDays}
                   title="Calendars pending freeze"
                   sub="Selected but not frozen by MR"
-                  value={
-                    dashboard.pendingFreeze ||
-                    0
-                  }
-                  onClick={() =>
-                    navigate(
-                      "/manager/calendar-designs"
-                    )
-                  }
-                  clickable={
-                    (dashboard.pendingFreeze ||
-                      0) > 0
-                  }
+                  value={dashboard.pendingFreeze || 0}
+                  onClick={() => navigate("/manager/calendar-designs")}
+                  clickable={(dashboard.pendingFreeze || 0) > 0}
                 />
               </div>
 
               <div
                 className={`pending-action-item ${
-                  (dashboard.inputGivenPending ||
-                    0) > 0
-                    ? "is-clickable"
-                    : ""
+                  (dashboard.inputGivenPending || 0) > 0 ? "is-clickable" : ""
                 }`}
               >
                 <ListLine
                   icon={Hand}
                   title="Input given pending"
                   sub="Frozen calendars not marked input"
-                  value={
-                    dashboard.inputGivenPending ||
-                    0
-                  }
-                  onClick={() =>
-                    navigate(
-                      "/input-given"
-                    )
-                  }
-                  clickable={
-                    (dashboard.inputGivenPending ||
-                      0) > 0
-                  }
+                  value={dashboard.inputGivenPending || 0}
+                  onClick={() => navigate("/input-given")}
+                  clickable={(dashboard.inputGivenPending || 0) > 0}
                 />
               </div>
             </div>
@@ -916,21 +728,12 @@ export default function ManagerDashboard() {
           <div className="dashboard-card">
             <div className="card-header">
               <div>
-                <div className="card-title">
-                  Recent Activity
-                </div>
+                <div className="card-title">Recent Activity</div>
 
-                <div className="card-subtitle">
-                  Latest team activity
-                </div>
+                <div className="card-subtitle">Latest team activity</div>
               </div>
 
-              <button
-                className="card-action"
-                onClick={
-                  handleViewAllActivities
-                }
-              >
+              <button className="card-action" onClick={handleViewAllActivities}>
                 View All
                 <ArrowUpRight size={14} />
               </button>
@@ -938,76 +741,50 @@ export default function ManagerDashboard() {
 
             <div className="activity-list">
               {dashboard.recentActivities &&
-              dashboard.recentActivities
-                .length > 0 ? (
-                dashboard.recentActivities.map(
-                  (activity, index) => {
-                    let title =
-                      "Activity performed";
+              dashboard.recentActivities.length > 0 ? (
+                dashboard.recentActivities.map((activity, index) => {
+                  let title = "Activity performed";
 
-                    let status =
-                      "Completed";
+                  let status = "Completed";
 
-                    let time =
-                      activity.createdAt ||
-                      new Date();
+                  let time = activity.createdAt || new Date();
 
-                    if (activity.action) {
-                      title =
-                        activity.action;
-                    }
-
-                    if (
-                      activity.doctor
-                        ?.doctorName
-                    ) {
-                      title = `${activity.doctor.doctorName} - ${
-                        activity.action ||
-                        "Activity"
-                      }`;
-                    }
-
-                    if (
-                      activity.description
-                    ) {
-                      title =
-                        activity.description;
-                    }
-
-                    if (activity.status) {
-                      status =
-                        activity.status;
-                    }
-
-                    return (
-                      <div
-                        className="activity-row"
-                        key={
-                          activity._id ||
-                          index
-                        }
-                      >
-                        <ManagerActivity
-                          title={title}
-                          status={status}
-                          time={time}
-                          compact={
-                            isMobile
-                          }
-                        />
-                      </div>
-                    );
+                  if (activity.action) {
+                    title = activity.action;
                   }
-                )
+
+                  if (activity.doctor?.doctorName) {
+                    title = `${activity.doctor.doctorName} - ${
+                      activity.action || "Activity"
+                    }`;
+                  }
+
+                  if (activity.description) {
+                    title = activity.description;
+                  }
+
+                  if (activity.status) {
+                    status = activity.status;
+                  }
+
+                  return (
+                    <div className="activity-row" key={activity._id || index}>
+                      <ManagerActivity
+                        title={title}
+                        status={status}
+                        time={time}
+                        compact={isMobile}
+                      />
+                    </div>
+                  );
+                })
               ) : (
                 <div className="empty-state">
                   <div className="empty-state-icon">
                     <Activity size={20} />
                   </div>
 
-                  <span>
-                    No recent activities
-                  </span>
+                  <span>No recent activities</span>
                 </div>
               )}
             </div>
@@ -1018,106 +795,76 @@ export default function ManagerDashboard() {
             RECENT DOCTORS
         ==================================================== */}
 
-        {dashboard.recentDoctors &&
-          dashboard.recentDoctors.length >
-            0 && (
-            <div className="dashboard-card recent-doctors-card">
-              <div className="card-header">
-                <div>
-                  <div className="card-title">
-                    Recently Added Doctors
+        {dashboard.recentDoctors && dashboard.recentDoctors.length > 0 && (
+          <div className="dashboard-card recent-doctors-card">
+            <div className="card-header">
+              <div>
+                <div className="card-title">Recently Added Doctors</div>
+
+                <div className="card-subtitle">
+                  Latest doctors added to your team
+                </div>
+              </div>
+
+              <button
+                className="card-action"
+                onClick={() => navigate("/manager/doctor-progress")}
+              >
+                View All
+                <ArrowUpRight size={14} />
+              </button>
+            </div>
+
+            <div className="doctors-grid">
+              {dashboard.recentDoctors.map((doctor) => (
+                <div
+                  key={doctor._id}
+                  className="doctor-card"
+                  onClick={() => handleViewDoctor(doctor._id)}
+                >
+                  <div className="doctor-top">
+                    <div className="doctor-avatar">
+                      {doctor.doctorName?.charAt(0)?.toUpperCase() || "D"}
+                    </div>
+
+                    <Badge
+                      tone={
+                        doctor.approvalStatus === "approved"
+                          ? "green"
+                          : doctor.approvalStatus === "rejected"
+                            ? "red"
+                            : "orange"
+                      }
+                      compact={isMobile}
+                    >
+                      {doctor.approvalStatus === "approved"
+                        ? "Approved"
+                        : doctor.approvalStatus === "rejected"
+                          ? "Rejected"
+                          : "Pending"}
+                    </Badge>
                   </div>
 
-                  <div className="card-subtitle">
-                    Latest doctors added to
-                    your team
+                  <div className="doctor-info">
+                    <h4>{doctor.doctorName}</h4>
+
+                    <p>{doctor.speciality || "Speciality not available"}</p>
+
+                    <span>
+                      Added {new Date(doctor.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <div className="doctor-footer">
+                    <span>View details</span>
+
+                    <ArrowUpRight size={14} />
                   </div>
                 </div>
-
-                <button
-                  className="card-action"
-                  onClick={() =>
-                    navigate(
-                      "/manager/doctor-progress"
-                    )
-                  }
-                >
-                  View All
-                  <ArrowUpRight size={14} />
-                </button>
-              </div>
-
-              <div className="doctors-grid">
-                {dashboard.recentDoctors.map(
-                  (doctor) => (
-                    <div
-                      key={doctor._id}
-                      className="doctor-card"
-                      onClick={() =>
-                        handleViewDoctor(
-                          doctor._id
-                        )
-                      }
-                    >
-                      <div className="doctor-top">
-                        <div className="doctor-avatar">
-                          {doctor.doctorName
-                            ?.charAt(0)
-                            ?.toUpperCase() ||
-                            "D"}
-                        </div>
-
-                        <Badge
-                          tone={
-                            doctor.approvalStatus ===
-                            "approved"
-                              ? "green"
-                              : "orange"
-                          }
-                          compact={
-                            isMobile
-                          }
-                        >
-                          {doctor.approvalStatus ===
-                          "approved"
-                            ? "Approved"
-                            : "Pending"}
-                        </Badge>
-                      </div>
-
-                      <div className="doctor-info">
-                        <h4>
-                          {doctor.doctorName}
-                        </h4>
-
-                        <p>
-                          {doctor.speciality ||
-                            "Speciality not available"}
-                        </p>
-
-                        <span>
-                          Added{" "}
-                          {new Date(
-                            doctor.createdAt
-                          ).toLocaleDateString()}
-                        </span>
-                      </div>
-
-                      <div className="doctor-footer">
-                        <span>
-                          View details
-                        </span>
-
-                        <ArrowUpRight
-                          size={14}
-                        />
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
+              ))}
             </div>
-          )}
+          </div>
+        )}
       </div>
 
       {/* ======================================================
