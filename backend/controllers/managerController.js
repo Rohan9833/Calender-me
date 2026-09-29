@@ -585,7 +585,7 @@ const updateDoctorApproval = async (req, res) => {
     ) {
       return res.status(403).json({
         success: false,
-        message: \`This doctor was already \${doctor.approvalStatus} by a \${doctor.approvedByRole.toUpperCase()}. Only that manager or a higher-level manager can change the decision.\`,
+        message: `This doctor was already ${doctor.approvalStatus} by a ${doctor.approvedByRole.toUpperCase()}. Only that manager or a higher-level manager can change the decision.`,
         lockedByRole: doctor.approvedByRole,
       });
     }
@@ -619,7 +619,7 @@ const updateDoctorApproval = async (req, res) => {
       }
 
       await Activity.create({
-        action: \`\${approvalStatus.charAt(0).toUpperCase() + approvalStatus.slice(1)}: \${doctor.doctorName}\`,
+        action: `${approvalStatus.charAt(0).toUpperCase() + approvalStatus.slice(1)}: ${doctor.doctorName}`,
         doctor: doctor._id,
         mr: doctor.mr,
         flm: approvedByRole === "flm" ? approvedBy : null,
@@ -634,11 +634,11 @@ const updateDoctorApproval = async (req, res) => {
                 : "User",
         role: approvedByRole,
         status: approvalStatus === "approved" ? "Completed" : "Rejected",
-        details: \`Doctor \${approvalStatus} by \${userName} (\${approvedByRole.toUpperCase()})\`,
+        details: `Doctor ${approvalStatus} by ${userName} (${approvedByRole.toUpperCase()})`,
       });
 
       console.log(
-        \`✅ Activity logged: \${approvalStatus} - \${doctor.doctorName}\`,
+        `✅ Activity logged: ${approvalStatus} - ${doctor.doctorName}`,
       );
     } catch (err) {
       console.log("⚠️ Error logging activity:", err.message);
@@ -648,7 +648,7 @@ const updateDoctorApproval = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: \`Doctor \${approvalStatus}\`,
+      message: `Doctor ${approvalStatus}`,
       doctor,
     });
   } catch (error) {
