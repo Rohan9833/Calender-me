@@ -86,3 +86,31 @@ export const updateDoctorStatus = async (doctorId, approvalStatus, approvedBy, a
   });
   return response.data;
 };
+export const getPendingActions = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const userId =
+      user.role === "flm"
+        ? user.flmId
+        : user.role === "slm"
+          ? user.slmId
+          : user.role === "tlm"
+            ? user.tlmId
+            : user.role === "ho"
+              ? user.hoId
+              : null;
+
+    const response = await api.get("/manager/pending-actions", {
+      headers: {
+        "x-user-role": user.role,
+        "x-user-id": userId,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pending actions:", error);
+    return { success: false, actions: [] };
+  }
+};
