@@ -732,6 +732,11 @@ export function ApprovalQueue({ role = "manager" }) {
 
                     const isPending = doctor.approvalStatus === "pending";
 
+                    const lowerManagerLockedByTLM =
+                      isRejected &&
+                      doctor.approvedByRole === "tlm" &&
+                      user?.role !== "tlm";
+
                     return (
                       <tr
                         key={doctor._id}
@@ -856,7 +861,10 @@ export function ApprovalQueue({ role = "manager" }) {
                               </button>
                             </div>
                           ) : user?.role === "slm" || user?.role === "tlm" ? (
-                            <div className="approval-actions">
+                            lowerManagerLockedByTLM ? (
+                              <span className="view-only">Locked by TLM</span>
+                            ) : (
+                              <div className="approval-actions">
                               {(isPending || isRejected) && (
                                 <button
                                   className="action-button approve-button"
@@ -894,7 +902,8 @@ export function ApprovalQueue({ role = "manager" }) {
                                   {isApproved ? "Disapprove" : "Disapprove"}
                                 </button>
                               )}
-                            </div>
+                              </div>
+                            )
                           ) : (
                             <span className="view-only">
                               {isApproved
