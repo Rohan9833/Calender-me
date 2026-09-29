@@ -27,6 +27,24 @@ import {
 
 import { useEffect, useState } from "react";
 
+const MANAGER_APPROVAL_LEVEL = {
+  flm: 1,
+  slm: 2,
+  tlm: 3,
+  ho: 4,
+};
+
+const isDecisionLockedForRole = (doctor, role) => {
+  if (!doctor?.approvedByRole || !role) return false;
+
+  const currentLevel = MANAGER_APPROVAL_LEVEL[role];
+  const decisionLevel = MANAGER_APPROVAL_LEVEL[doctor.approvedByRole];
+
+  if (!currentLevel || !decisionLevel) return false;
+
+  return currentLevel < decisionLevel;
+};
+
 import {
   getPendingApprovals,
   updateDoctorStatus,
@@ -732,6 +750,13 @@ export function ApprovalQueue({ role = "manager" }) {
 
                     const isPending = doctor.approvalStatus === "pending";
 
+                    const isLockedByHigherManager = isDecisionLockedForRole(
+                      doctor,
+                      user?.role,
+                    );
+
+                    const lockedByRole = doctor.approvedByRole?.toUpperCase();
+
                     return (
                       <tr
                         key={doctor._id}
@@ -856,45 +881,51 @@ export function ApprovalQueue({ role = "manager" }) {
                               </button>
                             </div>
                           ) : user?.role === "slm" || user?.role === "tlm" ? (
-                            <div className="approval-actions">
-                              {(isPending || isRejected) && (
-                                <button
-                                  className="action-button approve-button"
-                                  onClick={() =>
-                                    openConfirmPopup(
-                                      doctor._id,
-                                      "approved",
-                                      doctor.doctorName,
-                                    )
-                                  }
-                                  disabled={processingId === doctor._id}
-                                  type="button"
-                                >
-                                  <CheckCircle2 size={14} />
-                                  {processingId === doctor._id
-                                    ? "Processing..."
-                                    : "Approve"}
-                                </button>
-                              )}
+                            isLockedByHigherManager ? (
+                              <span className="view-only approval-locked">
+                                Locked by {lockedByRole}
+                              </span>
+                            ) : (
+                              <div className="approval-actions">
+                                {(isPending || isRejected) && (
+                                  <button
+                                    className="action-button approve-button"
+                                    onClick={() =>
+                                      openConfirmPopup(
+                                        doctor._id,
+                                        "approved",
+                                        doctor.doctorName,
+                                      )
+                                    }
+                                    disabled={processingId === doctor._id}
+                                    type="button"
+                                  >
+                                    <CheckCircle2 size={14} />
+                                    {processingId === doctor._id
+                                      ? "Processing..."
+                                      : "Approve"}
+                                  </button>
+                                )}
 
-                              {(isPending || isApproved) && (
-                                <button
-                                  className="action-button reject-button"
-                                  onClick={() =>
-                                    openConfirmPopup(
-                                      doctor._id,
-                                      "rejected",
-                                      doctor.doctorName,
-                                    )
-                                  }
-                                  disabled={processingId === doctor._id}
-                                  type="button"
-                                >
-                                  <XCircle size={14} />
-                                  {isApproved ? "Disapprove" : "Disapprove"}
-                                </button>
-                              )}
-                            </div>
+                                {(isPending || isApproved) && (
+                                  <button
+                                    className="action-button reject-button"
+                                    onClick={() =>
+                                      openConfirmPopup(
+                                        doctor._id,
+                                        "rejected",
+                                        doctor.doctorName,
+                                      )
+                                    }
+                                    disabled={processingId === doctor._id}
+                                    type="button"
+                                  >
+                                    <XCircle size={14} />
+                                    Disapprove
+                                  </button>
+                                )}
+                              </div>
+                            )
                           ) : (
                             <span className="view-only">
                               {isApproved
@@ -1942,6 +1973,21 @@ export function ApprovalQueue({ role = "manager" }) {
           box-shadow:
             0 9px 20px
             rgba(239,68,68,.23);
+        }
+
+        .approval-locked {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 38px;
+          padding: 0 12px;
+          border-radius: 10px;
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+          color: #64748b;
+          font-size: 12px;
+          font-weight: 700;
+          white-space: nowrap;
         }
 
         .view-only {
