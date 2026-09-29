@@ -153,10 +153,10 @@ const getPendingActions = async (req, res) => {
     const userRole = req.headers["x-user-role"];
     const userId = req.headers["x-user-id"];
 
-    if (!userRole || !userId) {
+    if (!userRole) {
       return res.status(400).json({
         success: false,
-        message: "User role and user id are required",
+        message: "User role is required",
         actions: [],
       });
     }
