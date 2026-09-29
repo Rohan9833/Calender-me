@@ -545,6 +545,14 @@ const updateDoctorApproval = async (req, res) => {
       });
     }
 
+    const levels = { flm: 1, slm: 2, tlm: 3, ho: 4 };
+    const actorLevel = levels[approvedByRole];
+    const previousLevel = levels[doctor.approvedByRole];
+
+    if (doctor.approvalStatus === "rejected" && doctor.approvedByRole && previousLevel > actorLevel) {
+      return res.status(403).json({ success: false, message: "Higher-level decision is locked", lockedByRole: doctor.approvedByRole });
+    }
+
     // Update approval status
     doctor.approvalStatus = approvalStatus;
     doctor.approvedAt = new Date();
