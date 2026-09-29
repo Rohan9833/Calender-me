@@ -1424,13 +1424,17 @@ export default function ManagerDashboard() {
           cursor: pointer;
         }
 
-        .pending-action-item.is-clickable:hover {
+        .pending-action-item:hover {
           background: #f8fbff;
           border-color: #dbeafe;
           transform: translateX(3px);
           box-shadow:
             0 4px 14px
             rgba(37, 99, 235, 0.08);
+        }
+
+        .pending-action-item.is-clickable {
+          cursor: pointer;
         }
 
         .pending-action-item.is-clickable:active {
@@ -1831,7 +1835,7 @@ export default function ManagerDashboard() {
             border-radius: 11px;
           }
 
-          .pending-action-item.is-clickable:hover {
+          .pending-action-item:hover {
             transform: translateX(2px);
             box-shadow:
               0 3px 10px
