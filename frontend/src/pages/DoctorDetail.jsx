@@ -248,7 +248,7 @@ function CampaignSummary({ doctor }) {
 }
 
 // ─── Timeline ──────────────────────────────────────────
-function Timeline({ doctor }) {
+function Timeline({ doctor, onViewFullTimeline }) {
   const isMobile = useIsMobile(768);
   const timelineItems = [
     {
@@ -366,7 +366,7 @@ function Timeline({ doctor }) {
           </div>
         </div>
       ))}
-      <Button variant="outline" icon={Clock3} style={{ marginTop: 12, width: isMobile ? "100%" : "auto" }}>
+      <Button variant="outline" icon={Clock3} onClick={onViewFullTimeline} style={{ marginTop: 12, width: isMobile ? "100%" : "auto" }}>
         View Full Timeline
       </Button>
     </aside>
@@ -390,6 +390,10 @@ export default function DoctorDetail({ consentModal = false }) {
   });
   const [calendarData, setCalendarData] = useState(null);
   const [calendarLoading, setCalendarLoading] = useState(false);
+  const [timelineOpen, setTimelineOpen] = useState(false);
+  const [timelineLoading, setTimelineLoading] = useState(false);
+  const [timelineActivities, setTimelineActivities] = useState([]);
+  const [timelineError, setTimelineError] = useState("");
 
   const showPopup = (type, title, message) => {
     setPopup({ isOpen: true, type, title, message });
@@ -397,6 +401,35 @@ export default function DoctorDetail({ consentModal = false }) {
   const closePopup = () => {
     setPopup({ ...popup, isOpen: false });
   };
+
+  const handleViewFullTimeline = async () => {
+    if (!doctorId) return;
+
+    setTimelineOpen(true);
+    setTimelineLoading(true);
+    setTimelineError("");
+
+    try {
+      const response = await api.get(`/doctors/${doctorId}/timeline`);
+
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || "Unable to load timeline.");
+      }
+
+      setTimelineActivities(response.data.activities || []);
+    } catch (error) {
+      console.error("Failed to fetch doctor timeline:", error);
+      setTimelineActivities([]);
+      setTimelineError(
+        error.response?.data?.message ||
+        error.message ||
+        "Unable to load timeline."
+      );
+    } finally {
+      setTimelineLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     const fetchDoctor = async () => {
@@ -1086,7 +1119,7 @@ export default function DoctorDetail({ consentModal = false }) {
         </div>
 
         {/* Right Column: Timeline – moves to bottom on mobile */}
-        <Timeline doctor={doctor} />
+        <Timeline doctor={doctor} onViewFullTimeline={handleViewFullTimeline} />
       </div>
       </div>
 
@@ -1359,6 +1392,251 @@ export default function DoctorDetail({ consentModal = false }) {
       `}</style>
 
       {consentModal && <ConsentModal />}
+      {timelineOpen && (
+        <div
+          onClick={() => setTimelineOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9998,
+            background: "rgba(15,23,42,.62)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "min(760px, 96vw)",
+              maxHeight: "86vh",
+              overflow: "auto",
+              background: "#fff",
+              borderRadius: 18,
+              border: "1px solid #e5eaf3",
+              boxShadow: "0 24px 70px rgba(15,23,42,.28)",
+              padding: 22,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+                paddingBottom: 14,
+                borderBottom: "1px solid #eef2f7",
+                marginBottom: 16,
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
+                  DOCTOR ACTIVITY
+                </div>
+                <h2 style={{ margin: "4px 0 0", fontSize: 21, color: "#0f1f4d" }}>
+                  Full Activity Timeline
+                </h2>
+                <div style={{ marginTop: 4, fontSize: 13, color: "#64748b" }}>
+                  {doctor.doctorName}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setTimelineOpen(false)}
+                aria-label="Close timeline"
+                style={{
+                  width: 34,
+                  height: 34,
+                  border: 0,
+                  borderRadius: 8,
+                  background: "#f8fafc",
+                  color: "#64748b",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {timelineLoading ? (
+              <div
+                style={{
+                  minHeight: 220,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#64748b",
+                  fontSize: 14,
+                }}
+              >
+                Loading activity timeline...
+              </div>
+            ) : timelineError ? (
+              <div
+                style={{
+                  padding: 14,
+                  borderRadius: 10,
+                  background: "#fff7ed",
+                  border: "1px solid #fed7aa",
+                  color: "#9a3412",
+                  fontSize: 13,
+                }}
+              >
+                {timelineError}
+              </div>
+            ) : timelineActivities.length === 0 ? (
+              <div
+                style={{
+                  padding: 28,
+                  textAlign: "center",
+                  border: "1px dashed #dbe3ee",
+                  borderRadius: 12,
+                  color: "#64748b",
+                  fontSize: 14,
+                }}
+              >
+                No activity records found for this doctor.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {timelineActivities.map((activity, index) => {
+                  const performer =
+                    activity.performedBy?.mrName ||
+                    activity.performedBy?.flmName ||
+                    activity.performedBy?.slmName ||
+                    activity.performedBy?.tlmName ||
+                    activity.performedBy?.name ||
+                    activity.mr?.mrName ||
+                    "-";
+
+                  return (
+                    <div
+                      key={activity._id || index}
+                      style={{
+                        display: "flex",
+                        gap: 14,
+                        padding: "15px 0",
+                        borderBottom:
+                          index === timelineActivities.length - 1
+                            ? "none"
+                            : "1px solid #eef2f7",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 38,
+                          height: 38,
+                          flex: "0 0 38px",
+                          borderRadius: 10,
+                          background:
+                            activity.status === "Rejected"
+                              ? "#fef2f2"
+                              : "#eff6ff",
+                          color:
+                            activity.status === "Rejected"
+                              ? "#dc2626"
+                              : "#0b55f4",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Clock3 size={18} />
+                      </div>
+
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <strong
+                          style={{
+                            display: "block",
+                            color: "#172033",
+                            fontSize: 14,
+                          }}
+                        >
+                          {activity.action}
+                        </strong>
+
+                        <div
+                          style={{
+                            marginTop: 4,
+                            color: "#64748b",
+                            fontSize: 12,
+                          }}
+                        >
+                          By {performer}
+                          {activity.role
+                            ? ` (${activity.role.toUpperCase()})`
+                            : ""}
+                        </div>
+
+                        {activity.details && (
+                          <div
+                            style={{
+                              marginTop: 5,
+                              color: "#94a3b8",
+                              fontSize: 12,
+                              lineHeight: 1.5,
+                            }}
+                          >
+                            {activity.details}
+                          </div>
+                        )}
+
+                        <div
+                          style={{
+                            marginTop: 5,
+                            color: "#94a3b8",
+                            fontSize: 11,
+                          }}
+                        >
+                          {activity.createdAt
+                            ? new Date(activity.createdAt).toLocaleString(
+                                "en-IN",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  timeZone: "Asia/Kolkata",
+                                }
+                              )
+                            : "-"}
+                        </div>
+                      </div>
+
+                      <span
+                        style={{
+                          alignSelf: "flex-start",
+                          padding: "4px 8px",
+                          borderRadius: 999,
+                          fontSize: 10,
+                          fontWeight: 700,
+                          background:
+                            activity.status === "Rejected"
+                              ? "#fef2f2"
+                              : "#f0fdf4",
+                          color:
+                            activity.status === "Rejected"
+                              ? "#dc2626"
+                              : "#15803d",
+                        }}
+                      >
+                        {activity.status || "Completed"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <Popup
         isOpen={popup.isOpen}
         type={popup.type}
