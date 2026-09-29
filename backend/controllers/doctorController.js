@@ -594,6 +594,76 @@ const getDoctorsByMR = async (req, res) => {
 };
 // In doctorController.js - Add update function
 
+
+const getMRPendingActions = async (req, res) => {
+  try {
+    const { mrId } = req.params;
+
+    let mr;
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(mrId);
+
+    if (isValidObjectId) {
+      mr = await MR.findById(mrId);
+    }
+
+    if (!mr) {
+      mr = await MR.findOne({ mrId });
+    }
+
+    if (!mr) {
+      return res.status(404).json({
+        success: false,
+        message: "MR not found",
+        actions: [],
+      });
+    }
+
+    const doctors = await Doctor.find({
+      mr: mr._id,
+      status: { $ne: "draft" },
+    })
+      .select("doctorName speciality city approvalStatus calendarSelected calendarFrozen inputGivenStatus")
+      .sort({ updatedAt: -1 });
+
+    const inputGivenPending = doctors.filter(
+      (doctor) =>
+        doctor.calendarFrozen === true &&
+        doctor.inputGivenStatus === "pending",
+    );
+
+    const actions = [];
+
+    if (inputGivenPending.length > 0) {
+      actions.push({
+        id: "mr-input-given-pending",
+        title: "Input given pending",
+        description: "Frozen calendars are waiting to be marked as input given",
+        count: inputGivenPending.length,
+        route: "/input-given",
+        icon: "input",
+        items: inputGivenPending.slice(0, 10).map((doctor) => ({
+          id: doctor._id,
+          name: doctor.doctorName,
+          speciality: doctor.speciality,
+          city: doctor.city,
+        })),
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      actions,
+    });
+  } catch (error) {
+    console.error("Error getting MR pending actions:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      actions: [],
+    });
+  }
+};
+
 const getDoctorTimeline = async (req, res) => {
   try {
     const { doctorId } = req.params;
@@ -760,6 +830,7 @@ module.exports = {
   getDoctors,
   getDoctorById,
   getDoctorTimeline,
+  getMRPendingActions,
   uploadDoctorPhotos,
   getDoctorsByMR,
   sendConsentToDoctor,
