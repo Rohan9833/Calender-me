@@ -230,10 +230,6 @@ function buildPendingActions(doctors) {
     (doctor) => doctor.calendarSelected === true && doctor.calendarFrozen !== true,
   );
 
-  const inputGivenPending = doctors.filter(
-    (doctor) => doctor.calendarFrozen === true && doctor.inputGivenStatus === "pending",
-  );
-
   const actions = [];
 
   if (pendingApprovals.length > 0) {
@@ -270,23 +266,6 @@ function buildPendingActions(doctors) {
     });
   }
 
-  if (inputGivenPending.length > 0) {
-    actions.push({
-      id: "input-given-pending",
-      title: "Input given pending",
-      description: "Frozen calendars are waiting to be marked as input given",
-      count: inputGivenPending.length,
-      route: "/input-given",
-      icon: "input",
-      items: inputGivenPending.slice(0, 10).map((doctor) => ({
-        id: doctor._id,
-        name: doctor.doctorName,
-        speciality: doctor.speciality,
-        city: doctor.city,
-      })),
-    });
-  }
-
   return actions;
 }
 
@@ -312,9 +291,7 @@ const getPendingActionsCount = async (req, res) => {
         
         const pendingApprovals = doctors.filter(d => d.approvalStatus === "pending").length;
         const pendingFreeze = doctors.filter(d => d.calendarSelected === true && d.calendarFrozen !== true).length;
-        const inputGivenPending = doctors.filter(d => d.calendarFrozen === true && d.inputGivenStatus === "pending").length;
-        
-        pendingCount = pendingApprovals + pendingFreeze + inputGivenPending;
+        pendingCount = pendingApprovals + pendingFreeze;
       }
     } else if (userRole === "slm") {
       const slm = await SLM.findOne({ slmId: userId });
@@ -330,9 +307,7 @@ const getPendingActionsCount = async (req, res) => {
         
         const pendingApprovals = doctors.filter(d => d.approvalStatus === "pending").length;
         const pendingFreeze = doctors.filter(d => d.calendarSelected === true && d.calendarFrozen !== true).length;
-        const inputGivenPending = doctors.filter(d => d.calendarFrozen === true && d.inputGivenStatus === "pending").length;
-        
-        pendingCount = pendingApprovals + pendingFreeze + inputGivenPending;
+        pendingCount = pendingApprovals + pendingFreeze;
       }
     } else if (userRole === "tlm") {
       const tlm = await TLM.findOne({ tlmId: userId });
@@ -350,9 +325,7 @@ const getPendingActionsCount = async (req, res) => {
         
         const pendingApprovals = doctors.filter(d => d.approvalStatus === "pending").length;
         const pendingFreeze = doctors.filter(d => d.calendarSelected === true && d.calendarFrozen !== true).length;
-        const inputGivenPending = doctors.filter(d => d.calendarFrozen === true && d.inputGivenStatus === "pending").length;
-        
-        pendingCount = pendingApprovals + pendingFreeze + inputGivenPending;
+        pendingCount = pendingApprovals + pendingFreeze;
       }
     }
     
