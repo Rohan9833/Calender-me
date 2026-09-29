@@ -59,7 +59,7 @@ export const getAllDoctors = async (mrId) => {
 };
 
 export const getFrozenDoctors = async (mrId) => {
-  const response = await api.get(`/doctors/by-mr/${mrId}`);
+  const response = await api.get(`/doctors/mr/${mrId}`);
   return response.data;
 };
 
