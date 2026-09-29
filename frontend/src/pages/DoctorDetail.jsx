@@ -313,6 +313,7 @@ function Timeline({ doctor }) {
 
   return (
     <aside
+      className="doctor-timeline"
       style={{
         background: "white",
         borderRadius: 12,
@@ -686,8 +687,9 @@ export default function DoctorDetail({ consentModal = false }) {
   return (
     <Layout active="My Doctors">
       <Crumbs items={["My Doctors", "Doctor Details"]} />
+      <div className="doctor-detail-shell">
       <div
-        className="pageHead"
+        className="pageHead doctor-detail-head"
         style={{
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
@@ -726,6 +728,7 @@ export default function DoctorDetail({ consentModal = false }) {
       </div>
 
       <div
+        className="doctor-detail-grid"
         style={{
           display: "grid",
           gridTemplateColumns: isMobile ? "1fr" : "1fr 340px",
@@ -736,7 +739,7 @@ export default function DoctorDetail({ consentModal = false }) {
         {/* Left Column */}
         <div>
           <div
-            className="tabs"
+            className="tabs doctor-detail-tabs"
             style={{
               display: "flex",
               gap: isMobile ? 12 : 16,
@@ -784,6 +787,7 @@ export default function DoctorDetail({ consentModal = false }) {
           {activeTab === "overview" && (
             <>
               <div
+                className="doctor-detail-avatar"
                 style={{
                   width: isMobile ? 60 : 80,
                   height: isMobile ? 60 : 80,
@@ -808,6 +812,7 @@ export default function DoctorDetail({ consentModal = false }) {
               </div>
 
               <div
+                className="doctor-info-grid"
                 style={{
                   display: "grid",
                   gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
@@ -838,7 +843,7 @@ export default function DoctorDetail({ consentModal = false }) {
                 />
               </div>
 
-              <div style={{ marginBottom: 24 }}>
+              <div className="doctor-business-card" style={{ marginBottom: 24 }}>
                 <Section
                   title="Business Information"
                   data={[
@@ -1083,6 +1088,275 @@ export default function DoctorDetail({ consentModal = false }) {
         {/* Right Column: Timeline – moves to bottom on mobile */}
         <Timeline doctor={doctor} />
       </div>
+      </div>
+
+      <style>{`
+        .doctor-detail-shell {
+          --dd-blue: #0b55f4;
+          --dd-navy: #0f1f4d;
+          --dd-text: #172554;
+          --dd-muted: #64748b;
+          --dd-border: #e5eaf3;
+          position: relative;
+          isolation: isolate;
+        }
+
+        .doctor-detail-head {
+          animation: ddFadeUp .55s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .doctor-detail-grid {
+          animation: ddFadeUp .7s .08s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .doctor-detail-shell .doctor-detail-head h1 {
+          letter-spacing: -.035em;
+        }
+
+        .doctor-detail-shell .doctor-detail-head button {
+          transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .doctor-detail-shell .doctor-detail-head button:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 24px rgba(11,85,244,.14);
+        }
+
+        .doctor-detail-tabs {
+          position: relative;
+          overflow: hidden !important;
+          box-shadow: 0 8px 24px rgba(15,31,77,.04);
+          transition: box-shadow .25s ease, transform .25s ease;
+        }
+
+        .doctor-detail-tabs:hover {
+          box-shadow: 0 12px 30px rgba(15,31,77,.07);
+        }
+
+        .doctor-detail-tabs::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 90px;
+          height: 2px;
+          background: linear-gradient(90deg,#0b55f4,#67a3ff,transparent);
+          animation: ddShimmer 2.8s ease-in-out infinite;
+          pointer-events: none;
+        }
+
+        .doctor-detail-tabs > span {
+          transition: color .25s ease, transform .25s ease;
+        }
+
+        .doctor-detail-tabs > span:hover {
+          transform: translateY(-2px);
+        }
+
+        .doctor-detail-avatar {
+          box-shadow: 0 14px 30px rgba(11,85,244,.22);
+          animation: ddFloat 4s ease-in-out infinite, ddPop .65s .18s cubic-bezier(.22,1,.36,1) both;
+          position: relative;
+        }
+
+        .doctor-detail-avatar::after {
+          content: "";
+          position: absolute;
+          inset: -7px;
+          border: 1px solid rgba(11,85,244,.18);
+          border-radius: 50%;
+          animation: ddPulse 2.4s ease-out infinite;
+        }
+
+        .doctor-info-grid {
+          align-items: stretch;
+        }
+
+        .doctor-info-grid > div,
+        .doctor-business-card,
+        .campaignSummary,
+        .doctor-timeline {
+          background: rgba(255,255,255,.97);
+          border: 1px solid var(--dd-border);
+          box-shadow: 0 8px 24px rgba(15,31,77,.045);
+          transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+        }
+
+        .doctor-info-grid > div {
+          border-radius: 16px;
+          padding: 22px;
+          animation: ddCardIn .65s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .doctor-info-grid > div:nth-child(2) {
+          animation-delay: .12s;
+        }
+
+        .doctor-info-grid > div:hover,
+        .doctor-business-card:hover,
+        .campaignSummary:hover,
+        .doctor-timeline:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 18px 38px rgba(15,31,77,.09);
+          border-color: #d6e1f7;
+        }
+
+        .doctor-info-grid h3,
+        .doctor-business-card h3 {
+          margin-top: 0;
+          color: var(--dd-navy);
+          font-size: 17px;
+          letter-spacing: -.015em;
+        }
+
+        .doctor-info-grid p,
+        .doctor-business-card p {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          gap: 18px;
+          margin: 0;
+          padding: 11px 0;
+          border-bottom: 1px solid #f0f3f8;
+          color: var(--dd-muted);
+          line-height: 1.45;
+        }
+
+        .doctor-info-grid p:last-child,
+        .doctor-business-card p:last-child {
+          border-bottom: 0;
+        }
+
+        .doctor-info-grid p span,
+        .doctor-business-card p span {
+          color: #64748b;
+          font-size: 13px;
+        }
+
+        .doctor-info-grid p b,
+        .doctor-business-card p b {
+          color: var(--dd-text);
+          font-size: 14px;
+          text-align: right;
+          word-break: break-word;
+        }
+
+        .doctor-business-card {
+          border-radius: 16px;
+          padding: 22px;
+          animation: ddCardIn .7s .18s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .campaignSummary {
+          animation: ddCardIn .7s .25s cubic-bezier(.22,1,.36,1) both;
+          overflow: hidden;
+        }
+
+        .campaignSummary > div {
+          transition: transform .25s ease, background .25s ease;
+        }
+
+        .campaignSummary > div:hover {
+          transform: translateY(-3px);
+        }
+
+        .doctor-timeline {
+          box-shadow: 0 10px 28px rgba(15,31,77,.06);
+          animation: ddSlideRight .75s .12s cubic-bezier(.22,1,.36,1) both;
+          overflow: hidden;
+        }
+
+        .doctor-timeline h3 {
+          color: var(--dd-navy);
+          letter-spacing: -.02em;
+        }
+
+        .doctor-timeline > div:not(:first-child) {
+          transition: transform .25s ease, background-color .25s ease;
+          border-radius: 12px;
+          padding-left: 8px !important;
+          padding-right: 8px !important;
+        }
+
+        .doctor-timeline > div:not(:first-child):hover {
+          transform: translateX(5px);
+          background: #f8fbff;
+        }
+
+        .doctor-timeline .iconbox {
+          transition: transform .25s ease;
+        }
+
+        .doctor-timeline > div:hover .iconbox {
+          transform: rotate(-5deg) scale(1.06);
+        }
+
+        @keyframes ddFadeUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes ddCardIn {
+          from { opacity: 0; transform: translateY(24px) scale(.985); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes ddSlideRight {
+          from { opacity: 0; transform: translateX(28px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes ddPop {
+          from { opacity: 0; transform: scale(.82); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes ddFloat {
+          0%,100% { transform: translateY(0); }
+          50% { transform: translateY(-7px); }
+        }
+
+        @keyframes ddPulse {
+          0% { opacity: .55; transform: scale(.94); }
+          70%,100% { opacity: 0; transform: scale(1.12); }
+        }
+
+        @keyframes ddShimmer {
+          0%,100% { opacity: .25; transform: translateX(-8px); }
+          50% { opacity: 1; transform: translateX(32px); }
+        }
+
+        @media (max-width: 768px) {
+          .doctor-info-grid > div,
+          .doctor-business-card {
+            padding: 17px;
+          }
+
+          .doctor-info-grid p,
+          .doctor-business-card p {
+            align-items: flex-start;
+          }
+
+          .doctor-info-grid p b,
+          .doctor-business-card p b {
+            max-width: 58%;
+          }
+
+          .doctor-timeline {
+            animation-name: ddFadeUp;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .doctor-detail-shell *,
+          .doctor-detail-shell *::before,
+          .doctor-detail-shell *::after {
+            animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: .01ms !important;
+          }
+        }
+      `}</style>
 
       {consentModal && <ConsentModal />}
       <Popup
