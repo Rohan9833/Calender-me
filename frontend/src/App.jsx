@@ -17,6 +17,7 @@ import {
   CalendarMonth,
   DesignSelect,
   CalendarSummary,
+  CalendarFinalized,
 } from "./pages/CalendarSelect";
 import InputGiven from "./pages/InputGiven";
 import CalendarSelectionEntry from "./pages/CalendarSelectionEntry";
@@ -72,7 +73,7 @@ function App() {
         <Route path="/calendar-summary" element={<CalendarSummary />} />
         <Route
           path="/calendar-finalized"
-          element={<CalendarSummary finalized />}
+          element={<CalendarFinalized />}
         />
         <Route path="/input-given" element={<InputGiven />} />
         <Route path="/manager/input-given" element={<InputGiven />} />

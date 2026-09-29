@@ -265,6 +265,7 @@ export default function ManagerDashboard() {
   const [loading, setLoading] = useState(true);
 
   const [refreshing, setRefreshing] = useState(false);
+  const [activityModalOpen, setActivityModalOpen] = useState(false);
   const [showAllMRs, setShowAllMRs] = useState(false);
 
   // ============================================================
@@ -313,7 +314,7 @@ export default function ManagerDashboard() {
   const handleViewDoctor = (doctorId) =>
     navigate(`/doctor-details/${doctorId}`);
 
-  const handleViewAllActivities = () => navigate("/manager/activity-log");
+  const handleViewAllActivities = () => setActivityModalOpen(true);
 
   // ============================================================
   // LOADING
@@ -493,7 +494,14 @@ export default function ManagerDashboard() {
       value: dashboard.pendingActions || 0,
       icon: Clock3,
       tone: "orange",
-      route: "/manager/approvals",
+      route:
+        (dashboard.pendingApprovals || 0) > 0
+          ? "/manager/approvals"
+          : (dashboard.inputGivenPending || 0) > 0
+            ? "/manager/input-given"
+            : (dashboard.pendingFreeze || 0) > 0
+              ? "/manager/calendar-designs"
+              : null,
     },
 
     {
@@ -830,7 +838,7 @@ export default function ManagerDashboard() {
 
               <button
                 className="card-action"
-                onClick={() => navigate("/manager/doctor-progress")}
+                onClick={() => navigate("/manager/approvals")}
               >
                 View All
                 <ArrowUpRight size={14} />
@@ -889,11 +897,184 @@ export default function ManagerDashboard() {
         )}
       </div>
 
+      {activityModalOpen && (
+        <div
+          className="manager-activity-modal-overlay"
+          onClick={() => setActivityModalOpen(false)}
+        >
+          <div
+            className="manager-activity-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="manager-activity-modal-header">
+              <div>
+                <h2>Recent Activity</h2>
+                <p>Latest activity from your team</p>
+              </div>
+              <button
+                type="button"
+                className="manager-activity-modal-close"
+                onClick={() => setActivityModalOpen(false)}
+                aria-label="Close recent activity"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="manager-activity-modal-list">
+              {dashboard.recentActivities?.length > 0 ? (
+                dashboard.recentActivities.map((activity, index) => {
+                  const title = activity.doctor?.doctorName
+                    ? `${activity.doctor.doctorName} - ${activity.action || "Activity"}`
+                    : activity.action || "Activity performed";
+
+                  return (
+                    <button
+                      type="button"
+                      className="manager-activity-modal-row"
+                      key={activity._id || index}
+                      onClick={() => {
+                        setActivityModalOpen(false);
+                        if (activity.doctor?._id) {
+                          handleViewDoctor(activity.doctor._id);
+                        }
+                      }}
+                    >
+                      <div className="manager-activity-modal-row-main">
+                        <strong>{title}</strong>
+                        <span>
+                          {activity.createdAt
+                            ? new Date(activity.createdAt).toLocaleString()
+                            : "Recently"}
+                        </span>
+                      </div>
+                      <Badge
+                        tone={
+                          activity.status === "Rejected"
+                            ? "red"
+                            : activity.status === "Completed"
+                              ? "green"
+                              : "purple"
+                        }
+                      >
+                        {activity.status || "Completed"}
+                      </Badge>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">
+                    <Activity size={20} />
+                  </div>
+                  <span>No recent activities</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ======================================================
           STYLES
       ====================================================== */}
 
       <style>{`
+        .manager-activity-modal-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 10000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+          background: rgba(15, 23, 42, 0.45);
+        }
+
+        .manager-activity-modal {
+          width: min(720px, 100%);
+          max-height: min(720px, 85vh);
+          overflow: hidden;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 18px;
+          box-shadow: 0 24px 70px rgba(15, 23, 42, 0.2);
+        }
+
+        .manager-activity-modal-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 16px;
+          padding: 20px 22px;
+          border-bottom: 1px solid #e2e8f0;
+        }
+
+        .manager-activity-modal-header h2 {
+          margin: 0;
+          color: #0f172a;
+          font-size: 20px;
+        }
+
+        .manager-activity-modal-header p {
+          margin: 5px 0 0;
+          color: #64748b;
+          font-size: 13px;
+        }
+
+        .manager-activity-modal-close {
+          width: 34px;
+          height: 34px;
+          border: 0;
+          border-radius: 9px;
+          background: #f1f5f9;
+          color: #475569;
+          font-size: 24px;
+          line-height: 1;
+          cursor: pointer;
+        }
+
+        .manager-activity-modal-list {
+          max-height: calc(min(720px, 85vh) - 92px);
+          overflow-y: auto;
+          padding: 8px;
+        }
+
+        .manager-activity-modal-row {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          padding: 14px;
+          border: 0;
+          border-bottom: 1px solid #f1f5f9;
+          background: #ffffff;
+          text-align: left;
+          cursor: pointer;
+        }
+
+        .manager-activity-modal-row:hover {
+          background: #f8fbff;
+        }
+
+        .manager-activity-modal-row-main {
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .manager-activity-modal-row-main strong {
+          color: #0f172a;
+          font-size: 14px;
+        }
+
+        .manager-activity-modal-row-main span {
+          color: #94a3b8;
+          font-size: 12px;
+        }
+
         .manager-dashboard {
           width: 100%;
           max-width: 1500px;
