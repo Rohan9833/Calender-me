@@ -847,8 +847,8 @@ export default function InputGiven({
                 </span>,
 
                 !doctor.inputGiven &&
-                doctor.calendarStatus ===
-                  "frozen" ? (
+                (doctor.calendarStatus === "frozen" ||
+                  doctor.calendarFrozen === true) ? (
                   <button
                     type="button"
                     className="handover-button"
