@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Check, CheckCircle2, ChevronDown, Eye, Lock, X } from "lucide-react";
 import { Badge, Button } from "./UIComponents";
 import { months } from "../utils/helpers";
@@ -9,6 +10,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_BASE = API_BASE_URL + "/api/calendar";
 
 export default function CalendarMonthGrid({ doctorId, mrId, isFrozen = false }) {
+  const navigate = useNavigate();
   const [selections, setSelections] = useState({});
   const [calendarStatus, setCalendarStatus] = useState("in_progress");
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,48 @@ export default function CalendarMonthGrid({ doctorId, mrId, isFrozen = false }) 
 
   const getSelectedDesign = (month) => {
     const selection = selections[month];
-    return selection?.designId ? (designAssets[month] || []).find((d) => d.id === selection.designId) || null : null;
+    return selection?.designId
+      ? (designAssets[month] || []).find((d) => d.id === selection.designId) || null
+      : null;
+  };
+
+  const goToDesignPage = (month) => {
+    if (frozen) return;
+
+    const resolvedDoctorId =
+      doctorId ||
+      sessionStorage.getItem("currentDoctorId") ||
+      localStorage.getItem("currentDoctorId");
+
+    const resolvedMrId =
+      mrId ||
+      sessionStorage.getItem("mrId") ||
+      localStorage.getItem("mrId") ||
+      JSON.parse(localStorage.getItem("user") || "{}").mrId;
+
+    if (!resolvedDoctorId) {
+      setError("Doctor ID is missing. Please select a doctor first.");
+      return;
+    }
+
+    sessionStorage.setItem("currentDoctorId", resolvedDoctorId);
+    if (resolvedMrId) sessionStorage.setItem("mrId", resolvedMrId);
+
+    navigate(
+      "/calendar-design?month=" +
+        encodeURIComponent(month) +
+        "&doctorId=" +
+        encodeURIComponent(resolvedDoctorId) +
+        "&mrId=" +
+        encodeURIComponent(resolvedMrId || ""),
+      {
+        state: {
+          doctorId: resolvedDoctorId,
+          mrId: resolvedMrId,
+          month,
+        },
+      },
+    );
   };
 
   const selectDesign = async (month, design) => {
@@ -61,11 +104,22 @@ export default function CalendarMonthGrid({ doctorId, mrId, isFrozen = false }) 
       const response = await fetch(API_BASE + "/save-month", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mrId, doctorId, year: CALENDAR_YEAR, month, designId: design.id, designLabel: design.label, unfreeze: false }),
+        body: JSON.stringify({
+          mrId,
+          doctorId,
+          year: CALENDAR_YEAR,
+          month,
+          designId: design.id,
+          designLabel: design.label,
+          unfreeze: false,
+        }),
       });
       const data = await response.json();
       if (!response.ok || data.success !== true) throw new Error(data.message || "Unable to save " + month + ".");
-      setSelections((current) => ({ ...current, [month]: { designId: design.id, designLabel: design.label } }));
+      setSelections((current) => ({
+        ...current,
+        [month]: { designId: design.id, designLabel: design.label },
+      }));
       if (data.status) setCalendarStatus(data.status);
       setOpenMonth(null);
     } catch (err) {
@@ -89,7 +143,7 @@ export default function CalendarMonthGrid({ doctorId, mrId, isFrozen = false }) 
       {error && <div className="calendar-selection-error"><span>{error}</span><button type="button" onClick={() => setError("")}><X size={16} /></button></div>}
 
       <section className="calendar-months-panel">
-        <div className="calendar-panel-heading"><div><h2>Select calendar designs</h2><p>Choose a design for each month without leaving this page. Your selection is saved immediately.</p></div><div className="calendar-panel-hint"><span className="hint-dot" /> Select from each month</div></div>
+        <div className="calendar-panel-heading"><div><h2>Select calendar designs</h2><p>Choose a design for each month. Click an unselected month to open the full design selection page.</p></div><div className="calendar-panel-hint"><span className="hint-dot" /> Select from each month</div></div>
         <div className="calendar-month-cards">
           {months.map((month, index) => {
             const selected = getSelectedDesign(month);
@@ -102,13 +156,9 @@ export default function CalendarMonthGrid({ doctorId, mrId, isFrozen = false }) 
                 <button
                   type="button"
                   className="calendar-card-preview"
-                  onClick={() =>
-                    selected
-                      ? setPreview({ month, design: selected })
-                      : setOpenMonth(month)
-                  }
+                  onClick={() => selected ? setPreview({ month, design: selected }) : goToDesignPage(month)}
                   disabled={frozen}
-                  aria-label={selected ? `Preview ${month} design` : `Select ${month} design`}
+                  aria-label={selected ? `Preview ${month} design` : `Open design selection page for ${month}`}
                 >
                   {selected ? (
                     <>
@@ -119,7 +169,7 @@ export default function CalendarMonthGrid({ doctorId, mrId, isFrozen = false }) 
                     <div className="calendar-empty-preview">
                       <div className="empty-image-icon">+</div>
                       <span>No design selected</span>
-                      <small>Click to choose a design</small>
+                      <small>Click to select a design</small>
                     </div>
                   )}
                 </button>
