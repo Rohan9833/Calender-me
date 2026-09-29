@@ -416,7 +416,7 @@ export default function DoctorDetail({ consentModal = false }) {
         throw new Error(response.data?.message || "Unable to load timeline.");
       }
 
-      setTimelineActivities(response.data.activities || []);
+      setTimelineActivities(response.data.timeline || response.data.activities || []);
     } catch (error) {
       console.error("Failed to fetch doctor timeline:", error);
       setTimelineActivities([]);
