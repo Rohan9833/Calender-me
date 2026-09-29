@@ -714,6 +714,21 @@ export default function ManagerDashboard() {
 
               <div
                 className={`pending-action-item ${
+                  (dashboard.inputGivenPending || 0) > 0 ? "is-clickable" : ""
+                }`}
+              >
+                <ListLine
+                  icon={Hand}
+                  title="Input given pending"
+                  sub="Frozen calendars not marked input"
+                  value={dashboard.inputGivenPending || 0}
+                  onClick={() => navigate("/manager/input-given")}
+                  clickable={(dashboard.inputGivenPending || 0) > 0}
+                />
+              </div>
+
+              <div
+                className={`pending-action-item ${
                   (dashboard.pendingFreeze || 0) > 0 ? "is-clickable" : ""
                 }`}
               >
