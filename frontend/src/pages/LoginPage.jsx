@@ -29,7 +29,7 @@ export default function LoginPage({ forgot = false }) {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "https://calendarme.digilateral.com/api/auth/login",
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
         {
           userId,
           password,
