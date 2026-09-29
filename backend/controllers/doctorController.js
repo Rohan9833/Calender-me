@@ -613,22 +613,88 @@ const getDoctorTimeline = async (req, res) => {
       .populate("performedBy")
       .sort({ createdAt: -1 });
 
+    const timeline = activities.map((activity) => ({
+      _id: activity._id,
+      action: activity.action,
+      status: activity.status,
+      details: activity.details,
+      role: activity.role,
+      createdAt: activity.createdAt,
+      source: "activity",
+      performedBy: activity.performedBy,
+      mr: activity.mr,
+      flm: activity.flm,
+    }));
+
+    const fallbackEvents = [
+      {
+        action: "Doctor Added",
+        date: doctor.createdAt,
+        details: `Doctor ${doctor.doctorName} added`,
+      },
+      {
+        action: "Consent Sent",
+        date: doctor.consentSentAt,
+        details: "Consent request sent to the doctor",
+      },
+      {
+        action: "Consent Approved",
+        date: doctor.consentDate || doctor.approvedAt,
+        details: "Doctor consent was approved",
+      },
+      {
+        action: "Photo Uploaded",
+        date: doctor.photoUploadedAt,
+        details: "Doctor photo was uploaded",
+      },
+      {
+        action: "Calendar Design Selected",
+        date: doctor.calendarSelectedAt,
+        details: "Calendar design selection was completed",
+      },
+      {
+        action: "Calendar Frozen",
+        date: doctor.calendarFrozenAt,
+        details: "Calendar was frozen",
+      },
+      {
+        action: "Input Given",
+        date: doctor.inputGivenAt,
+        details: "Input was given for the calendar",
+      },
+      {
+        action: "Calendar Delivered",
+        date: doctor.deliveredAt,
+        details: "Calendar was delivered",
+      },
+    ];
+
+    const existingActions = new Set(
+      timeline.map((item) => item.action.toLowerCase())
+    );
+
+    fallbackEvents.forEach((event) => {
+      if (event.date && !existingActions.has(event.action.toLowerCase())) {
+        timeline.push({
+          _id: `fallback-${event.action.replace(/\\s+/g, "-").toLowerCase()}`,
+          action: event.action,
+          status: "Completed",
+          details: event.details,
+          role: "mr",
+          createdAt: event.date,
+          source: "doctor",
+          performedBy: doctor.mr,
+          mr: doctor.mr,
+        });
+      }
+    });
+
+    timeline.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
     return res.status(200).json({
       success: true,
+      timeline,
       activities,
-      doctor: {
-        _id: doctor._id,
-        doctorName: doctor.doctorName,
-        createdAt: doctor.createdAt,
-        consentSentAt: doctor.consentSentAt || null,
-        consentDate: doctor.consentDate || null,
-        approvedAt: doctor.approvedAt || null,
-        photoUploadedAt: doctor.photoUploadedAt || null,
-        calendarSelectedAt: doctor.calendarSelectedAt || null,
-        calendarFrozenAt: doctor.calendarFrozenAt || null,
-        inputGivenAt: doctor.inputGivenAt || null,
-        deliveredAt: doctor.deliveredAt || null,
-      },
     });
   } catch (error) {
     console.error("Error fetching doctor timeline:", error);
