@@ -429,7 +429,11 @@ export function ApprovalQueue({ role = "manager" }) {
             <h1>Doctor Approval Queue</h1>
 
             <p className="subtitle">
-              Review and Approve or reject doctors submitted by your MRs.
+              {user?.role === "slm"
+                ? "FLM-approved doctors are already approved. Approve pending submissions or override an approval with Disapprove."
+                : user?.role === "tlm"
+                  ? "TLM can approve MR submissions directly, bypassing FLM and SLM, or override an existing approval with Disapprove."
+                  : "Review and Approve or reject doctors submitted by your MRs."}
             </p>
           </div>
 
@@ -815,7 +819,7 @@ export function ApprovalQueue({ role = "manager" }) {
                         </td>
 
                         <td>
-                          {isPending && user?.role === "flm" ? (
+                          {user?.role === "flm" && isPending ? (
                             <div className="approval-actions">
                               <button
                                 className="action-button approve-button"
@@ -830,7 +834,6 @@ export function ApprovalQueue({ role = "manager" }) {
                                 type="button"
                               >
                                 <CheckCircle2 size={14} />
-
                                 {processingId === doctor._id
                                   ? "Processing..."
                                   : "Approve"}
@@ -851,6 +854,46 @@ export function ApprovalQueue({ role = "manager" }) {
                                 <XCircle size={14} />
                                 Reject
                               </button>
+                            </div>
+                          ) : user?.role === "slm" || user?.role === "tlm" ? (
+                            <div className="approval-actions">
+                              {(isPending || isRejected) && (
+                                <button
+                                  className="action-button approve-button"
+                                  onClick={() =>
+                                    openConfirmPopup(
+                                      doctor._id,
+                                      "approved",
+                                      doctor.doctorName,
+                                    )
+                                  }
+                                  disabled={processingId === doctor._id}
+                                  type="button"
+                                >
+                                  <CheckCircle2 size={14} />
+                                  {processingId === doctor._id
+                                    ? "Processing..."
+                                    : "Approve"}
+                                </button>
+                              )}
+
+                              {(isPending || isApproved) && (
+                                <button
+                                  className="action-button reject-button"
+                                  onClick={() =>
+                                    openConfirmPopup(
+                                      doctor._id,
+                                      "rejected",
+                                      doctor.doctorName,
+                                    )
+                                  }
+                                  disabled={processingId === doctor._id}
+                                  type="button"
+                                >
+                                  <XCircle size={14} />
+                                  {isApproved ? "Disapprove" : "Disapprove"}
+                                </button>
+                              )}
                             </div>
                           ) : (
                             <span className="view-only">
@@ -896,11 +939,21 @@ export function ApprovalQueue({ role = "manager" }) {
               <AlertTriangle size={29} />
             </div>
 
-            <span className="modal-eyebrow">ACTION CONFIRMATION</span>
+            <span className="modal-eyebrow">
+              {confirmPopup.status === "approved"
+                ? "APPROVAL CONFIRMATION"
+                : user?.role === "slm" || user?.role === "tlm"
+                  ? "OVERRIDE CONFIRMATION"
+                  : "ACTION CONFIRMATION"}
+            </span>
 
             <h2>
               Confirm{" "}
-              {confirmPopup.status === "approved" ? "Approval" : "Rejection"}
+              {confirmPopup.status === "approved"
+                ? "Approval"
+                : user?.role === "slm" || user?.role === "tlm"
+                  ? "Disapproval"
+                  : "Rejection"}
             </h2>
 
             <p>
@@ -912,7 +965,11 @@ export function ApprovalQueue({ role = "manager" }) {
                     : "text-danger"
                 }
               >
-                {confirmPopup.status}
+                {confirmPopup.status === "approved"
+                  ? "approve"
+                  : user?.role === "slm" || user?.role === "tlm"
+                    ? "disapprove"
+                    : "reject"}
               </strong>{" "}
               this doctor?
             </p>
