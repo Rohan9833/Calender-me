@@ -94,7 +94,44 @@ export default function Header({
 
   const handlePendingActionClick = (action) => {
     setIsNotificationOpen(false);
-    if (action?.route) navigate(action.route);
+
+    if (!action) return;
+
+    // Manager notifications must always stay inside the manager flow.
+    // Do not blindly trust a route returned by the API because an older
+    // backend response can contain an MR route such as /mr-dashboard.
+    const actualRole = user?.role;
+
+    const managerRoutes = {
+      "pending-approvals": "/manager/approvals",
+      "pending-freeze": "/manager/calendar-designs",
+      "input-given-pending": "/input-given",
+    };
+
+    const hoRoutes = {
+      "pending-approvals": "/manager/approvals",
+      "pending-freeze": "/manager/calendar-designs",
+      "input-given-pending": "/input-given",
+    };
+
+    const isManagerRole = ["flm", "slm", "tlm"].includes(actualRole);
+    const isHoRole = actualRole === "ho";
+
+    if (isManagerRole && managerRoutes[action.id]) {
+      navigate(managerRoutes[action.id]);
+      return;
+    }
+
+    if (isHoRole && hoRoutes[action.id]) {
+      navigate(hoRoutes[action.id]);
+      return;
+    }
+
+    // Fallback for any future notification type that has its own route.
+    // Never fall back to /mr-dashboard from a manager notification.
+    if (action.route && action.route !== "/mr-dashboard") {
+      navigate(action.route);
+    }
   };
 
   const handleProfileClick = () => {
