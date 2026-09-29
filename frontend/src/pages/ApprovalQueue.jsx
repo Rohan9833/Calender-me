@@ -857,7 +857,7 @@ export function ApprovalQueue({ role = "manager" }) {
                             </div>
                           ) : user?.role === "slm" || user?.role === "tlm" ? (
                             <div className="approval-actions">
-                              {(isPending || (isRejected && doctor.approvedByRole !== "tlm")) && (
+                              {(isPending || (isRejected && (doctor.approvedByRole !== "tlm" || user?.role === "tlm"))) && (
                                 <button
                                   className="action-button approve-button"
                                   onClick={() =>
