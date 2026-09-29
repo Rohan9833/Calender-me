@@ -927,5 +927,6 @@ module.exports = {
 
   updateDoctorApproval,
   getPendingApprovals,
-  getPendingActionsCount
+  getPendingActionsCount,
+  getPendingActions
 };
