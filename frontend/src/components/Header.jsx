@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Avatar } from "./UIComponents";
 import { useNavigate } from "react-router-dom";
-import { getPendingActions } from "../api/managerAPI";
+import { getPendingActions, getMRPendingActions } from "../api/managerAPI";
 
 export default function Header({
   role = "mr",
@@ -61,7 +61,10 @@ export default function Header({
     const loadPendingActions = async () => {
       const actualRole = user?.role;
 
-      if (!["flm", "slm", "tlm", "ho"].includes(actualRole)) {
+      const isManagerRole = ["flm", "slm", "tlm", "ho"].includes(actualRole);
+      const isMRRole = actualRole === "mr";
+
+      if (!isManagerRole && !isMRRole) {
         if (mounted) setPendingActions([]);
         return;
       }
@@ -69,7 +72,9 @@ export default function Header({
       setPendingLoading(true);
 
       try {
-        const response = await getPendingActions();
+        const response = isManagerRole
+          ? await getPendingActions()
+          : await getMRPendingActions();
 
         if (mounted) {
           setPendingActions(response?.success ? response.actions || [] : []);
@@ -119,6 +124,11 @@ export default function Header({
 
     if (isManagerRole && managerRoutes[action.id]) {
       navigate(managerRoutes[action.id]);
+      return;
+    }
+
+    if (isMRRole && action.id === "mr-input-given-pending") {
+      navigate("/input-given");
       return;
     }
 
