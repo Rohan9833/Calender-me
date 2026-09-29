@@ -116,15 +116,6 @@ export default function Header({
       "input-given-pending": "/manager/input-given",
     };
 
-    const hoRoutes = {
-      "pending-approvals": "/manager/approvals",
-      "pending-freeze": "/manager/calendar-designs",
-      "input-given-pending": "/input-given",
-    };
-
-    const isManagerRole = ["flm", "slm", "tlm"].includes(actualRole);
-    const isHoRole = actualRole === "ho";
-
     if (isManagerRole && managerRoutes[action.id]) {
       navigate(managerRoutes[action.id]);
       return;
@@ -132,11 +123,6 @@ export default function Header({
 
     if (isMRRole && action.id === "mr-input-given-pending") {
       navigate("/input-given");
-      return;
-    }
-
-    if (isHoRole && hoRoutes[action.id]) {
-      navigate(hoRoutes[action.id]);
       return;
     }
 
