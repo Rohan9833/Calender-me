@@ -1,5 +1,6 @@
 const Doctor = require("../models/Doctor");
 const MR = require("../models/MR");
+const Activity = require("../models/activitymodel");
 const { sendConsentMail } = require("../services/mailService");
 
 // Create doctor
@@ -592,6 +593,52 @@ const getDoctorsByMR = async (req, res) => {
   }
 };
 // In doctorController.js - Add update function
+
+const getDoctorTimeline = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+
+    const doctor = await Doctor.findById(doctorId).populate("mr", "mrName mrId");
+
+    if (!doctor) {
+      return res.status(404).json({
+        success: false,
+        message: "Doctor not found",
+      });
+    }
+
+    const activities = await Activity.find({ doctor: doctorId })
+      .populate("mr", "mrName mrId")
+      .populate("flm", "flmName flmId")
+      .populate("performedBy")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      activities,
+      doctor: {
+        _id: doctor._id,
+        doctorName: doctor.doctorName,
+        createdAt: doctor.createdAt,
+        consentSentAt: doctor.consentSentAt || null,
+        consentDate: doctor.consentDate || null,
+        approvedAt: doctor.approvedAt || null,
+        photoUploadedAt: doctor.photoUploadedAt || null,
+        calendarSelectedAt: doctor.calendarSelectedAt || null,
+        calendarFrozenAt: doctor.calendarFrozenAt || null,
+        inputGivenAt: doctor.inputGivenAt || null,
+        deliveredAt: doctor.deliveredAt || null,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching doctor timeline:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const updateDoctor = async (req, res) => {
   try {
     const { doctorId } = req.params;
@@ -646,6 +693,7 @@ module.exports = {
   giveConsent,
   getDoctors,
   getDoctorById,
+  getDoctorTimeline,
   uploadDoctorPhotos,
   getDoctorsByMR,
   sendConsentToDoctor,
