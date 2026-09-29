@@ -1944,7 +1944,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
       <CalendarMonthGrid
         doctorId={CURRENT_DOCTOR_ID}
         mrId={CURRENT_MR_ID}
-        isFrozen={calendarStatus === "frozen"}
+        isFrozen={calendarStatus === "frozen" || calendarStatus === "input_given"}
       />
 
       {/* Preview Modal (keep if you need it) */}
@@ -2708,7 +2708,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
 
   const completedCount = selections.length;
   const isComplete = completedCount === 12;
-  const isFrozen = status === "frozen";
+  const isFrozen = status === "frozen" || status === "input_given";
 
   // Download PDF
   const downloadCompleteCalendar = async () => {
