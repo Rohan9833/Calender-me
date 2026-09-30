@@ -187,6 +187,12 @@ const CALENDAR_YEAR = 2027;
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_BASE = `${API_BASE_URL}/api/calendar`;
 
+function getCalendarLayoutRole() {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = String(user.role || "mr").toLowerCase();
+  return ["flm", "slm", "tlm"].includes(role) ? "manager" : role;
+}
+
 // ─── Popup Component ────────────────────────────────────
 // ─── Popup Component ────────────────────────────────────
 function Popup({
@@ -2636,6 +2642,7 @@ export function CalendarSummary() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const layoutRole = getCalendarLayoutRole();
 
   const [popup, setPopup] = useState({
     isOpen: false,
@@ -2661,7 +2668,7 @@ export function CalendarSummary() {
     sessionStorage.getItem("currentDoctorId") ||
     localStorage.getItem("currentDoctorId");
 
-const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId string
+const CURRENT_MR_ID = searchParams.get("mrId") || storedUser.mrId || sessionStorage.getItem("mrId") || "";
 
   const [selections, setSelections] = useState([]);
   const [status, setStatus] = useState("in_progress");
@@ -2670,6 +2677,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
   const [downloading, setDownloading] = useState(false);
   const [doctorInfo, setDoctorInfo] = useState(null);
   const [inputGivenLoading, setInputGivenLoading] = useState(false);
+  const resolvedMrId = doctorInfo?.mr?.mrId || CURRENT_MR_ID;
 
   // Fetch data
   useEffect(() => {
@@ -2809,7 +2817,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mrId: CURRENT_MR_ID,
+          mrId: resolvedMrId,
           doctorId: CURRENT_DOCTOR_ID,
           year: CALENDAR_YEAR,
         }),
@@ -2820,7 +2828,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
       if (data.success) {
         showPopup("✅ Calendar frozen successfully!");
         navigate(
-          `/calendar-finalized?doctorId=${CURRENT_DOCTOR_ID}&mrId=${CURRENT_MR_ID}`
+          `/calendar-finalized?doctorId=${CURRENT_DOCTOR_ID}&mrId=${resolvedMrId}`
         );
       } else {
         throw new Error(data.message);
@@ -2840,7 +2848,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mrId: CURRENT_MR_ID,
+          mrId: resolvedMrId,
           doctorId: CURRENT_DOCTOR_ID,
           year: CALENDAR_YEAR,
         }),
@@ -2859,14 +2867,14 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
 
   if (loading) {
     return (
-      <Layout active="Calendar Selection">
+      <Layout role={layoutRole} active="Calendar Selection">
         <div style={{ padding: 40, textAlign: "center" }}>Loading...</div>
       </Layout>
     );
   }
 
   return (
-    <Layout active="Calendar Selection">
+    <Layout role={layoutRole} active="Calendar Selection">
       <Crumbs items={["Calendar Selection", "Summary"]} />
 
       {/* ─── Page Head with Doctor Info ─── */}
@@ -2983,7 +2991,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
           icon={ArrowLeft}
           onClick={() =>
             navigate(
-              `/calendar-selection?doctorId=${CURRENT_DOCTOR_ID}&mrId=${CURRENT_MR_ID}`
+              `/calendar-selection?doctorId=${CURRENT_DOCTOR_ID}&mrId=${resolvedMrId}`
             )
           }
         >
@@ -3032,6 +3040,7 @@ export function CalendarFinalized() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const layoutRole = getCalendarLayoutRole();
   // Add this after your existing state declarations
   const [popup, setPopup] = useState({
     isOpen: false,
@@ -3053,7 +3062,11 @@ export function CalendarFinalized() {
     sessionStorage.getItem("currentDoctorId") ||
     localStorage.getItem("currentDoctorId");
 
-const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId string
+const CURRENT_MR_ID =
+    searchParams.get("mrId") ||
+    storedUser.mrId ||
+    sessionStorage.getItem("mrId") ||
+    "";
 
   const [record, setRecord] = useState(null);
   const [selections, setSelections] = useState([]);
@@ -3124,14 +3137,14 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
 
   if (loading) {
     return (
-      <Layout active="Calendar Selection">
+      <Layout role={layoutRole} active="Calendar Selection">
         <div style={{ padding: 40, textAlign: "center" }}>Loading...</div>
       </Layout>
     );
   }
 
   return (
-    <Layout active="Calendar Selection">
+    <Layout role={layoutRole} active="Calendar Selection">
       <Crumbs items={["Calendar Selection", "Summary", "Finalized"]} />
 
       <div
