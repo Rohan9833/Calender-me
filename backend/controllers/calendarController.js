@@ -39,6 +39,13 @@ const saveMonthDesign = async (req, res) => {
       return res.status(404).json({ success: false, message: "Doctor not found" });
     }
 
+    if (doctor.mr.toString() !== mr._id.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: "Selected MR is not assigned to this doctor",
+      });
+    }
+
     // Find existing record or create new one
     let record = await CalendarSelection.findOne({
       doctor: doctor._id,
@@ -143,6 +150,13 @@ const freezeCalendar = async (req, res) => {
       return res.status(404).json({ 
         success: false, 
         message: "Doctor not found" 
+      });
+    }
+
+    if (doctor.mr.toString() !== mr._id.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: "Selected MR is not assigned to this doctor",
       });
     }
 
