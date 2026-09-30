@@ -71,6 +71,40 @@ const getFLMDoctors = async (req, res) => {
   }
 };
 
+// Return only the MRs that belong to the requesting FLM.
+// Used by the FLM doctor-creation screen to prevent cross-team assignment.
+const getFLMMRs = async (req, res) => {
+  try {
+    const { flmId } = req.params;
+
+    const flm = await FLM.findOne({ flmId });
+
+    if (!flm) {
+      return res.status(404).json({
+        success: false,
+        message: "FLM not found",
+      });
+    }
+
+    const mrs = await MR.find({ flm: flm._id })
+      .select("_id mrId mrName hq region zone businessUnit")
+      .sort({ mrName: 1 });
+
+    return res.status(200).json({
+      success: true,
+      count: mrs.length,
+      mrs,
+    });
+  } catch (error) {
+    console.error("Error getting FLM MRs:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      mrs: [],
+    });
+  }
+};
+
 // =====================================
 // SLM DOCTORS
 // =====================================
@@ -968,6 +1002,7 @@ const getTLMDashboard = async (req, res) => {
 };
 module.exports = {
   getFLMDoctors,
+  getFLMMRs,
   getSLMDoctors,
   getTLMDoctors,
 
