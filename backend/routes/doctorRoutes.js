@@ -29,7 +29,29 @@ router.get("/:mrId", getDoctors);
 router.get("/:doctorId/details", getDoctorById);
 router.get("/mr/:mrId/pending-actions", getMRPendingActions);
 router.get("/:doctorId/timeline", getDoctorTimeline);
-router.post("/:doctorId/photos", upload.array("photos", 5), uploadDoctorPhotos);
+router.post(
+  "/:doctorId/photos",
+  (req, res, next) => {
+    upload.array("photos", 5)(req, res, (err) => {
+      if (err) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(413).json({
+            success: false,
+            message: "Image is too large. Maximum allowed size is 20 MB per image.",
+          });
+        }
+
+        return res.status(400).json({
+          success: false,
+          message: err.message || "Failed to upload image.",
+        });
+      }
+
+      next();
+    });
+  },
+  uploadDoctorPhotos
+);
 router.get("/mr/:mrId", getDoctorsByMR);
 router.delete("/:doctorId", deleteDoctor);
 router.delete('/:doctorId/photos/:photoId', deleteDoctorPhoto);
