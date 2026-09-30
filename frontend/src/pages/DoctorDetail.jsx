@@ -378,7 +378,6 @@ export default function DoctorDetail({ consentModal = false }) {
   const navigate = useNavigate();
   const { doctorId } = useParams();
   const isMobile = useIsMobile(768);
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const [doctor, setDoctor] = useState(null);
   const fileInputRef = useRef(null);
   const [activeTab, setActiveTab] = useState("overview");
