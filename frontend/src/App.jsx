@@ -26,6 +26,7 @@ import CalendarSelectionEntry from "./pages/CalendarSelectionEntry";
 import ManagerDashboard from "./pages/ManagerDashboard";
 import { ApprovalQueue, DoctorReview } from "./pages/ApprovalQueue";
 import { MRProgress, DelayReport } from "./pages/MRProgress";
+import ManagerReports from "./pages/ManagerReports";
 import CalendarDesigns from "./pages/CalendarDesigns";
 // HO Pages
 import HODashboard from "./pages/HODashboard";
@@ -49,7 +50,7 @@ function App() {
         <Route path="/submitted-doctors" element={<SubmittedDoctors />} />
         <Route path="/approved-doctors" element={<ApprovedDoctors />} />
         <Route path="/manager/mr-progress" element={<MRProgress />} />
-        <Route path="/manager/delay-report" element={<DelayReport />} />
+        <Route path="/manager/delay-report" element={<ManagerReports />} />
         <Route path="/profile-edit" element={<ProfileEdit />} />
         <Route path="/all-doctors" element={<AllDoctors />} />
         <Route path="/frozen-doctors" element={<FrozenDoctors />} />
