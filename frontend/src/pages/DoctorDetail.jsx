@@ -716,7 +716,12 @@ export default function DoctorDetail({ consentModal = false }) {
     }
   };
 
-  const mrIdString = storedUser.mrId || "";
+  const mrIdString =
+    storedUser.mrId ||
+    doctor?.mr?._id ||
+    doctor?.mr?.mrId ||
+    doctor?.mrId ||
+    "";
 
   return (
     <Layout active="My Doctors">
