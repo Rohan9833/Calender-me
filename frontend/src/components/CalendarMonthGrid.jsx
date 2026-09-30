@@ -253,7 +253,7 @@ export default function CalendarMonthGrid({
                       ? setPreview({ month, design: selected })
                       : setOpenMonth(month)
                   }
-                  disabled={!selected}
+                  disabled={frozen}
                   aria-label={
                     selected
                       ? `Preview ${month} design`
