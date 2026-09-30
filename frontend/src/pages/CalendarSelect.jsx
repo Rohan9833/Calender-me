@@ -2649,7 +2649,7 @@ export function CalendarSummary() {
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const layoutRole = getCalendarLayoutRole();
   const dashboardPath =
-    layoutRole === "manager" ? "/manager-dashboard" : "/dashboard";
+    layoutRole === "manager" ? "/manager-dashboard" : "/mr-dashboard";
 
   const [popup, setPopup] = useState({
     isOpen: false,
@@ -3049,7 +3049,7 @@ export function CalendarFinalized() {
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const layoutRole = getCalendarLayoutRole();
   const dashboardPath =
-    layoutRole === "manager" ? "/manager-dashboard" : "/dashboard";
+    layoutRole === "manager" ? "/manager-dashboard" : "/mr-dashboard";
   // Add this after your existing state declarations
   const [popup, setPopup] = useState({
     isOpen: false,

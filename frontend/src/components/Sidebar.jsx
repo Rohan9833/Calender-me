@@ -510,7 +510,7 @@ export default function Sidebar({
       {/* Campaign Period */}
 
       {/* Campaign Period */}
-      {isOpen && (
+      {/* {isOpen && (
         <div
           className="period"
           style={{
@@ -534,7 +534,7 @@ export default function Sidebar({
             365 days remaining
           </strong>
         </div>
-      )}
+      )} */}
     </aside>
   );
 }
