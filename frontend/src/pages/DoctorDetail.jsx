@@ -394,11 +394,6 @@ export default function DoctorDetail({ consentModal = false }) {
   const [timelineLoading, setTimelineLoading] = useState(false);
   const [timelineActivities, setTimelineActivities] = useState([]);
   const [timelineError, setTimelineError] = useState("");
-  const isManager =
-    ["flm", "slm", "tlm", "ho", "manager"].includes(
-      String(storedUser.role || "").toLowerCase()
-    );
-
   const showPopup = (type, title, message) => {
     setPopup({ isOpen: true, type, title, message });
   };
@@ -481,11 +476,6 @@ export default function DoctorDetail({ consentModal = false }) {
       if (!files.length) return;
       const formData = new FormData();
       files.forEach((file) => formData.append("photos", file));
-
-      const actingMrId = doctor?.mr?.mrId || "";
-      if (actingMrId) {
-        formData.append("mrId", actingMrId);
-      }
 
       await uploadDoctorPhotos(doctorId, formData);
       const data = await getDoctorDetails(doctorId);
@@ -725,10 +715,10 @@ export default function DoctorDetail({ consentModal = false }) {
     }
   };
 
+  // The doctor is already assigned to an MR. Use that MR automatically.
   const mrIdString =
-    storedUser.mrId ||
-    doctor?.mr?._id ||
     doctor?.mr?.mrId ||
+    doctor?.mr?._id ||
     doctor?.mrId ||
     "";
 
