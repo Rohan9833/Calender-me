@@ -34,6 +34,7 @@ import { downloadCalendarPDF } from "../utils/calendarPdf";
 import CalendarMonthGrid from "../components/CalendarMonthGrid";
 import jsPDF from "jspdf";
 import { deleteDoctorPhoto } from "../api/doctorAPI";
+import { getManagerMRs } from "../api/managerAPI";
 
 // ---- Mobile breakpoint hook ----
 function useIsMobile(breakpoint = 768) {
@@ -395,6 +396,13 @@ export default function DoctorDetail({ consentModal = false }) {
   const [timelineLoading, setTimelineLoading] = useState(false);
   const [timelineActivities, setTimelineActivities] = useState([]);
   const [timelineError, setTimelineError] = useState("");
+  const isManager =
+    ["flm", "slm", "tlm", "ho", "manager"].includes(
+      String(storedUser.role || "").toLowerCase()
+    );
+  const [managerMRs, setManagerMRs] = useState([]);
+  const [managerMRLoading, setManagerMRLoading] = useState(false);
+  const [selectedManagerMrId, setSelectedManagerMrId] = useState("");
 
   const showPopup = (type, title, message) => {
     setPopup({ isOpen: true, type, title, message });
@@ -445,6 +453,39 @@ export default function DoctorDetail({ consentModal = false }) {
   }, [doctorId]);
 
   useEffect(() => {
+    if (!doctor || !isManager) return;
+
+    const managerUserId =
+      storedUser.flmId ||
+      storedUser.slmId ||
+      storedUser.tlmId ||
+      storedUser.hoId ||
+      storedUser.managerId ||
+      "";
+
+    if (!managerUserId) {
+      setManagerMRs([]);
+      return;
+    }
+
+    setManagerMRLoading(true);
+    getManagerMRs(storedUser.role, managerUserId)
+      .then((data) => {
+        setManagerMRs(data.mrs || []);
+      })
+      .catch((error) => {
+        console.error("Failed to load manager MRs:", error);
+        setManagerMRs([]);
+        showPopup(
+          "error",
+          "Unable to load MRs",
+          "Could not load the MRs you can act on behalf of."
+        );
+      })
+      .finally(() => setManagerMRLoading(false));
+  }, [doctor, isManager]);
+
+  useEffect(() => {
     if (doctor) {
       fetchCalendarData();
     }
@@ -478,6 +519,19 @@ export default function DoctorDetail({ consentModal = false }) {
       if (!files.length) return;
       const formData = new FormData();
       files.forEach((file) => formData.append("photos", file));
+
+      if (isManager) {
+        if (!selectedManagerMrId) {
+          showPopup(
+            "error",
+            "Select MR First",
+            "Please select the MR you are acting on behalf of before uploading photos."
+          );
+          return;
+        }
+        formData.append("mrId", selectedManagerMrId);
+      }
+
       await uploadDoctorPhotos(doctorId, formData);
       const data = await getDoctorDetails(doctorId);
       setDoctor(data.doctor);
@@ -900,6 +954,89 @@ export default function DoctorDetail({ consentModal = false }) {
           {/* Calendar & Photo Tab */}
           {activeTab === "calendar" && (
             <div>
+              {isManager && (
+                <div
+                  style={{
+                    marginBottom: 20,
+                    padding: isMobile ? 14 : 18,
+                    background: "#eff6ff",
+                    border: "1px solid #bfdbfe",
+                    borderRadius: 14,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 14,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 700,
+                          color: "#172033",
+                        }}
+                      >
+                        Select MR to act on behalf of
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 4,
+                          fontSize: 11,
+                          color: "#64748b",
+                        }}
+                      >
+                        Select the MR responsible for this doctor before uploading photos or selecting the calendar.
+                      </div>
+                    </div>
+                    <select
+                      value={selectedManagerMrId}
+                      onChange={(e) => setSelectedManagerMrId(e.target.value)}
+                      disabled={managerMRLoading}
+                      style={{
+                        minWidth: isMobile ? "100%" : 280,
+                        padding: "10px 12px",
+                        borderRadius: 9,
+                        border: "1px solid #bfdbfe",
+                        background: "#fff",
+                        color: "#172033",
+                        fontSize: 13,
+                        fontWeight: 600,
+                        outline: "none",
+                      }}
+                    >
+                      <option value="">
+                        {managerMRLoading ? "Loading MRs..." : "Select MR"}
+                      </option>
+                      {managerMRs.map((mr) => (
+                        <option key={mr._id} value={mr.mrId}>
+                          {mr.mrName} ({mr.mrId})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {selectedManagerMrId && doctor?.mr?.mrId !== selectedManagerMrId && (
+                    <div
+                      style={{
+                        marginTop: 10,
+                        padding: "9px 11px",
+                        borderRadius: 8,
+                        background: "#fff7ed",
+                        border: "1px solid #fed7aa",
+                        color: "#9a3412",
+                        fontSize: 11,
+                      }}
+                    >
+                      The selected MR is not the MR assigned to this doctor. Select {doctor?.mr?.mrName || "the assigned MR"} to continue.
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Photo Section */}
               <div
                 style={{
@@ -935,7 +1072,7 @@ export default function DoctorDetail({ consentModal = false }) {
                   </div>
                 </div>
 
-                {isApproved ? (
+                {isApproved && (!isManager || !!selectedManagerMrId) ? (
                   <>
                     <input
                       ref={fileInputRef}
@@ -1074,11 +1211,26 @@ export default function DoctorDetail({ consentModal = false }) {
                     </Button>
                   )}
                 </div> */}
-                <CalendarMonthGrid
-                  doctorId={doctorId}
-                  mrId={mrIdString}
-                  isFrozen={doctor.calendarFrozen || false}
-                />
+                {isManager && !selectedManagerMrId ? (
+                  <div
+                    style={{
+                      padding: 24,
+                      textAlign: "center",
+                      border: "1px dashed #bfdbfe",
+                      borderRadius: 12,
+                      background: "#f8fbff",
+                      color: "#64748b",
+                    }}
+                  >
+                    Select an MR above to start calendar selection on their behalf.
+                  </div>
+                ) : (
+                  <CalendarMonthGrid
+                    doctorId={doctorId}
+                    mrId={isManager ? selectedManagerMrId : mrIdString}
+                    isFrozen={doctor.calendarFrozen || false}
+                  />
+                )}
               </div>
             </div>
           )}
