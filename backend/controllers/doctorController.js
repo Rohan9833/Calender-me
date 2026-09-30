@@ -3,6 +3,106 @@ const MR = require("../models/MR");
 const Activity = require("../models/activitymodel");
 const { sendConsentMail } = require("../services/mailService");
 
+
+// Create doctor by FLM under one of the FLM's MRs.
+// This is intentionally separate from Createdoc so the existing MR flow is unchanged.
+const CreatedocByFLM = async (req, res) => {
+  try {
+    const { flmId, mrId } = req.body;
+
+    if (!flmId || !mrId) {
+      return res.status(400).json({
+        success: false,
+        message: "FLM ID and MR ID are required",
+      });
+    }
+
+    const flm = await require("../models/FLM").findOne({ flmId });
+
+    if (!flm) {
+      return res.status(404).json({
+        success: false,
+        message: "FLM not found",
+      });
+    }
+
+    const mr = await MR.findOne({
+      mrId,
+      flm: flm._id,
+    });
+
+    if (!mr) {
+      return res.status(403).json({
+        success: false,
+        message: "The selected MR does not belong to this FLM",
+      });
+    }
+
+    const isDraft = req.body.status === "draft";
+    const doctorStatus = isDraft ? "draft" : "pending";
+
+    const doctor = await Doctor.create({
+      doctorName: req.body.doctorName,
+      speciality: req.body.speciality,
+      mclCode: req.body.mclCode,
+      clinicName: req.body.clinicName,
+      city: req.body.city,
+      area: req.body.area,
+      email: req.body.email,
+      brand: req.body.brand,
+      mobile: req.body.mobile,
+      preferredContact: req.body.preferredContact,
+      currentBusiness: req.body.currentBusiness,
+      expectedBusiness: req.body.expectedBusiness,
+      brandFocus: req.body.brandFocus,
+      otherActivities: req.body.otherActivities,
+
+      status: doctorStatus,
+      approvalStatus: isDraft ? null : "pending",
+      consentStatus: "pending",
+      consentSent: false,
+      photoUploaded: false,
+      mr: mr._id,
+    });
+
+    await MR.findByIdAndUpdate(mr._id, {
+      $push: { doctors: doctor._id },
+    });
+
+    if (!isDraft) {
+      try {
+        await Activity.create({
+          action: `Doctor Added: ${doctor.doctorName}`,
+          doctor: doctor._id,
+          mr: mr._id,
+          flm: flm._id,
+          performedBy: flm._id,
+          performedByModel: "FLM",
+          role: "flm",
+          status: "Pending",
+          details: `Doctor ${doctor.doctorName} added by FLM ${flm.flmName} under MR ${mr.mrName}`,
+        });
+      } catch (err) {
+        console.log("⚠️ Error logging FLM doctor activity:", err.message);
+      }
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: isDraft
+        ? "Doctor saved as draft"
+        : "Doctor submitted for approval",
+      doctor,
+    });
+  } catch (error) {
+    console.error("Error creating doctor by FLM:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 // Create doctor
 const Createdoc = async (req, res) => {
   try {
@@ -825,6 +925,7 @@ const updateDoctor = async (req, res) => {
 };
 module.exports = {
   Createdoc,
+  CreatedocByFLM,
   getDashboardData,
   giveConsent,
   getDoctors,
