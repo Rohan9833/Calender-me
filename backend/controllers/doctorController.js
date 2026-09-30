@@ -581,8 +581,6 @@ const getDoctorById = async (req, res) => {
 const uploadDoctorPhotos = async (req, res) => {
   try {
     const { doctorId } = req.params;
-    const { mrId } = req.body;
-
     const doctor = await Doctor.findById(doctorId);
 
     if (!doctor) {
@@ -592,29 +590,15 @@ const uploadDoctorPhotos = async (req, res) => {
       });
     }
 
-    // The uploader must act on behalf of the MR assigned to this doctor.
-    // MR users keep their existing flow; managers send mrId explicitly.
-    const actingMrId = mrId || null;
-    let actingMr = null;
+    // Always attribute the upload to the MR assigned to this doctor.
+    // Managers do not need to select or provide an MR.
+    const actingMr = await MR.findById(doctor.mr);
 
-    if (actingMrId) {
-      actingMr = await MR.findOne({ mrId: actingMrId });
-
-      if (!actingMr) {
-        return res.status(404).json({
-          success: false,
-          message: "MR not found",
-        });
-      }
-
-      if (doctor.mr.toString() !== actingMr._id.toString()) {
-        return res.status(400).json({
-          success: false,
-          message: "Selected MR is not assigned to this doctor",
-        });
-      }
-    } else {
-      actingMr = await MR.findById(doctor.mr);
+    if (!actingMr) {
+      return res.status(404).json({
+        success: false,
+        message: "Assigned MR not found for this doctor",
+      });
     }
 
     // Check if consent is approved
