@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import { createPortal } from "react-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import { useNavigate, useParams } from "react-router-dom";
