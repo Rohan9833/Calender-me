@@ -202,11 +202,6 @@ function Popup({ isOpen, type, title, message, onClose }) {
 // ─── Campaign Summary ──────────────────────────────────
 function CampaignSummary({ doctor }) {
   const isMobile = useIsMobile(768);
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const loggedInRole = String(storedUser.role || "mr").toLowerCase();
-  const layoutRole = ["flm", "slm", "tlm"].includes(loggedInRole)
-    ? "manager"
-    : loggedInRole;
   return (
     <div className="campaignSummary" style={{ marginTop: 24 }}>
       <h3 style={{ fontSize: isMobile ? "16px" : "20px" }}>Campaign Status Summary</h3>
@@ -383,6 +378,11 @@ export default function DoctorDetail({ consentModal = false }) {
   const navigate = useNavigate();
   const { doctorId } = useParams();
   const isMobile = useIsMobile(768);
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const loggedInRole = String(storedUser.role || "mr").toLowerCase();
+  const layoutRole = ["flm", "slm", "tlm"].includes(loggedInRole)
+    ? "manager"
+    : loggedInRole;
   const [doctor, setDoctor] = useState(null);
   const fileInputRef = useRef(null);
   const [activeTab, setActiveTab] = useState("overview");
