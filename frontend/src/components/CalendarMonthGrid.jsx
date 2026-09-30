@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
 import { Check, CheckCircle2, ChevronRight, Eye, Lock, X } from "lucide-react";
 import { Badge, Button } from "./UIComponents";
 import { months } from "../utils/helpers";
@@ -15,7 +14,6 @@ export default function CalendarMonthGrid({
   mrId,
   isFrozen = false,
 }) {
-  const navigate = useNavigate();
   const [selections, setSelections] = useState({});
   const [calendarStatus, setCalendarStatus] = useState("in_progress");
   const [loading, setLoading] = useState(true);
@@ -101,45 +99,6 @@ export default function CalendarMonthGrid({
       ? (designAssets[month] || []).find((d) => d.id === selection.designId) ||
           null
       : null;
-  };
-
-  const goToDesignPage = (month) => {
-    if (frozen) return;
-
-    const resolvedDoctorId =
-      doctorId ||
-      sessionStorage.getItem("currentDoctorId") ||
-      localStorage.getItem("currentDoctorId");
-
-    const resolvedMrId =
-      mrId ||
-      sessionStorage.getItem("mrId") ||
-      localStorage.getItem("mrId") ||
-      JSON.parse(localStorage.getItem("user") || "{}").mrId;
-
-    if (!resolvedDoctorId) {
-      setError("Doctor ID is missing. Please select a doctor first.");
-      return;
-    }
-
-    sessionStorage.setItem("currentDoctorId", resolvedDoctorId);
-    if (resolvedMrId) sessionStorage.setItem("mrId", resolvedMrId);
-
-    navigate(
-      "/calendar-design?month=" +
-        encodeURIComponent(month) +
-        "&doctorId=" +
-        encodeURIComponent(resolvedDoctorId) +
-        "&mrId=" +
-        encodeURIComponent(resolvedMrId || ""),
-      {
-        state: {
-          doctorId: resolvedDoctorId,
-          mrId: resolvedMrId,
-          month,
-        },
-      },
-    );
   };
 
   const selectDesign = async (month, design) => {
