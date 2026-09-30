@@ -417,27 +417,33 @@ export default function CalendarMonthGrid({
         </section>
       )}
 
-      {preview && (
-        <div className="calendar-image-modal" onClick={() => setPreview(null)}>
+      {preview &&
+        typeof document !== "undefined" &&
+        createPortal(
           <div
-            className="calendar-image-modal-card"
-            onClick={(e) => e.stopPropagation()}
+            className="calendar-image-modal"
+            onClick={() => setPreview(null)}
           >
-            <div className="calendar-image-modal-header">
-              <div>
-                <span>
-                  {preview.month} {CALENDAR_YEAR}
-                </span>
-                <strong>{preview.design.label}</strong>
+            <div
+              className="calendar-image-modal-card"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="calendar-image-modal-header">
+                <div>
+                  <span>
+                    {preview.month} {CALENDAR_YEAR}
+                  </span>
+                  <strong>{preview.design.label}</strong>
+                </div>
+                <button type="button" onClick={() => setPreview(null)}>
+                  <X size={19} />
+                </button>
               </div>
-              <button type="button" onClick={() => setPreview(null)}>
-                <X size={19} />
-              </button>
+              <img src={preview.design.file} alt={preview.design.label} />
             </div>
-            <img src={preview.design.file} alt={preview.design.label} />
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
       <style>{calendarStyles}</style>
     </div>
   );
