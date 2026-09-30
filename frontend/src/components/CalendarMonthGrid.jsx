@@ -79,8 +79,17 @@ export default function CalendarMonthGrid({
 
   useEffect(() => {
     const close = (event) => {
-      if (rootRef.current && !rootRef.current.contains(event.target))
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest(".calendar-design-modal-overlay")
+      ) {
+        return;
+      }
+
+      if (rootRef.current && !rootRef.current.contains(target)) {
         setOpenMonth(null);
+      }
     };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
@@ -297,7 +306,7 @@ export default function CalendarMonthGrid({
                       "calendar-dropdown-trigger " + (isOpen ? "open" : "")
                     }
                     onClick={() =>
-                      !frozen && !isSaving && goToDesignPage(month)
+                      !frozen && !isSaving && setOpenMonth(month)
                     }
                     disabled={frozen || isSaving}
                   >
