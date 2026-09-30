@@ -581,6 +581,7 @@ const getDoctorById = async (req, res) => {
 const uploadDoctorPhotos = async (req, res) => {
   try {
     const { doctorId } = req.params;
+    const { mrId } = req.body;
 
     const doctor = await Doctor.findById(doctorId);
 
@@ -591,11 +592,43 @@ const uploadDoctorPhotos = async (req, res) => {
       });
     }
 
+    // The uploader must act on behalf of the MR assigned to this doctor.
+    // MR users keep their existing flow; managers send mrId explicitly.
+    const actingMrId = mrId || null;
+    let actingMr = null;
+
+    if (actingMrId) {
+      actingMr = await MR.findOne({ mrId: actingMrId });
+
+      if (!actingMr) {
+        return res.status(404).json({
+          success: false,
+          message: "MR not found",
+        });
+      }
+
+      if (doctor.mr.toString() !== actingMr._id.toString()) {
+        return res.status(400).json({
+          success: false,
+          message: "Selected MR is not assigned to this doctor",
+        });
+      }
+    } else {
+      actingMr = await MR.findById(doctor.mr);
+    }
+
     // Check if consent is approved
     if (doctor.consentStatus !== "approved") {
       return res.status(400).json({
         success: false,
         message: "Cannot upload photo. Doctor consent not approved yet.",
+      });
+    }
+
+    if (!req.files?.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select at least one photo",
       });
     }
 
@@ -609,6 +642,7 @@ const uploadDoctorPhotos = async (req, res) => {
     const uploadedPhotos = req.files.map((file) => ({
       url: `/uploads/doctors/${file.filename}`,
       uploadedAt: new Date(),
+      uploadedByMr: actingMr?._id,
     }));
 
     doctor.doctorPhotos.push(...uploadedPhotos);
