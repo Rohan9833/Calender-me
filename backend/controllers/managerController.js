@@ -105,6 +105,76 @@ const getFLMMRs = async (req, res) => {
   }
 };
 
+
+// Return the MRs a manager is allowed to act on behalf of.
+const getManagerMRs = async (req, res) => {
+  try {
+    const userRole = (req.headers["x-user-role"] || "").toLowerCase();
+    const userId = req.headers["x-user-id"];
+
+    if (!userRole || !userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User role and user ID are required",
+        mrs: [],
+      });
+    }
+
+    let mrs = [];
+
+    if (userRole === "flm") {
+      const flm = await FLM.findOne({ flmId: userId });
+      if (!flm) return res.status(404).json({ success: false, message: "FLM not found", mrs: [] });
+      mrs = await MR.find({ flm: flm._id });
+    } else if (userRole === "slm") {
+      const slm = await SLM.findOne({ slmId: userId });
+      if (!slm) return res.status(404).json({ success: false, message: "SLM not found", mrs: [] });
+
+      const flms = await FLM.find({ slm: slm._id }).select("_id");
+      mrs = await MR.find({ flm: { $in: flms.map((flm) => flm._id) } });
+    } else if (userRole === "tlm") {
+      const tlm = await TLM.findOne({ tlmId: userId });
+      if (!tlm) return res.status(404).json({ success: false, message: "TLM not found", mrs: [] });
+
+      const slms = await SLM.find({ tlm: tlm._id }).select("_id");
+      const flms = await FLM.find({ slm: { $in: slms.map((slm) => slm._id) } }).select("_id");
+      mrs = await MR.find({ flm: { $in: flms.map((flm) => flm._id) } });
+    } else if (userRole === "ho" || userRole === "manager") {
+      mrs = await MR.find({});
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: "This role cannot act on behalf of an MR",
+        mrs: [],
+      });
+    }
+
+    mrs = mrs
+      .map((mr) => ({
+        _id: mr._id,
+        mrId: mr.mrId,
+        mrName: mr.mrName,
+        hq: mr.hq,
+        region: mr.region,
+        zone: mr.zone,
+      }))
+      .sort((a, b) => (a.mrName || "").localeCompare(b.mrName || ""));
+
+    return res.status(200).json({
+      success: true,
+      count: mrs.length,
+      mrs,
+    });
+  } catch (error) {
+    console.error("Error getting manager MRs:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      mrs: [],
+    });
+  }
+};
+
 // =====================================
 // SLM DOCTORS
 // =====================================
@@ -1003,6 +1073,7 @@ const getTLMDashboard = async (req, res) => {
 module.exports = {
   getFLMDoctors,
   getFLMMRs,
+  getManagerMRs,
   getSLMDoctors,
   getTLMDoctors,
 
