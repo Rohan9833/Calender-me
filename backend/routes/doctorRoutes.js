@@ -2,6 +2,7 @@ const express = require("express");
 const upload = require("../middleware/upload.js");
 const {
   Createdoc,
+  CreatedocByFLM,
   getDashboardData,
   giveConsent,
   getDoctors,
@@ -20,6 +21,8 @@ const router = express.Router();
 
 // Remove 'protect' from all routes if it's not defined
 router.post("/", Createdoc);
+// Separate FLM creation flow; the existing MR endpoint remains unchanged.
+router.post("/flm", CreatedocByFLM);
 router.get("/dashboard/:mrId", getDashboardData);
 router.get("/consent/:doctorId", giveConsent);
 router.get("/:mrId", getDoctors);
