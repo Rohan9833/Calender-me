@@ -1818,6 +1818,7 @@ export function CalendarMonth() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const layoutRole = getCalendarLayoutRole();
 
   const [popup, setPopup] = useState({
     isOpen: false,
@@ -1852,7 +1853,11 @@ export function CalendarMonth() {
     sessionStorage.getItem("currentDoctorId") ||
     localStorage.getItem("currentDoctorId");
 
-const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId string
+const CURRENT_MR_ID =
+    searchParams.get("mrId") ||
+    storedUser.mrId ||
+    sessionStorage.getItem("mrId") ||
+    "";
 
   // We still need calendarStatus and loading for the notice and View Summary button
   const [calendarStatus, setCalendarStatus] = useState("in_progress");
@@ -1892,11 +1897,11 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
       return;
     }
     if (!CURRENT_MR_ID) {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (!user.mrId) {
-        showPopup("error", "Session Expired", "Please login again");
-        navigate("/login");
-      }
+      showPopup(
+        "error",
+        "MR Information Missing",
+        "The assigned MR could not be determined for this doctor."
+      );
     }
   }, []);
 
@@ -1905,7 +1910,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
   }
 
   return (
-    <Layout active="Calendar Selection">
+    <Layout role={layoutRole} active="Calendar Selection">
       <Crumbs items={["Calendar Selection"]} />
 
       <div
@@ -3043,6 +3048,8 @@ export function CalendarFinalized() {
   const location = useLocation();
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const layoutRole = getCalendarLayoutRole();
+  const dashboardPath =
+    layoutRole === "manager" ? "/manager-dashboard" : "/dashboard";
   // Add this after your existing state declarations
   const [popup, setPopup] = useState({
     isOpen: false,
