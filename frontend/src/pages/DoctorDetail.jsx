@@ -202,6 +202,11 @@ function Popup({ isOpen, type, title, message, onClose }) {
 // ─── Campaign Summary ──────────────────────────────────
 function CampaignSummary({ doctor }) {
   const isMobile = useIsMobile(768);
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const loggedInRole = String(storedUser.role || "mr").toLowerCase();
+  const layoutRole = ["flm", "slm", "tlm"].includes(loggedInRole)
+    ? "manager"
+    : loggedInRole;
   return (
     <div className="campaignSummary" style={{ marginTop: 24 }}>
       <h3 style={{ fontSize: isMobile ? "16px" : "20px" }}>Campaign Status Summary</h3>
@@ -722,7 +727,7 @@ export default function DoctorDetail({ consentModal = false }) {
     "";
 
   return (
-    <Layout active="My Doctors">
+    <Layout role={layoutRole} active={layoutRole === "mr" ? "My Doctors" : "Dashboard"}>
       <Crumbs items={["My Doctors", "Doctor Details"]} />
       <div className="doctor-detail-shell">
       <div
