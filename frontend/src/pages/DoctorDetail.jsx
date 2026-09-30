@@ -486,8 +486,21 @@ export default function DoctorDetail({ consentModal = false }) {
       setDoctor(data.doctor);
       showPopup("success", "Photos Uploaded!", "Photos uploaded successfully!");
     } catch (error) {
-      console.log(error);
-      showPopup("error", "Upload Failed", "Failed to upload photos Doctor havent approved yet");
+      console.error("Photo upload error:", error);
+
+      const status = error.response?.status;
+      const backendMessage = error.response?.data?.message;
+
+      let message =
+        backendMessage ||
+        error.message ||
+        "Failed to upload photos.";
+
+      if (status === 413) {
+        message = "The image is too large. Please upload an image smaller than 20 MB.";
+      }
+
+      showPopup("error", "Upload Failed", message);
     }
   };
 
