@@ -558,7 +558,7 @@ const getDoctorById = async (req, res) => {
 
     await doctor.populate({
       path: "mr",
-      select: "mrName hq region zone",
+      select: "mrName mrId hq region zone",
       populate: {
         path: "flm",
         select: "flmName",
