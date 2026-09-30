@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -13,6 +13,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Layout from "../components/Layout";
+import { getFLMMRs } from "../api/managerAPI";
 import {
   Button,
   Field,
@@ -21,6 +22,12 @@ import {
 } from "../components/UIComponents";
 
 export default function AddDoctor() {
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user") || "{}"));
+  const [flmMRs, setFlmMRs] = useState([]);
+  const [selectedMRId, setSelectedMRId] = useState("");
+
+  const isFLM = user?.role === "flm";
+
   const [formData, setFormData] = useState({
     doctorName: "",
     speciality: "",
@@ -37,6 +44,26 @@ export default function AddDoctor() {
     brandFocus: "",
     otherActivities: "",
   });
+
+  useEffect(() => {
+    if (!isFLM || !user?.flmId) return;
+
+    const loadMRs = async () => {
+      try {
+        const response = await getFLMMRs(user.flmId);
+        setFlmMRs(response?.mrs || []);
+      } catch (error) {
+        console.error("Error loading FLM MRs:", error);
+        showPopup(
+          "error",
+          "Failed to Load MRs",
+          error?.response?.data?.message || "Unable to load your MRs. Please try again.",
+        );
+      }
+    };
+
+    loadMRs();
+  }, [isFLM, user?.flmId]);
 
   // Popup state
   const [popup, setPopup] = useState({
@@ -74,19 +101,33 @@ export default function AddDoctor() {
 
   const handleSubmit = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-      const response = await axios.post(`${API_BASE_URL}/api/createdoc`, {
+      if (isFLM && !selectedMRId) {
+        showPopup("error", "Select an MR", "Please select the MR under whom this doctor should be created.");
+        return;
+      }
+
+      const endpoint = isFLM
+        ? `${API_BASE_URL}/api/createdoc/flm`
+        : `${API_BASE_URL}/api/createdoc`;
+
+      const payload = {
         ...formData,
-        mrId: user.mrId,
+        mrId: isFLM ? selectedMRId : currentUser.mrId,
         status: "pending",
-      });
+        ...(isFLM ? { flmId: currentUser.flmId } : {}),
+      };
+
+      const response = await axios.post(endpoint, payload);
 
       showPopup(
         "success",
         "Doctor Added Successfully!",
         ` ${formData.doctorName} has been submitted for approval.`,
       );
+
+      setSelectedMRId("");
 
       setFormData({
         doctorName: "",
@@ -119,12 +160,22 @@ export default function AddDoctor() {
 
   const handleSaveDraft = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-      await axios.post(`${API_BASE_URL}/api/createdoc`, {
+      if (isFLM && !selectedMRId) {
+        showPopup("error", "Select an MR", "Please select the MR under whom this draft should be created.");
+        return;
+      }
+
+      const endpoint = isFLM
+        ? `${API_BASE_URL}/api/createdoc/flm`
+        : `${API_BASE_URL}/api/createdoc`;
+
+      await axios.post(endpoint, {
         ...formData,
-        mrId: user.mrId,
+        mrId: isFLM ? selectedMRId : currentUser.mrId,
         status: "draft",
+        ...(isFLM ? { flmId: currentUser.flmId } : {}),
       });
 
       showPopup(
@@ -165,20 +216,48 @@ export default function AddDoctor() {
   };
 
   return (
-    <Layout active="Add Doctor">
+    <Layout role={isFLM ? "manager" : "mr"} active="Add Doctor">
       <div className="add-doctor-page">
         <div className="add-doctor-breadcrumb" aria-label="Breadcrumb">
-          <Link to="/mr-dashboard">Dashboard</Link>
+          <Link to={isFLM ? "/manager-dashboard" : "/mr-dashboard"}>Dashboard</Link>
           <span aria-hidden="true">›</span>
-          <span>Add Doctor</span>
+          <span>{isFLM ? "Add Doctor for MR" : "Add Doctor"}</span>
         </div>
-        <h1>Add Doctor</h1>
+        <h1>{isFLM ? "Add Doctor for MR" : "Add Doctor"}</h1>
         <p className="subtitle">
-          Enter doctor details and campaign information.
+          {isFLM
+            ? "Select any MR assigned to you, then enter the doctor details."
+            : "Enter doctor details and campaign information."}
         </p>
         <div className="formLayout">
           <div className="formCard">
             <SectionTitle>A. Doctor Information</SectionTitle>
+
+            {isFLM && (
+              <div style={{ marginBottom: "14px" }}>
+                <Field
+                  label="Select MR *"
+                  select
+                  name="targetMR"
+                  value={selectedMRId}
+                  onChange={(e) => setSelectedMRId(e.target.value)}
+                  options={flmMRs.map((mr) => mr.mrId)}
+                  helperText={
+                    flmMRs.length
+                      ? "Only MRs assigned to your FLM account are available."
+                      : "No MRs are currently assigned to you."
+                  }
+                  disabled={flmMRs.length === 0}
+                />
+                {selectedMRId && (
+                  <div style={{ marginTop: "5px", color: "#64748b", fontSize: "11px" }}>
+                    {flmMRs.find((mr) => mr.mrId === selectedMRId)?.mrName || ""}
+                  </div>
+                )}
+              </div>
+            )}
+
+
 
             <div className="formGrid">
               <Field
