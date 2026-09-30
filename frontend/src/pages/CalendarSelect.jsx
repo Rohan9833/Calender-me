@@ -2643,6 +2643,8 @@ export function CalendarSummary() {
   const location = useLocation();
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const layoutRole = getCalendarLayoutRole();
+  const dashboardPath =
+    layoutRole === "manager" ? "/manager-dashboard" : "/dashboard";
 
   const [popup, setPopup] = useState({
     isOpen: false,
@@ -3397,7 +3399,7 @@ const CURRENT_MR_ID =
           Download Summary (PDF)
         </Button>
 
-        <Button variant="outline" onClick={() => navigate("/dashboard")}>
+        <Button variant="outline" onClick={() => navigate(dashboardPath)}>
           Go to Dashboard
         </Button>
 
