@@ -1,6 +1,17 @@
 // api/managerAPI.js
 import api from "./axios";
 
+// Get all MRs the current manager can act on behalf of.
+export const getManagerMRs = async (role, userId) => {
+  const response = await api.get("/manager/mrs", {
+    headers: {
+      "x-user-role": role,
+      "x-user-id": userId,
+    },
+  });
+  return response.data;
+};
+
 // =====================================
 // FLM APIs
 // =====================================
