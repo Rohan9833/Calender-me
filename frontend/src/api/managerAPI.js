@@ -10,6 +10,12 @@ export const getFLMDashboard = async (flmId) => {
   return response.data;
 };
 
+// Get only the MRs assigned to the logged-in FLM.
+export const getFLMMRs = async (flmId) => {
+  const response = await api.get(`/manager/flm/${flmId}/mrs`);
+  return response.data;
+};
+
 // api/managerAPI.js - Add this function
 export const getAllDoctors = async (flmId) => {
   const response = await api.get(`/manager/flm/${flmId}/doctors`);
