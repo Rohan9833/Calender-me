@@ -197,6 +197,8 @@ export default function AddDoctor() {
   };
 
   const handleClear = () => {
+    setSelectedMRId("");
+
     setFormData({
       doctorName: "",
       speciality: "",
