@@ -511,6 +511,9 @@ export default function DoctorDetail({ consentModal = false }) {
 
   const isPhotoLimitReached = (doctor?.doctorPhotos?.length || 0) >= 5;
   const isApproved = doctor?.approvalStatus === "approved";
+  const canActForSelectedMr =
+    !isManager ||
+    (!!selectedManagerMrId && selectedManagerMrId === doctor?.mr?.mrId);
 
   const handlePhotoUpload = async (e) => {
     try {
@@ -1071,7 +1074,7 @@ export default function DoctorDetail({ consentModal = false }) {
                   </div>
                 </div>
 
-                {isApproved && (!isManager || !!selectedManagerMrId) ? (
+                {isApproved && canActForSelectedMr ? (
                   <>
                     <input
                       ref={fileInputRef}
@@ -1210,7 +1213,7 @@ export default function DoctorDetail({ consentModal = false }) {
                     </Button>
                   )}
                 </div> */}
-                {isManager && !selectedManagerMrId ? (
+                {isManager && !canActForSelectedMr ? (
                   <div
                     style={{
                       padding: 24,
