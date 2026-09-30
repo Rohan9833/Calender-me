@@ -24,7 +24,7 @@ export default function CalendarMonthGrid({
   const [error, setError] = useState("");
   const rootRef = useRef(null);
 
-  const frozen = isFrozen || calendarStatus === "frozen";
+  const frozen = isFrozen || calendarStatus === "frozen" || calendarStatus === "input_given";
   const completedCount = Object.keys(selections).length;
   const progress = Math.round((completedCount / months.length) * 100);
 

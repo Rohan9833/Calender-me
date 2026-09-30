@@ -420,7 +420,7 @@ const MRDashboard = () => {
     "Approved Doctors": "/approved-doctors",
     "Consent Pending": "/approved-doctors?filter=consent-pending",
     "Photo Pending": "/approved-doctors?filter=photo-pending",
-    "Calendar Frozen": "/calendar-finalized",
+    "Calendar Frozen": "/frozen-doctors",
     "Input Given Pending": "/input-given",
     "Calendar Delivered": "/input-given?status=delivered",
   };
