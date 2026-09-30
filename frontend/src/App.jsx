@@ -86,7 +86,7 @@ function App() {
         <Route path="/manager/approvals" element={<ApprovalQueue />} />
         <Route path="/manager/doctor-review" element={<DoctorReview />} />
         <Route path="/manager/mr-progress" element={<MRProgress />} />
-        <Route path="/manager/delay-report" element={<DelayReport />} />
+        <Route path="/manager/delay-report" element={<ManagerReports />} />
 
         {/* HO Routes */}
         <Route path="/ho-dashboard" element={<HODashboard />} />
