@@ -5,7 +5,6 @@ const router = express.Router();
 const {
   getFLMDoctors,
   getFLMMRs,
-  getManagerMRs,
   getSLMDoctors,
   getTLMDoctors,
   getFLMDashboard,
@@ -19,7 +18,6 @@ const {
 
 router.get("/flm/:flmId/doctors", getFLMDoctors);
 router.get("/flm/:flmId/mrs", getFLMMRs);
-router.get("/mrs", getManagerMRs);
 
 router.get("/slm/:slmId/doctors", getSLMDoctors);
 
