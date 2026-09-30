@@ -95,6 +95,10 @@ const doctorSchema = new mongoose.Schema(
             type: Date,
             default: Date.now,
           },
+          uploadedByMr: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "MR",
+          },
         },
       ],
       default: [],
