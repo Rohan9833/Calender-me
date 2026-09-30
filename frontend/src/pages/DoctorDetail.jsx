@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import { useNavigate, useParams } from "react-router-dom";
@@ -895,197 +896,157 @@ export default function DoctorDetail({ consentModal = false }) {
           {activeTab === "calendar" && (
             <div>
               {/* Photo Section */}
-              <div style={{ marginBottom: 24 }}>
-                <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, marginBottom: 12 }}>
-                  Photos
-                </h3>
+              <div
+                style={{
+                  marginBottom: 28,
+                  background: "#fff",
+                  border: "1px solid #e5eaf3",
+                  borderRadius: 16,
+                  padding: isMobile ? 16 : 22,
+                  boxShadow: "0 5px 20px rgba(15, 31, 77, 0.04)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 18 }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 5 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "#eff6ff", color: "#0b55f4", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Camera size={19} />
+                      </div>
+                      <h3 style={{ margin: 0, fontSize: isMobile ? 17 : 19, fontWeight: 700, color: "#172033" }}>Doctor Photos</h3>
+                    </div>
+                    <p style={{ margin: 0, color: "#64748b", fontSize: 12, lineHeight: 1.5 }}>
+                      Upload up to 5 clear photos of the doctor.
+                    </p>
+                  </div>
+
+                  <div style={{
+                    display: "inline-flex", alignItems: "center", gap: 7, padding: "7px 10px",
+                    borderRadius: 999, background: isPhotoLimitReached ? "#f0fdf4" : "#f8fafc",
+                    border: "1px solid " + (isPhotoLimitReached ? "#bbf7d0" : "#e5eaf3"),
+                    color: isPhotoLimitReached ? "#15803d" : "#64748b", fontSize: 11, fontWeight: 700
+                  }}>
+                    <Camera size={13} />
+                    {doctor?.doctorPhotos?.length || 0}/5 photos
+                  </div>
+                </div>
+
                 {isApproved ? (
                   <>
                     <input
                       ref={fileInputRef}
                       type="file"
                       multiple
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/webp,image/*"
                       hidden
                       onChange={handlePhotoUpload}
                       disabled={isPhotoLimitReached}
                     />
-                    <div
-                      className="uploadBox"
-                      onClick={() => {
-                        if (!isPhotoLimitReached) fileInputRef.current?.click();
-                      }}
-                      style={{
-                        cursor: isPhotoLimitReached ? "not-allowed" : "pointer",
-                        opacity: isPhotoLimitReached ? 0.6 : 1,
-                        border: "2px dashed #d1d5db",
-                        borderRadius: 8,
-                        padding: isMobile ? 16 : 20,
-                        textAlign: "center",
-                        background: "#f9fafb",
-                      }}
-                    >
-                      <Upload
-                        size={isMobile ? 24 : 28}
-                        style={{ display: "block", margin: "0 auto 8px" }}
-                      />
-                      <span style={{ fontSize: isMobile ? 13 : 14 }}>
-                        {isPhotoLimitReached
-                          ? "Photo Limit Reached (5/5)"
-                          : `View / Upload Photo (${doctor?.doctorPhotos?.length || 0}/5)`}
-                      </span>
+
+                    <div style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      gap: 14, flexWrap: "wrap", padding: isMobile ? 14 : 16, borderRadius: 12,
+                      border: "1px dashed " + (isPhotoLimitReached ? "#bbf7d0" : "#b9c9df"),
+                      background: isPhotoLimitReached ? "#f0fdf4" : "#f8fbff"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+                        <div style={{ width: 42, height: 42, flex: "0 0 42px", borderRadius: 11, background: "#fff", border: "1px solid #dbe7f5", color: "#0b55f4", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Upload size={19} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "#172033" }}>
+                            {isPhotoLimitReached ? "All photo slots are filled" : "Add doctor photos"}
+                          </div>
+                          <div style={{ marginTop: 3, fontSize: 11, color: "#64748b" }}>
+                            {isPhotoLimitReached ? "Delete a photo if you need to replace one." : "JPG, PNG or WebP • You can select multiple photos."}
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button
+                        variant="primary"
+                        icon={Upload}
+                        onClick={() => { if (!isPhotoLimitReached) fileInputRef.current?.click(); }}
+                        disabled={isPhotoLimitReached}
+                      >
+                        {isPhotoLimitReached ? "Limit Reached" : "Choose Photos"}
+                      </Button>
                     </div>
                   </>
                 ) : (
-                  <div
-                    style={{
-                      border: "2px dashed #d1d5db",
-                      borderRadius: 8,
-                      padding: isMobile ? 16 : 20,
-                      textAlign: "center",
-                      background: "#f3f4f6",
-                      opacity: 0.7,
-                    }}
-                  >
-                    <div style={{ fontSize: isMobile ? 24 : 28, marginBottom: 8 }}>🔒</div>
-                    <span style={{ color: "#6b7280", fontSize: isMobile ? 13 : 14 }}>
-                      Photos can be uploaded only after approval
-                    </span>
-                    <div
-                      style={{ fontSize: isMobile ? 11 : 12, color: "#9ca3af", marginTop: 4 }}
-                    >
-                      Current status: {doctor.approvalStatus || "Pending"}
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, borderRadius: 12, background: "#f8fafc", border: "1px solid #e5eaf3" }}>
+                    <div style={{ width: 40, height: 40, flex: "0 0 40px", borderRadius: 10, background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🔒</div>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#334155" }}>Photo upload is locked</div>
+                      <div style={{ marginTop: 3, fontSize: 11, color: "#64748b" }}>
+                        Photos can be uploaded after doctor approval. Current status: <strong>{doctor.approvalStatus || "Pending"}</strong>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {doctor.doctorPhotos && doctor.doctorPhotos.length > 0 && (
-                  <>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginTop: 12,
-                        flexWrap: "wrap",
-                        gap: 8,
-                      }}
-                    >
-                      <h4
-                        style={{
-                          fontSize: isMobile ? 13 : 14,
-                          fontWeight: 600,
-                          color: "#374151",
-                        }}
-                      >
-                        Uploaded Photos ({doctor.doctorPhotos.length}/5)
-                      </h4>
-                      <Button
-                        variant="outline"
-                        icon={Download}
-                        onClick={handleDownloadPhotosZip}
-                        size="small"
-                      >
+                  <div style={{ marginTop: 20 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 11 }}>
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#334155" }}>Uploaded Photos</h4>
+                        <span style={{ fontSize: 11, color: "#94a3b8" }}>Click a photo to view it</span>
+                      </div>
+
+                      <Button variant="outline" icon={Download} onClick={handleDownloadPhotosZip} size="small">
                         Download ZIP
                       </Button>
                     </div>
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: isMobile
-                          ? "repeat(auto-fill, minmax(80px, 1fr))"
-                          : "repeat(auto-fill, minmax(100px, 1fr))",
-                        gap: isMobile ? 8 : 12,
-                        marginTop: 8,
-                      }}
-                    >
+
+                    <div style={{
+                      display: "grid",
+                      gridTemplateColumns: isMobile ? "repeat(2, minmax(0, 1fr))" : "repeat(5, minmax(0, 1fr))",
+                      gap: isMobile ? 10 : 12
+                    }}>
                       {doctor.doctorPhotos.map((photo, idx) => (
                         <div
                           key={photo._id || idx}
-                          style={{
-                            position: "relative",
-                            borderRadius: 8,
-                            overflow: "hidden",
-                            border: "1px solid #e5e7eb",
-                            cursor: "pointer",
-                            background: "white",
-                          }}
-                          onClick={() =>
-                            window.open(
-                              `${API_BASE_URL}${photo.url}`,
-                              "_blank",
-                            )
-                          }
+                          style={{ position: "relative", aspectRatio: "1 / 1", borderRadius: 12, overflow: "hidden", border: "1px solid #e2e8f0", background: "#f8fafc", cursor: "pointer", boxShadow: "0 2px 8px rgba(15, 23, 42, 0.05)" }}
+                          onClick={() => window.open(API_BASE_URL + photo.url, "_blank", "noopener,noreferrer")}
                         >
                           <img
-                            src={`${API_BASE_URL}${photo.url}`}
-                            alt={`Photo ${idx + 1}`}
-                            style={{
-                              width: "100%",
-                              height: isMobile ? 80 : 100,
-                              objectFit: "cover",
-                              display: "block",
-                            }}
+                            src={API_BASE_URL + photo.url}
+                            alt={"Doctor photo " + (idx + 1)}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                             onError={(e) => {
-                              e.target.src =
-                                'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2"%3E%3Crect x="2" y="2" width="20" height="20" rx="2.18"/%3E%3Ccircle cx="8.5" cy="8.5" r="2.5"/%3E%3Cpath d="M21 15l-5-5-6 6-3-3-4 4"/%3E%3C/svg%3E';
+                              e.currentTarget.src =
+                                'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="1.5"%3E%3Crect x="2" y="2" width="20" height="20" rx="2.18"/%3E%3Ccircle cx="8.5" cy="8.5" r="2.5"/%3E%3Cpath d="M21 15l-5-5-6 6-3-3-4 4"/%3E%3C/svg%3E';
                             }}
                           />
 
-                          {/* Delete Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeletePhoto(photo._id, idx);
-                            }}
-                            style={{
-                              position: "absolute",
-                              top: "4px",
-                              right: "4px",
-                              background: "rgba(0,0,0,0.7)",
-                              border: "none",
-                              borderRadius: "50%",
-                              width: isMobile ? 24 : 28,
-                              height: isMobile ? 24 : 28,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              color: "#fff",
-                              cursor: "pointer",
-                              transition: "0.2s",
-                              zIndex: 2,
-                            }}
-                            onMouseEnter={(e) =>
-                              (e.currentTarget.style.background =
-                                "rgba(220,0,0,0.9)")
-                            }
-                            onMouseLeave={(e) =>
-                              (e.currentTarget.style.background =
-                                "rgba(0,0,0,0.7)")
-                            }
-                          >
-                            <X size={isMobile ? 14 : 16} />
-                          </button>
-
-                          <div
-                            style={{
-                              position: "absolute",
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              background: "rgba(0,0,0,0.6)",
-                              color: "white",
-                              fontSize: isMobile ? 8 : 10,
-                              padding: isMobile ? 2 : 4,
-                              textAlign: "center",
-                            }}
-                          >
+                          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "18px 8px 7px", background: "linear-gradient(transparent, rgba(15,23,42,.78))", color: "#fff", fontSize: 10, fontWeight: 700 }}>
                             Photo {idx + 1}
                           </div>
+
+                          <button
+                            type="button"
+                            aria-label={"Delete photo " + (idx + 1)}
+                            onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo._id, idx); }}
+                            style={{ position: "absolute", top: 7, right: 7, width: 29, height: 29, border: "1px solid rgba(255,255,255,.65)", borderRadius: 8, background: "rgba(15,23,42,.72)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }}
+                          >
+                            <X size={15} />
+                          </button>
                         </div>
                       ))}
+
+                      {!isPhotoLimitReached &&
+                        Array.from({ length: 5 - doctor.doctorPhotos.length }).map((_, idx) => (
+                          <button
+                            key={"empty-photo-slot-" + idx}
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            style={{ aspectRatio: "1 / 1", borderRadius: 12, border: "1px dashed #cbd5e1", background: "#f8fafc", color: "#94a3b8", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, cursor: "pointer" }}
+                          >
+                            <Upload size={18} />
+                            <span style={{ fontSize: 10, fontWeight: 700 }}>Add photo</span>
+                          </button>
+                        ))}
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
 
