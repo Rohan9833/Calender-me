@@ -144,6 +144,27 @@ export default function CalendarMonthGrid({
 
   const selectDesign = async (month, design) => {
     if (frozen || saving || !design) return;
+
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const resolvedDoctorId =
+      doctorId ||
+      sessionStorage.getItem("currentDoctorId") ||
+      localStorage.getItem("currentDoctorId");
+
+    const resolvedMrId =
+      mrId ||
+      sessionStorage.getItem("mrId") ||
+      localStorage.getItem("mrId") ||
+      storedUser.mrId ||
+      storedUser._id ||
+      storedUser.id ||
+      "";
+
+    if (!resolvedDoctorId || !resolvedMrId || !design.id) {
+      setError("Doctor, MR, and design information is missing. Please refresh the page and try again.");
+      return;
+    }
+
     setSaving(month);
     setError("");
     try {
@@ -151,8 +172,8 @@ export default function CalendarMonthGrid({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mrId,
-          doctorId,
+          mrId: resolvedMrId,
+          doctorId: resolvedDoctorId,
           year: CALENDAR_YEAR,
           month,
           designId: design.id,
