@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Check, CheckCircle2, ChevronRight, Eye, Lock, X } from "lucide-react";
 import { Badge, Button } from "./UIComponents";
@@ -25,6 +26,28 @@ export default function CalendarMonthGrid({
   const rootRef = useRef(null);
 
   const frozen = isFrozen || calendarStatus === "frozen" || calendarStatus === "input_given";
+  useEffect(() => {
+    if (!openMonth && !preview) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setOpenMonth(null);
+        setPreview(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [openMonth, preview]);
+
+
   const completedCount = Object.keys(selections).length;
   const progress = Math.round((completedCount / months.length) * 100);
 
@@ -287,63 +310,66 @@ export default function CalendarMonthGrid({
                     </span>
                     <ChevronRight size={18} />
                   </button>
-                  {isOpen && !frozen && (
-                    <div
-                      className="calendar-design-modal-overlay"
-                      onClick={() => setOpenMonth(null)}
-                    >
+                  {isOpen && !frozen && typeof document !== "undefined" &&
+                    createPortal(
                       <div
-                        className="calendar-design-modal"
-                        onClick={(e) => e.stopPropagation()}
+                        className="calendar-design-modal-overlay"
+                        onClick={() => setOpenMonth(null)}
                       >
-                        <div className="calendar-dropdown-heading">
-                          <div>
-                            <strong>{month} designs</strong>
-                            <span>{options.length} options</span>
+                        <div
+                          className="calendar-design-modal"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="calendar-dropdown-heading">
+                            <div>
+                              <strong>{month} designs</strong>
+                              <span>{options.length} options</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setOpenMonth(null)}
+                            >
+                              <X size={15} />
+                            </button>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => setOpenMonth(null)}
-                          >
-                            <X size={15} />
-                          </button>
+                          <div className="calendar-design-options">
+                            {options.map((design) => {
+                              const active = selected?.id === design.id;
+                              return (
+                                <button
+                                  type="button"
+                                  key={design.id}
+                                  className={
+                                    "calendar-design-option " +
+                                    (active ? "active" : "")
+                                  }
+                                  onClick={() => selectDesign(month, design)}
+                                  disabled={saving !== null}
+                                >
+                                  <div className="calendar-option-thumb">
+                                    <img src={design.file} alt={design.label} />
+                                    {active && (
+                                      <span>
+                                        <Check size={13} />
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="calendar-option-info">
+                                    <strong>{design.label}</strong>
+                                    <small>
+                                      {design.category || "Calendar design"}
+                                    </small>
+                                  </div>
+                                  {active && <CheckCircle2 size={17} />}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                        <div className="calendar-design-options">
-                          {options.map((design) => {
-                            const active = selected?.id === design.id;
-                            return (
-                              <button
-                                type="button"
-                                key={design.id}
-                                className={
-                                  "calendar-design-option " +
-                                  (active ? "active" : "")
-                                }
-                                onClick={() => selectDesign(month, design)}
-                                disabled={saving !== null}
-                              >
-                                <div className="calendar-option-thumb">
-                                  <img src={design.file} alt={design.label} />
-                                  {active && (
-                                    <span>
-                                      <Check size={13} />
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="calendar-option-info">
-                                  <strong>{design.label}</strong>
-                                  <small>
-                                    {design.category || "Calendar design"}
-                                  </small>
-                                </div>
-                                {active && <CheckCircle2 size={17} />}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                      </div>,
+                      document.body
+                    )
+                  }
                 </div>
 
                 <div
@@ -847,23 +873,27 @@ const calendarStyles = `
 .calendar-design-modal-overlay{
   position:fixed;
   inset:0;
-  z-index:1100;
+  z-index:11000;
+  width:100vw;
+  height:100vh;
   background:rgba(15,23,42,.62);
   display:flex;
   align-items:center;
   justify-content:center;
   padding:24px;
+  box-sizing:border-box;
 }
 
 .calendar-design-modal{
   width:min(1000px,96vw);
-  max-height:90vh;
+  max-height:min(90vh,820px);
   overflow:auto;
   background:#fff;
   border:1px solid #dbe3ee;
   border-radius:20px;
   box-shadow:0 28px 80px rgba(15,23,42,.32);
   padding:24px;
+  box-sizing:border-box;
 }
 
 .calendar-dropdown-menu{
