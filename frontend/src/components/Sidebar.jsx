@@ -90,7 +90,11 @@ export default function Sidebar({
   const [doctorMenuOpen, setDoctorMenuOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
 
-  const items = navByRole[role];
+  const baseItems = navByRole[role] || [];
+  const items =
+    user.role === "flm"
+      ? [["Add Doctor", "UserPlus", "/add-doctor"], ...baseItems]
+      : baseItems;
 
   const isActive = (path) => location.pathname === path;
 
