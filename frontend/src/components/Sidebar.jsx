@@ -59,7 +59,7 @@ const navByRole = {
   ho: [
     ["Dashboard", "LayoutDashboard", "/ho-dashboard"],
     ["Doctor Approvals", "ClipboardList", "/ho/approvals"],
-    ["Campaign Funnel", "Filter", "/ho/report-summary"],
+    ["Campaign Funnel", "Filter", "/ho/report-funnel"],
     ["Calendar Designs", "ImageIcon", "/ho/calendar-designs"],
     ["Consent Tracker", "Users", "/ho/consent-tracker"],
     ["Input Given Tracker", "Hand", "/ho/input-tracker"],
