@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Users,
@@ -2614,41 +2615,60 @@ export function ApprovalQueue({ role = "manager" }) {
 }
 
 export function DoctorReview({ role = "manager" }) {
+  const [doctors, setDoctors] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const go = useNavigate();
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        let result;
+        if (user.role === "ho" || role === "ho") result = await getHODoctors();
+        else if (user.role === "flm") result = await getFLMDoctors(user.flmId);
+        else if (user.role === "slm") result = await getSLMDoctors(user.slmId);
+        else if (user.role === "tlm") result = await getTLMDoctors(user.tlmId);
+        if (active) setDoctors(result?.doctors || []);
+      } catch (e) {
+        if (active) setError(e.response?.data?.message || "Unable to load doctors for review.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    load();
+    return () => { active = false; };
+  }, [role]);
+
+  const filtered = doctors.filter((doctor) =>
+    [doctor.doctorName, doctor.speciality, doctor.mclCode, doctor.mr?.mrName, doctor.city]
+      .filter(Boolean).join(" ").toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <Layout role={role} active="Doctor Approvals">
-      <Crumbs items={["Doctor Approvals", "Approval Queue", "Doctor Review"]} />
-
+      <Crumbs items={["Doctor Approvals", "Doctor Review"]} />
       <div className="pageHead">
         <div>
-          <h1>{role === "ho" ? "Doctor Review / Approve" : "Doctor Review"}</h1>
-
-          <p className="subtitle">
-            Review doctor details submitted by the MR and take action.
-          </p>
+          <h1>{role === "ho" ? "National Doctor Review" : "Doctor Review"}</h1>
+          <p className="subtitle">Search submitted doctor records and open their full details before taking action.</p>
         </div>
-
-        <Button
-          variant="outline"
-          icon={ArrowLeft}
-          onClick={() => window.history.back()}
-        >
-          Back to Queue
-        </Button>
+        <Button variant="outline" icon={ArrowLeft} onClick={() => go(role === "ho" ? "/ho/approvals" : "/manager/approvals")}>Back to Queue</Button>
       </div>
-
-      <div className="review">
-        <div className="panel">
-          <div className="panelHead">
-            <h3>Doctor Details</h3>
-          </div>
-
-          <div className="reviewGrid">
-            <span>
-              Doctor Name <b>Loading...</b>
-            </span>
-          </div>
-        </div>
+      <div style={{background:"#fff",border:"1px solid #e5eaf2",borderRadius:12,padding:14,marginBottom:14}}>
+        <input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search doctor, speciality, MCL code, MR or city…" style={{width:"100%",boxSizing:"border-box",border:"1px solid #dbe3ef",borderRadius:9,padding:"11px 12px"}}/>
+        <div style={{fontSize:12,color:"#64748b",marginTop:9}}>{filtered.length} doctor records</div>
       </div>
+      {loading ? <div style={{padding:35,textAlign:"center",color:"#64748b"}}>Loading doctor records…</div> : error ? <div role="alert" style={{padding:16,color:"#b91c1c",background:"#fff1f2",borderRadius:10}}>{error}</div> : filtered.length===0 ? <div style={{padding:35,textAlign:"center",background:"#fff",borderRadius:12,color:"#64748b"}}>No doctor records found.</div> :
+        <div style={{overflowX:"auto",background:"#fff",border:"1px solid #e5eaf2",borderRadius:12}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,whiteSpace:"nowrap"}}>
+            <thead><tr>{["Doctor","Speciality","MCL Code","MR / HQ","Approval","Consent","Review"].map(h=><th key={h} style={{textAlign:"left",padding:"12px 14px",background:"#f8fafc",borderBottom:"1px solid #e5eaf2",fontSize:10,color:"#64748b",textTransform:"uppercase"}}>{h}</th>)}</tr></thead>
+            <tbody>{filtered.map(doctor=><tr key={doctor._id}>{[doctor.doctorName,doctor.speciality,doctor.mclCode,[doctor.mr?.mrName,doctor.mr?.hq].filter(Boolean).join(" / "),doctor.approvalStatus,doctor.consentStatus].map((value,i)=><td key={i} style={{padding:"13px 14px",borderBottom:"1px solid #edf1f7",color:"#334155"}}>{value||"—"}</td>)}<td style={{padding:"13px 14px",borderBottom:"1px solid #edf1f7"}}><button type="button" onClick={()=>go("/doctor-details/"+doctor._id)} style={{border:0,background:"#eff6ff",color:"#1d4ed8",padding:"8px 11px",borderRadius:8,fontWeight:700,cursor:"pointer"}}>Open details</button></td></tr>)}</tbody>
+          </table>
+        </div>}
     </Layout>
   );
 }
