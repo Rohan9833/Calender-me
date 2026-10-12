@@ -252,7 +252,7 @@ const getPendingActions = async (req, res) => {
       const flmIds = flms.map((flm) => flm._id);
       const mrs = await MR.find({ flm: { $in: flmIds } });
       mrIds = mrs.map((mr) => mr._id);
-    else if (userRole === "ho") {
+    } else if (userRole === "ho") {
       const doctors = await Doctor.find({ status: { $ne: "draft" } })
         .select("doctorName speciality city approvalStatus calendarSelected calendarFrozen inputGivenStatus")
         .sort({ updatedAt: -1 });
