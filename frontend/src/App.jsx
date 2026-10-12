@@ -99,6 +99,7 @@ function App() {
         <Route path="/ho/settings" element={<HOOperations page="settings" />} />
         <Route path="/ho/approvals" element={<ApprovalQueue role="ho" />} />
         <Route path="/ho/doctor-review" element={<DoctorReview role="ho" />} />
+        <Route path="/ho/report-funnel" element={<HOReport type="summary" />} />
         <Route
           path="/ho/report-summary"
           element={<HOReport type="summary" />}
