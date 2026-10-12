@@ -47,8 +47,8 @@ const getDoctors = async (req, res) => {
       const searchable = [d.doctorName, d.speciality, d.mclCode, d.city, d.mr?.mrName, d.mr?.mrId, d.mr?.hq, d.mr?.region, d.mr?.zone].filter(Boolean).join(" ").toLowerCase();
       return (!term || searchable.includes(term))
         && (status === "all" || d.approvalStatus === status)
-        && (consent === "all" || (consent === "pending" ? (!d.consentSent || d.consentStatus === "pending") : d.consentStatus === consent))
-        && (input === "all" || (input === "completed" ? d.inputGivenStatus === "completed" : d.inputGivenStatus !== "completed"));
+        && (consent === "all" || (consent === "pending" ? (d.approvalStatus === "approved" && (!d.consentSent || d.consentStatus === "pending")) : d.consentStatus === consent))
+        && (input === "all" || (input === "completed" ? d.inputGivenStatus === "completed" : d.calendarFrozen === true && d.inputGivenStatus !== "completed"));
     });
     res.json({ success: true, count: filtered.length, doctors: filtered });
   } catch (error) {
