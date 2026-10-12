@@ -33,6 +33,7 @@ import HODashboard from "./pages/HODashboard";
 import HOReport from "./pages/HOReport";
 import AllDoctors from "./pages/Alldoctors ";
 import FrozenDoctors from "./pages/Frozendoctors";
+import HOOperations from "./pages/HOOperations";
 
 function App() {
   return (
@@ -90,6 +91,12 @@ function App() {
 
         {/* HO Routes */}
         <Route path="/ho-dashboard" element={<HODashboard />} />
+        <Route path="/ho/users" element={<HOOperations page="users" />} />
+        <Route path="/ho/hierarchy" element={<HOOperations page="hierarchy" />} />
+        <Route path="/ho/activity" element={<HOOperations page="activity" />} />
+        <Route path="/ho/consent-tracker" element={<HOOperations page="consent" />} />
+        <Route path="/ho/input-tracker" element={<HOOperations page="input" />} />
+        <Route path="/ho/settings" element={<HOOperations page="settings" />} />
         <Route path="/ho/approvals" element={<ApprovalQueue role="ho" />} />
         <Route path="/ho/doctor-review" element={<DoctorReview role="ho" />} />
         <Route
