@@ -61,12 +61,13 @@ const navByRole = {
     ["Doctor Approvals", "ClipboardList", "/ho/approvals"],
     ["Campaign Funnel", "Filter", "/ho/report-summary"],
     ["Calendar Designs", "ImageIcon", "/ho/calendar-designs"],
-    ["Consent & Input Tracker", "Users", "/ho/pending-report"],
+    ["Consent Tracker", "Users", "/ho/consent-tracker"],
+    ["Input Given Tracker", "Hand", "/ho/input-tracker"],
     ["Reports", "BarChart3", "/ho/report-summary"],
-    ["Hierarchy", "Building2", "/ho/report-hierarchy"],
-    ["Users Management", "Users", "/ho/dashboard"],
-    ["Activity Log", "FileText", "/ho/pending-report"],
-    ["System Settings", "Settings", "/ho/dashboard"],
+    ["Hierarchy", "Building2", "/ho/hierarchy"],
+    ["Users Management", "Users", "/ho/users"],
+    ["Activity Log", "FileText", "/ho/activity"],
+    ["System Settings", "Settings", "/ho/settings"],
   ],
 };
 
