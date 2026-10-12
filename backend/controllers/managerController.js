@@ -252,7 +252,7 @@ const getPendingActions = async (req, res) => {
       const flmIds = flms.map((flm) => flm._id);
       const mrs = await MR.find({ flm: { $in: flmIds } });
       mrIds = mrs.map((mr) => mr._id);
-    } else if (userRole === "ho") {
+    else if (userRole === "ho") {
       const doctors = await Doctor.find({ status: { $ne: "draft" } })
         .select("doctorName speciality city approvalStatus calendarSelected calendarFrozen inputGivenStatus")
         .sort({ updatedAt: -1 });
@@ -418,6 +418,14 @@ const getPendingActionsCount = async (req, res) => {
       }
     }
     
+    } else if (userRole === "ho") {
+      const doctors = await Doctor.find({ status: { $ne: "draft" } });
+      const pendingApprovals = doctors.filter(d => d.approvalStatus === "pending").length;
+      const pendingFreeze = doctors.filter(d => d.calendarSelected === true && d.calendarFrozen !== true).length;
+      const inputGivenPending = doctors.filter(d => d.calendarFrozen === true && d.inputGivenStatus !== "completed").length;
+      pendingCount = pendingApprovals + pendingFreeze + inputGivenPending;
+    }
+
     console.log("Pending count calculated:", pendingCount);
     
     res.status(200).json({
