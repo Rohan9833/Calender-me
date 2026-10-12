@@ -6,6 +6,7 @@ const profileRoutes = require("./routes/profileRoutes");
 const hierarchyroutes = require("./routes/hierarchyRoutes");
 const doctorroutes = require("./routes/doctorRoutes");
 const managerRoutes = require("./routes/managerRoutes");
+const hoRoutes = require("./routes/hoRoutes");
 const calendarRoutes = require("./routes/calendarRoutes");
 const path = require("path");
 
@@ -33,6 +34,7 @@ app.use("/api/hierarchy", hierarchyroutes);
 app.use("/api/createdoc", doctorroutes);
 app.use("/api/doctors", doctorroutes);
 app.use("/api/manager", managerRoutes);
+app.use("/api/ho", hoRoutes);
 app.use("/api/calendar", calendarRoutes);
 
 app.use("/uploads/doctors", express.static(path.join(__dirname, "uploads/doctors")));
