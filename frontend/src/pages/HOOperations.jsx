@@ -24,7 +24,9 @@ export default function HOOperations({ page = "users" }) {
   const load = async () => {
     setLoading(true); setError("");
     try {
-      if (page === "activity") {
+      if (page === "settings") {
+        setRows([]);
+      } else if (page === "activity") {
         const data = await getHOActivity(); setRows(data.activities || []);
       } else if (page === "users" || page === "hierarchy") {
         const data = await getHOHierarchy(); setRows(data.users || []); setCounts(data.counts || {});
