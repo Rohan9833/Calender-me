@@ -416,8 +416,6 @@ const getPendingActionsCount = async (req, res) => {
         const inputGivenPending = doctors.filter(d => d.calendarFrozen === true && d.inputGivenStatus === "pending").length;
         pendingCount = pendingApprovals + pendingFreeze + inputGivenPending;
       }
-    }
-    
     } else if (userRole === "ho") {
       const doctors = await Doctor.find({ status: { $ne: "draft" } });
       const pendingApprovals = doctors.filter(d => d.approvalStatus === "pending").length;
