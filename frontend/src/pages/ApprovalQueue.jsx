@@ -34,6 +34,7 @@ import {
   getTLMDoctors,
   getFLMDoctors,
 } from "../api/managerAPI";
+import { getHODoctors } from "../api/hoAPI";
 
 export function ApprovalQueue({ role = "manager" }) {
   const [doctors, setDoctors] = useState([]);
@@ -154,6 +155,8 @@ export function ApprovalQueue({ role = "manager" }) {
         data = await getSLMDoctors(user.slmId);
       } else if (user.role === "tlm") {
         data = await getTLMDoctors(user.tlmId);
+      } else if (user.role === "ho" || role === "ho") {
+        data = await getHODoctors();
       }
 
       console.log("Fetched all doctors:", data?.doctors);
@@ -429,11 +432,13 @@ export function ApprovalQueue({ role = "manager" }) {
             <h1>Doctor Approval Queue</h1>
 
             <p className="subtitle">
-              {user?.role === "slm"
-                ? "FLM-approved doctors are already approved. Approve pending submissions or override an approval with Disapprove."
-                : user?.role === "tlm"
-                  ? "TLM can approve MR submissions directly, bypassing FLM and SLM, or override an existing approval with Disapprove."
-                  : "Review and Approve or reject doctors submitted by your MRs."}
+              {user?.role === "ho"
+                ? "Review all submitted doctors nationally and override approval decisions when required."
+                : user?.role === "slm"
+                  ? "FLM-approved doctors are already approved. Approve pending submissions or override an approval with Disapprove."
+                  : user?.role === "tlm"
+                    ? "TLM can approve MR submissions directly, bypassing FLM and SLM, or override an existing approval with Disapprove."
+                    : "Review and approve or reject doctors submitted by your MRs."}
             </p>
           </div>
 
@@ -735,7 +740,7 @@ export function ApprovalQueue({ role = "manager" }) {
                     const lowerManagerLockedByTLM =
                       isRejected &&
                       doctor.approvedByRole === "tlm" &&
-                      user?.role !== "tlm";
+                      user?.role !== "tlm" && user?.role !== "ho";
 
                     return (
                       <tr
@@ -860,7 +865,7 @@ export function ApprovalQueue({ role = "manager" }) {
                                 Reject
                               </button>
                             </div>
-                          ) : user?.role === "slm" || user?.role === "tlm" ? (
+                          ) : user?.role === "slm" || user?.role === "tlm" || user?.role === "ho" ? (
                             lowerManagerLockedByTLM ? (
                               <span className="view-only">Locked by TLM</span>
                             ) : (
