@@ -28,6 +28,7 @@ import { ApprovalQueue, DoctorReview } from "./pages/ApprovalQueue";
 import { MRProgress, DelayReport } from "./pages/MRProgress";
 import ManagerReports from "./pages/ManagerReports";
 import CalendarDesigns from "./pages/CalendarDesigns";
+import CalendarUpload from "./pages/CalendarUpload";
 // HO Pages
 import HODashboard from "./pages/HODashboard";
 import HOReport from "./pages/HOReport";
@@ -90,6 +91,7 @@ function App() {
 
         {/* HO Routes */}
         <Route path="/ho-dashboard" element={<HODashboard />} />
+        <Route path="/ho/calendar-upload" element={<CalendarUpload />} />
         <Route path="/ho/approvals" element={<ApprovalQueue role="ho" />} />
         <Route path="/ho/doctor-review" element={<DoctorReview role="ho" />} />
         <Route
