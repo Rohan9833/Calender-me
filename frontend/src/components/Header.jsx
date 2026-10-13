@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Menu,
   MapPin,
@@ -27,6 +27,8 @@ export default function Header({
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [pendingActions, setPendingActions] = useState([]);
   const [pendingLoading, setPendingLoading] = useState(false);
+  const notificationRef = useRef(null);
+  const profileRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -90,6 +92,15 @@ export default function Header({
       mounted = false;
     };
   }, [user?.role, user?.flmId, user?.slmId, user?.tlmId, user?.hoId]);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) setIsNotificationOpen(false);
+      if (profileRef.current && !profileRef.current.contains(event.target)) setIsProfileOpen(false);
+    };
+    document.addEventListener("pointerdown", handleOutsideClick);
+    return () => document.removeEventListener("pointerdown", handleOutsideClick);
+  }, []);
 
   const actionIcon = (type) => {
     if (type === "calendar") return CalendarClock;
@@ -244,6 +255,7 @@ export default function Header({
           SPACER
       ===================================================== */}
       <div
+        ref={profileRef}
         style={{
           flex: 1,
           minWidth: "20px",
@@ -292,7 +304,7 @@ export default function Header({
         </div>
       )}
 
-      <div style={{ position: "relative", flexShrink: 0 }}>
+      <div ref={notificationRef} style={{ position: "relative", flexShrink: 0 }}>
         <button
           type="button"
           aria-label="Notifications"
