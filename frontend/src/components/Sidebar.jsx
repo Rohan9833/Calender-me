@@ -61,6 +61,7 @@ const navByRole = {
     ["Doctor Approvals", "ClipboardList", "/ho/approvals"],
     ["Campaign Funnel", "Filter", "/ho/report-summary"],
     ["Calendar Designs", "ImageIcon", "/ho/calendar-designs"],
+    ["Upload Calendars", "CalendarDays", "/ho/calendar-upload"],
     ["Consent & Input Tracker", "Users", "/ho/pending-report"],
     ["Reports", "BarChart3", "/ho/report-summary"],
     ["Hierarchy", "Building2", "/ho/report-hierarchy"],
