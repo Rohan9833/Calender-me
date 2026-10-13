@@ -436,9 +436,9 @@ export function ApprovalQueue({ role = "manager" }) {
               {user?.role === "ho"
                 ? "Review all submitted doctors nationally and override approval decisions when required."
                 : user?.role === "slm"
-                  ? "FLM-approved doctors are already approved. Approve pending submissions or override an approval with Disapprove."
+                  ? "FLM-approved doctors are already approved. Approve pending submissions or override an approval with Reject."
                   : user?.role === "tlm"
-                    ? "TLM can approve MR submissions directly, bypassing FLM and SLM, or override an existing approval with Disapprove."
+                    ? "TLM can approve MR submissions directly, bypassing FLM and SLM, or override an existing approval with Reject."
                     : "Review and approve or reject doctors submitted by your MRs."}
             </p>
           </div>
@@ -905,7 +905,7 @@ export function ApprovalQueue({ role = "manager" }) {
                                   type="button"
                                 >
                                   <XCircle size={14} />
-                                  {isApproved ? "Disapprove" : "Disapprove"}
+                                  {isApproved ? "Reject" : "Reject"}
                                 </button>
                               )}
                               </div>
@@ -983,7 +983,7 @@ export function ApprovalQueue({ role = "manager" }) {
                 {confirmPopup.status === "approved"
                   ? "approve"
                   : user?.role === "slm" || user?.role === "tlm"
-                    ? "disapprove"
+                    ? "reject"
                     : "reject"}
               </strong>{" "}
               this doctor?
