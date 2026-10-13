@@ -268,13 +268,10 @@ export default function CalendarDesigns({ role: propRole }) {
     months.forEach(month => {
       const designs = designAssets[month] || [];
       designs.forEach(design => {
-        all.push({
-          ...design,
-          month: month,
-          status: "available"
-        });
+        all.push({ ...design, month, year: CALENDAR_YEAR, status: "available" });
       });
     });
+    all.push(...uploadedDesigns.filter((design) => Number(design.year) === currentYear).map((design) => ({ ...design, status: "available" })));
     return all;
   };
 
@@ -319,7 +316,12 @@ export default function CalendarDesigns({ role: propRole }) {
     if (!designsByMonth[design.month]) designsByMonth[design.month] = [];
     designsByMonth[design.month].push(design);
   });
-  Object.values(designsByMonth).forEach(list => list.sort((a, b) => (a.isUploaded ? a.sequence : Number.MAX_SAFE_INTEGER) - (b.isUploaded ? b.sequence : Number.MAX_SAFE_INTEGER)));
+  Object.values(designsByMonth).forEach(list => list.sort((a, b) => {
+    if (a.isUploaded && b.isUploaded) return a.sequence - b.sequence;
+    if (a.isUploaded) return -1;
+    if (b.isUploaded) return 1;
+    return 0;
+  }));
 
   return (
     <Layout role={role} active="Calendar Designs">
