@@ -74,10 +74,12 @@ export default function CalendarUpload() {
   };
   const fileUrl = (url) => {
     if (!url) return "";
-    if (/^https?:\\/\\//i.test(url)) return url;
-    // API_BASE_URL is normally the origin; strip a mistakenly configured /api suffix
-    // because uploaded files are served from /uploads, not /api/uploads.
-    const base = String(API_BASE_URL || "").replace(/\\/api\\/?$/i, "").replace(/\\/$/, "");
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    // Images are served from /uploads, not /api/uploads. Normalize a base URL
+    // that may have been configured with an accidental trailing /api.
+    let base = String(API_BASE_URL || "");
+    if (base.endsWith("/")) base = base.slice(0, -1);
+    if (base.toLowerCase().endsWith("/api")) base = base.slice(0, -4);
     return `${base}${url.startsWith("/") ? url : `/${url}`}`;
   };
 
