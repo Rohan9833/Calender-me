@@ -30,7 +30,7 @@ export default function CalendarUpload() {
       const response = await fetch(API_URL);
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || "Unable to load calendars.");
-      setItems(data.calendars || []);
+      setItems((data.calendars || []).filter(item => !item.isDeleted));
     } catch (e) { setError(e.message); }
     finally { setLoading(false); }
   };
@@ -47,7 +47,7 @@ export default function CalendarUpload() {
       const response = await fetch(API_URL, { method: "POST", headers: { "X-User-Role": role }, body });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || "Upload failed.");
-      setItems(current => [data.calendar, ...current]);
+      setItems(current => [data.calendar, ...current.filter(item => item._id !== data.calendar._id)]);
       setName(""); setCategory("general"); setSequence("1"); setFile(null); e.target.reset();
       setMessage("Calendar uploaded and made available to users.");
     } catch (err) { setError(err.message); }
@@ -62,7 +62,7 @@ export default function CalendarUpload() {
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || "Delete failed.");
       setItems(current => current.filter(item => item._id !== id));
-      setMessage("Calendar deleted.");
+      setMessage(data.message || "Calendar removed from the library.");
     } catch (err) { setError(err.message); }
   };
   const fileUrl = url => url?.startsWith("http") ? url : `${API_BASE_URL}${url || ""}`;
