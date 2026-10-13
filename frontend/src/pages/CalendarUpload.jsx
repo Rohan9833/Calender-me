@@ -16,6 +16,7 @@ export default function CalendarUpload() {
   const [name, setName] = useState("");
   const [month, setMonth] = useState("January");
   const [year, setYear] = useState("2027");
+  const [sequence, setSequence] = useState("1");
   const [category, setCategory] = useState("general");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -39,7 +40,7 @@ export default function CalendarUpload() {
     e.preventDefault(); setError(""); setMessage("");
     if (!file) { setError("Choose a calendar image first."); return; }
     const body = new FormData();
-    body.append("name", name); body.append("month", month); body.append("year", year);
+    body.append("name", name); body.append("month", month); body.append("year", year); body.append("sequence", sequence);
     body.append("category", category); body.append("calendarFile", file);
     setSaving(true);
     try {
@@ -47,7 +48,7 @@ export default function CalendarUpload() {
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || "Upload failed.");
       setItems(current => [data.calendar, ...current]);
-      setName(""); setCategory("general"); setFile(null); e.target.reset();
+      setName(""); setCategory("general"); setSequence("1"); setFile(null); e.target.reset();
       setMessage("Calendar uploaded and made available to users.");
     } catch (err) { setError(err.message); }
     finally { setSaving(false); }
@@ -84,6 +85,7 @@ export default function CalendarUpload() {
           <div><label>Month</label><select value={month} onChange={e => setMonth(e.target.value)} style={field}>{MONTHS.map(m => <option key={m}>{m}</option>)}</select></div>
           <div><label>Year</label><input type="number" min="2000" max="2100" required value={year} onChange={e => setYear(e.target.value)} style={field}/></div>
         </div>
+        <label>Display sequence</label><input type="number" min="1" step="1" required value={sequence} onChange={e => setSequence(e.target.value)} style={field}/><p style={{ marginTop: -8, marginBottom: 14, color: "#6b7280", fontSize: 12 }}>1 appears first in that month, 2 appears second, and so on.</p>
         <label>Category</label><input maxLength={50} value={category} onChange={e => setCategory(e.target.value)} placeholder="Festival, Health, General..." style={field}/>
         <label>Calendar image</label><input required type="file" accept="image/jpeg,image/png,image/webp" onChange={e => setFile(e.target.files?.[0] || null)} style={{ ...field, padding: 8 }}/>
         <button type="submit" disabled={saving} style={{ ...primary, width: "100%", opacity: saving ? .7 : 1 }}>{saving ? "Uploading..." : "Upload calendar"}</button>
@@ -94,7 +96,7 @@ export default function CalendarUpload() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 200px), 1fr))", gap: 14 }}>
             {items.map(item => <article key={item._id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" }}>
               <a href={fileUrl(item.fileUrl)} target="_blank" rel="noreferrer"><img src={fileUrl(item.fileUrl)} alt={item.name} style={{ display: "block", width: "100%", height: 160, objectFit: "contain", background: "#f8fafc" }}/></a>
-              <div style={{ padding: 12 }}><strong>{item.name}</strong><div style={{ color: "#6b7280", fontSize: 12, margin: "5px 0 12px" }}>{item.month} {item.year} · {item.category}</div><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><a href={fileUrl(item.fileUrl)} target="_blank" rel="noreferrer">View image</a><button onClick={() => remove(item._id)} title="Delete calendar" style={{ color: "#b91c1c", background: "#fff", border: "1px solid #fecaca", borderRadius: 7, padding: 7, cursor: "pointer" }}><Trash2 size={15}/></button></div></div>
+              <div style={{ padding: 12 }}><strong>{item.name}</strong><div style={{ color: "#6b7280", fontSize: 12, margin: "5px 0 12px" }}>{item.month} {item.year} · Order {item.sequence} · {item.category}</div><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><a href={fileUrl(item.fileUrl)} target="_blank" rel="noreferrer">View image</a><button onClick={() => remove(item._id)} title="Delete calendar" style={{ color: "#b91c1c", background: "#fff", border: "1px solid #fecaca", borderRadius: 7, padding: 7, cursor: "pointer" }}><Trash2 size={15}/></button></div></div>
             </article>)}
           </div>}
       </section>
