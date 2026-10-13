@@ -58,6 +58,11 @@ export const getAllDoctors = async (mrId) => {
   return response.data;
 };
 
+export const getAllFrozenDoctors = async () => {
+  const response = await api.get("/doctors/frozen");
+  return response.data;
+};
+
 export const getFrozenDoctors = async (mrId) => {
   const response = await api.get(`/doctors/mr/${mrId}`);
   return response.data;
