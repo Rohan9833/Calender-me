@@ -106,7 +106,7 @@ export function SelectBox({ label = "All", wide = false, value, onChange, option
         onChange={onChange}
         style={{ padding: "6px 12px", borderRadius: "6px", border: "1px solid #ddd" }}
       >
-        <option value="">All</option>
+        {/* <option value="">All</option> */}
         {options.map(opt => (
           <option key={opt.value || opt} value={opt.value || opt}>
             {opt.label || opt}
