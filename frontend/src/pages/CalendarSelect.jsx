@@ -3339,7 +3339,7 @@ const CURRENT_MR_ID =
             {months.map((month) => {
               const selection = selections.find((s) => s.month === month);
               const designAsset = selection
-                ? designAssets[month]?.find((d) => d.id === selection.designId)
+                ? [...uploadedDesigns, ...(designAssets[month] || [])].find((d) => d.id === selection.designId)
                 : null;
               return (
                 <div
