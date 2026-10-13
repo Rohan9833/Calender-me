@@ -2074,7 +2074,14 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
       .catch(error => console.error("Unable to load uploaded calendars:", error));
   }, []);
 
-  const designs = [...uploadedDesigns.filter(item => item.month === activeMonth && Number(item.year) === CALENDAR_YEAR).sort((a, b) => a.sequence - b.sequence), ...(designAssets[activeMonth] || [])];
+  const designs = (() => {
+    const ordered = [...(designAssets[activeMonth] || [])];
+    uploadedDesigns
+      .filter(item => item.month === activeMonth && Number(item.year) === CALENDAR_YEAR)
+      .sort((a, b) => b.sequence - a.sequence)
+      .forEach(item => ordered.splice(Math.max(0, Math.min(ordered.length, item.sequence - 1)), 0, item));
+    return ordered;
+  })();
  // ✅ Define designs FIRST
 
 
