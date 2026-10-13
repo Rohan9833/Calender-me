@@ -11,6 +11,7 @@ const {
   getMRPendingActions,
   uploadDoctorPhotos,
   getDoctorsByMR,
+  getAllFrozenDoctors,
   sendConsentToDoctor,
   updateDoctor,
   deleteDoctor,
@@ -24,6 +25,7 @@ router.post("/", Createdoc);
 // Separate FLM creation flow; the existing MR endpoint remains unchanged.
 router.post("/flm", CreatedocByFLM);
 router.get("/dashboard/:mrId", getDashboardData);
+router.get("/frozen", getAllFrozenDoctors);
 router.get("/consent/:doctorId", giveConsent);
 router.get("/:mrId", getDoctors);
 router.get("/:doctorId/details", getDoctorById);
