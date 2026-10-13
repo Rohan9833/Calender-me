@@ -80,7 +80,7 @@ export default function ProfileEdit() {
       setUser(storedUser);
 
       const storedRole = String(
-        storedUser?.role || "mr",
+        window.location.pathname.startsWith("/ho/") ? "ho" : storedUser?.role || "mr",
       ).toLowerCase();
 
       const storedConfig =
