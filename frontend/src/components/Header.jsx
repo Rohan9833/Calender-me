@@ -135,7 +135,7 @@ export default function Header({
 
   const handleProfileClick = () => {
     setIsProfileOpen(false);
-    navigate("/profile-edit");
+    navigate(role === "ho" ? "/ho/profile-edit" : "/profile-edit");
   };
 
   const handleLogout = () => {
