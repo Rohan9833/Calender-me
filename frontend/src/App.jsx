@@ -53,6 +53,7 @@ function App() {
         <Route path="/manager/mr-progress" element={<MRProgress />} />
         <Route path="/manager/delay-report" element={<ManagerReports />} />
         <Route path="/profile-edit" element={<ProfileEdit />} />
+        <Route path="/ho/profile-edit" element={<ProfileEdit />} />
         <Route path="/all-doctors" element={<AllDoctors />} />
         <Route path="/frozen-doctors" element={<FrozenDoctors />} />
         {/* <Route path="/doctor-detail" element={<DoctorDetail />} /> */}
@@ -92,6 +93,7 @@ function App() {
         {/* HO Routes */}
         <Route path="/ho-dashboard" element={<HODashboard />} />
         <Route path="/ho/users" element={<HOOperations page="users" />} />
+        <Route path="/ho/deleted-users" element={<HOOperations page="deleted-users" />} />
         <Route path="/ho/hierarchy" element={<HOOperations page="hierarchy" />} />
         <Route path="/ho/activity" element={<HOOperations page="activity" />} />
         <Route path="/ho/consent-tracker" element={<HOOperations page="consent" />} />
