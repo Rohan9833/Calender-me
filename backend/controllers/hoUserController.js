@@ -85,8 +85,8 @@ exports.restoreUser = async (req, res) => {
     if (!deleted) return res.status(404).json({ success: false, message: "Deleted user record not found" });
     const cfg = CONFIG[deleted.role];
     if (!cfg) return res.status(400).json({ success: false, message: "Unsupported deleted user role" });
-    const conflict = await cfg.Model.findOne({ [cfg.idField]: deleted.userId });
-    if (conflict) return res.status(409).json({ success: false, message: "An active user already uses this ID. Resolve the conflict before restoring." });
+    const conflicts = await Promise.all(Object.values(CONFIG).map(c => c.Model.exists({ [c.idField]: deleted.userId })));
+    if (conflicts.some(Boolean)) return res.status(409).json({ success: false, message: "An active user already uses this ID. Resolve the conflict before restoring." });
     const snapshot = { ...deleted.snapshot, _id: deleted.originalId };
     await cfg.Model.create(snapshot);
     await DeletedUser.deleteOne({ _id: deleted._id });
