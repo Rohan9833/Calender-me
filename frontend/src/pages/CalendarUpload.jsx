@@ -72,7 +72,14 @@ export default function CalendarUpload() {
       setMessage(data.message || "Calendar removed from the library.");
     } catch (err) { setError(err.message); }
   };
-  const fileUrl = url => url?.startsWith("http") ? url : `${API_BASE_URL}${url || ""}`;
+  const fileUrl = (url) => {
+    if (!url) return "";
+    if (/^https?:\\/\\//i.test(url)) return url;
+    // API_BASE_URL is normally the origin; strip a mistakenly configured /api suffix
+    // because uploaded files are served from /uploads, not /api/uploads.
+    const base = String(API_BASE_URL || "").replace(/\\/api\\/?$/i, "").replace(/\\/$/, "");
+    return `${base}${url.startsWith("/") ? url : `/${url}`}`;
+  };
 
   if (role !== "ho") return <Layout><div style={{ background: "#fff", padding: 24, borderRadius: 12 }}>Only HO users can manage calendars.</div></Layout>;
 
@@ -87,7 +94,7 @@ export default function CalendarUpload() {
     <form onSubmit={submit} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 16, padding: "clamp(16px, 3vw, 28px)", boxShadow: "0 4px 18px rgba(15,23,42,.04)" }}>
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 20 }}>
         <div style={{ width: 44, height: 44, display: "grid", placeItems: "center", borderRadius: 12, background: "#eff6ff", color: "#155eef" }}><UploadCloud size={23}/></div>
-        <div><h2 style={{ margin: 0, fontSize: 20, color: "#111827" }}>Upload a calendar</h2><p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 13 }}>JPG, PNG or WEBP · maximum 15 MB</p></div>
+        <div><h2 style={{ margin: 0, fontSize: 20, color: "#111827" }}>Upload a calendar</h2><p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 13 }}>JPG, PNG or WEBP · maximum 50 MB</p></div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))", gap: "0 18px" }}>
         <div><label style={{ display: "block", fontWeight: 600, fontSize: 13, marginBottom: 7, color: "#334155" }}>Calendar name</label><input required maxLength={100} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Calendar Design V1" style={field}/></div>
@@ -101,14 +108,14 @@ export default function CalendarUpload() {
         <label style={{ display: "block", fontWeight: 600, fontSize: 13, marginBottom: 8, color: "#334155" }}>Calendar image</label>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 18, alignItems: "start" }}>
           <div style={{ border: "1px dashed #cbd5e1", borderRadius: 12, background: "#f8fafc", padding: 16 }}>
-            {previewUrl ? <img src={previewUrl} alt="Selected calendar preview" style={{ width: "100%", maxHeight: 320, objectFit: "contain", display: "block", borderRadius: 8, background: "#fff" }}/> : <div style={{ minHeight: 180, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "#64748b" }}><CalendarDays size={38}/><strong>No image selected</strong><span style={{ fontSize: 13 }}>Your image preview will appear here</span></div>}
+            {previewUrl ? <img src={previewUrl} alt="Selected calendar preview" style={{ width: "100%", maxHeight: 480, minHeight: 260, objectFit: "contain", display: "block", borderRadius: 8, background: "#fff" }}/> : <div style={{ minHeight: 260, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "#64748b" }}><CalendarDays size={38}/><strong>No image selected</strong><span style={{ fontSize: 13 }}>Your image preview will appear here</span></div>}
           </div>
           <div style={{ padding: "8px 0" }}>
             <p style={{ marginTop: 0, color: "#475569", fontSize: 14, lineHeight: 1.6 }}>{file ? <><strong style={{ color: "#0f172a" }}>Selected:</strong> {file.name}<br/><span style={{ fontSize: 12 }}>{(file.size / (1024 * 1024)).toFixed(2)} MB</span></> : "Choose an image to preview it before uploading. You can change the image any time before submitting."}</p>
-            <input id="calendar-image-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={e => { const selected = e.target.files?.[0] || null; if (selected && selected.size > 15 * 1024 * 1024) { setError("Image must be 15 MB or smaller."); e.target.value = ""; return; } setError(""); setFile(selected); }} style={{ display: "none" }}/>
+            <input id="calendar-image-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={e => { const selected = e.target.files?.[0] || null; if (selected && selected.size > 50 * 1024 * 1024) { setError("Image must be 50 MB or smaller."); e.target.value = ""; return; } setError(""); setFile(selected); }} style={{ display: "none" }}/>
             <label htmlFor="calendar-image-input" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 14px", border: "1px solid #cbd5e1", borderRadius: 9, background: "#fff", color: "#1d4ed8", fontWeight: 700, fontSize: 13, cursor: "pointer" }}><UploadCloud size={17}/>{file ? "Change image" : "Choose image"}</label>
             {file && <button type="button" onClick={() => { setFile(null); const input = document.getElementById("calendar-image-input"); if (input) input.value = ""; }} style={{ marginLeft: 8, padding: "10px 12px", border: "1px solid #e2e8f0", borderRadius: 9, background: "#fff", color: "#475569", cursor: "pointer" }}>Remove</button>}
-            <p style={{ color: "#64748b", fontSize: 12, marginTop: 12 }}>Supported formats: JPG, PNG, WEBP. Maximum size: 15 MB.</p>
+            <p style={{ color: "#64748b", fontSize: 12, marginTop: 12 }}>Supported formats: JPG, PNG, WEBP. Maximum size: 50 MB.</p>
           </div>
         </div>
       </div>
