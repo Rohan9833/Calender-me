@@ -2078,7 +2078,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
     const ordered = [...(designAssets[activeMonth] || [])];
     uploadedDesigns
       .filter(item => item.month === activeMonth && Number(item.year) === CALENDAR_YEAR)
-      .sort((a, b) => b.sequence - a.sequence)
+      .sort((a, b) => a.sequence - b.sequence)
       .forEach(item => ordered.splice(Math.max(0, Math.min(ordered.length, item.sequence - 1)), 0, item));
     return ordered;
   })();
