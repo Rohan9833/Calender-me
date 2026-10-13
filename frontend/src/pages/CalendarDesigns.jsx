@@ -271,8 +271,18 @@ export default function CalendarDesigns({ role: propRole }) {
         all.push({ ...design, month, year: CALENDAR_YEAR, status: "available" });
       });
     });
-    all.push(...uploadedDesigns.filter((design) => Number(design.year) === currentYear).map((design) => ({ ...design, status: "available" })));
-    return all;
+    const monthOrder = { January: 1, February: 2, March: 3, April: 4, May: 5, June: 6, July: 7, August: 8, September: 9, October: 10, November: 11, December: 12 };
+    const uploadedByMonth = uploadedDesigns.filter((design) => Number(design.year) === currentYear);
+    months.forEach((month) => {
+      const staticDesigns = all.filter((design) => design.month === month);
+      const monthUploads = uploadedByMonth.filter((design) => design.month === month).sort((a, b) => b.sequence - a.sequence);
+      monthUploads.forEach((design) => {
+        const index = Math.max(0, Math.min(staticDesigns.length, design.sequence - 1));
+        staticDesigns.splice(index, 0, { ...design, status: "available" });
+      });
+      all.splice(0, all.length, ...all.filter((design) => design.month !== month), ...staticDesigns);
+    });
+    return all.sort((a, b) => monthOrder[a.month] - monthOrder[b.month] || 0);
   };
 
   const allDesigns = getAllDesigns();
@@ -316,12 +326,7 @@ export default function CalendarDesigns({ role: propRole }) {
     if (!designsByMonth[design.month]) designsByMonth[design.month] = [];
     designsByMonth[design.month].push(design);
   });
-  Object.values(designsByMonth).forEach(list => list.sort((a, b) => {
-    if (a.isUploaded && b.isUploaded) return a.sequence - b.sequence;
-    if (a.isUploaded) return -1;
-    if (b.isUploaded) return 1;
-    return 0;
-  }));
+
 
   return (
     <Layout role={role} active="Calendar Designs">
