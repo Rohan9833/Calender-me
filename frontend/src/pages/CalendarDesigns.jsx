@@ -275,7 +275,7 @@ export default function CalendarDesigns({ role: propRole }) {
     const uploadedByMonth = uploadedDesigns.filter((design) => Number(design.year) === currentYear);
     months.forEach((month) => {
       const staticDesigns = all.filter((design) => design.month === month);
-      const monthUploads = uploadedByMonth.filter((design) => design.month === month).sort((a, b) => b.sequence - a.sequence);
+      const monthUploads = uploadedByMonth.filter((design) => design.month === month).sort((a, b) => a.sequence - b.sequence);
       monthUploads.forEach((design) => {
         const index = Math.max(0, Math.min(staticDesigns.length, design.sequence - 1));
         staticDesigns.splice(index, 0, { ...design, status: "available" });
