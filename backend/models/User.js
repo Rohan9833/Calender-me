@@ -13,10 +13,10 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    // name: {
-    //   type: String,
-    //   required: true,
-    // },
+    name: { type: String, default: "" },
+    hq: { type: String, default: "" },
+    region: { type: String, default: "" },
+    zone: { type: String, default: "" },
 
     role: {
       type: String,
