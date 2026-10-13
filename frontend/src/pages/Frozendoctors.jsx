@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { CalendarDays, ArrowRight } from "lucide-react";
 import Layout from "../components/Layout";
 import { Crumbs, Badge } from "../components/UIComponents";
-import { getFrozenDoctors } from "../api/doctorAPI";
+import { getAllFrozenDoctors } from "../api/doctorAPI";
 
 const FrozenDoctors = () => {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const FrozenDoctors = () => {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const res = await getFrozenDoctors(mrId);
+        const res = await getAllFrozenDoctors();
         const allDocs = res.doctors || [];
         // filter only frozen
         const frozen = allDocs.filter(d => d.calendarFrozen === true || d.calendarStatus === "frozen");
@@ -31,7 +31,7 @@ const FrozenDoctors = () => {
         setLoading(false);
       }
     };
-    if (mrId) fetch();
+    fetch();
   }, [mrId]);
 
   const filtered = doctors.filter(d =>
@@ -96,7 +96,7 @@ const FrozenDoctors = () => {
                 <div>
                   <div style={{ fontWeight: 600, fontSize: '14px' }}>{doctor.doctorName}</div>
                   <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>
-                    {doctor.speciality} • {doctor.city} • MCL: {doctor.mclCode}
+                    {doctor.speciality} • {doctor.city} • MCL: {doctor.mclCode}{doctor.mr?.mrName ? ` • MR: ${doctor.mr.mrName}` : ""}
                   </div>
                 </div>
               </div>
