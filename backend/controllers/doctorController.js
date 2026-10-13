@@ -941,6 +941,29 @@ const updateDoctor = async (req, res) => {
     });
   }
 };
+
+
+// Return frozen calendars across the organization for HO visibility.
+const getAllFrozenDoctors = async (req, res) => {
+  try {
+    const CalendarSelection = require("../models/CalendarSelection");
+    const frozenSelections = await CalendarSelection.find({ status: "frozen", year: 2027 }).select("doctor");
+    const selectedDoctorIds = frozenSelections.map((selection) => selection.doctor).filter(Boolean);
+    const doctors = await Doctor.find({
+      $or: [
+        { calendarFrozen: true },
+        { calendarStatus: "frozen" },
+        { _id: { $in: selectedDoctorIds } },
+      ],
+    }).populate("mr", "mrName mrId").sort({ calendarFrozenAt: -1, updatedAt: -1 });
+    const uniqueDoctors = Array.from(new Map(doctors.map((doctor) => [String(doctor._id), doctor])).values());
+    return res.status(200).json({ success: true, count: uniqueDoctors.length, doctors: uniqueDoctors });
+  } catch (error) {
+    console.error("Error getting all frozen doctors:", error);
+    return res.status(500).json({ success: false, message: "Unable to load frozen calendars.", doctors: [] });
+  }
+};
+
 module.exports = {
   Createdoc,
   CreatedocByFLM,
@@ -952,6 +975,7 @@ module.exports = {
   getMRPendingActions,
   uploadDoctorPhotos,
   getDoctorsByMR,
+  getAllFrozenDoctors,
   sendConsentToDoctor,
   updateDoctor,
   deleteDoctor,
