@@ -18,8 +18,8 @@ const uploadCalendarFile = multer({
   storage,
   limits: { fileSize: 15 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
-    const allowed = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-    if (!allowed.includes(file.mimetype)) return cb(new Error("Only JPG, PNG, WEBP, and PDF files are allowed."));
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.mimetype)) return cb(new Error("Only JPG, PNG, and WEBP image files are allowed."));
     cb(null, true);
   },
 }).single("calendarFile");
