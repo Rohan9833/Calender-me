@@ -2068,13 +2068,13 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
       .then(data => {
         if (data.success) setUploadedDesigns((data.calendars || []).map(item => ({
           id: `uploaded-${item._id}`, label: item.name, file: item.fileUrl?.startsWith("http") ? item.fileUrl : `${API_BASE_URL}${item.fileUrl}`,
-          month: item.month, year: item.year, category: item.category || "festival", isUploaded: true,
+          month: item.month, year: item.year, sequence: Number(item.sequence) || 1, category: item.category || "festival", isUploaded: true,
         })).filter(item => item.month && !item.file.toLowerCase().endsWith(".pdf")));
       })
       .catch(error => console.error("Unable to load uploaded calendars:", error));
   }, []);
 
-  const designs = [...(designAssets[activeMonth] || []), ...uploadedDesigns.filter(item => item.month === activeMonth && Number(item.year) === CALENDAR_YEAR)];
+  const designs = [...(designAssets[activeMonth] || []), ...uploadedDesigns.filter(item => item.month === activeMonth && Number(item.year) === CALENDAR_YEAR).sort((a, b) => a.sequence - b.sequence)];
  // ✅ Define designs FIRST
 
 
