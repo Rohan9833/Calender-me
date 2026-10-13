@@ -256,7 +256,7 @@ export default function CalendarDesigns({ role: propRole }) {
       .then(data => {
         if (data.success) setUploadedDesigns((data.calendars || []).map(item => ({
           id: `uploaded-${item._id}`, label: item.name, file: item.fileUrl?.startsWith("http") ? item.fileUrl : `${API_BASE_URL}${item.fileUrl}`,
-          month: item.month, year: item.year, category: item.category || "general", isUploaded: true,
+          month: item.month, year: item.year, sequence: Number(item.sequence) || 1, category: item.category || "general", isUploaded: true,
         })));
       })
       .catch(error => console.error("Unable to load uploaded calendars:", error));
