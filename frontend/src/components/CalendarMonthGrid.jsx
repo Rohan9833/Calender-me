@@ -79,7 +79,7 @@ export default function CalendarMonthGrid({
     const ordered = [...(designAssets[month] || [])];
     const uploads = uploadedDesigns
       .filter((design) => design.month === month && design.year === CALENDAR_YEAR)
-      .sort((a, b) => b.sequence - a.sequence);
+      .sort((a, b) => a.sequence - b.sequence);
     uploads.forEach((design) => {
       const index = Math.max(0, Math.min(ordered.length, design.sequence - 1));
       ordered.splice(index, 0, design);
