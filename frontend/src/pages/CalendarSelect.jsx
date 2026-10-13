@@ -2080,7 +2080,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
 
 const [activeTab, setActiveTab] = useState("festival"); // ✅ singular
 const filteredDesigns = designs.filter(d => 
-  d.category && d.category.toLowerCase() === activeTab.toLowerCase()
+  d.isUploaded || (d.category && d.category.toLowerCase() === activeTab.toLowerCase())
 );
 
 // Debug logs
