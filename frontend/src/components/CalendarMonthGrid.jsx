@@ -75,12 +75,17 @@ export default function CalendarMonthGrid({
     return () => { cancelled = true; };
   }, []);
 
-  const getMonthDesigns = (month) => [
-    ...uploadedDesigns
+  const getMonthDesigns = (month) => {
+    const ordered = [...(designAssets[month] || [])];
+    const uploads = uploadedDesigns
       .filter((design) => design.month === month && design.year === CALENDAR_YEAR)
-      .sort((a, b) => a.sequence - b.sequence),
-    ...(designAssets[month] || []),
-  ];
+      .sort((a, b) => b.sequence - a.sequence);
+    uploads.forEach((design) => {
+      const index = Math.max(0, Math.min(ordered.length, design.sequence - 1));
+      ordered.splice(index, 0, design);
+    });
+    return ordered;
+  };
 
   const completedCount = Object.keys(selections).length;
   const progress = Math.round((completedCount / months.length) * 100);
