@@ -3100,11 +3100,34 @@ const CURRENT_MR_ID =
 
   const [record, setRecord] = useState(null);
   const [selections, setSelections] = useState([]);
+  const [uploadedDesigns, setUploadedDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [doctorInfo, setDoctorInfo] = useState(null);
 
   useEffect(() => {
-    if (!CURRENT_DOCTOR_ID) return;
+    let cancelled = false;
+    fetch(`${API_BASE_URL}/api/uploaded-calendars`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (cancelled || !data.success) return;
+        setUploadedDesigns((data.calendars || []).map((item) => ({
+          id: `uploaded-${item._id}`,
+          label: item.name,
+          file: item.fileUrl?.startsWith("http") ? item.fileUrl : `${API_BASE_URL}${item.fileUrl || ""}`,
+          month: item.month,
+          year: Number(item.year),
+          isUploaded: true,
+        })));
+      })
+      .catch((error) => console.error("Unable to load uploaded calendar previews:", error));
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!CURRENT_DOCTOR_ID) {
+      setLoading(false);
+      return;
+    }
 
     const fetchData = async () => {
       try {
