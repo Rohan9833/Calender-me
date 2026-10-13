@@ -31,7 +31,7 @@ const requireHO = (req, res, next) => {
 
 const listCalendars = async (_req, res) => {
   try {
-    const calendars = await UploadedCalendar.find().sort({ year: -1, createdAt: -1 });
+    const calendars = await UploadedCalendar.find().sort({ year: -1, month: 1, sequence: 1, createdAt: 1 });
     res.json({ success: true, calendars });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -43,14 +43,14 @@ const createCalendar = (req, res) => {
     if (uploadError) return res.status(400).json({ success: false, message: uploadError.message });
     if (!req.file) return res.status(400).json({ success: false, message: "Choose a calendar image to upload." });
     try {
-      const { name, month, year, category } = req.body;
+      const { name, month, year, category, sequence } = req.body;
       const validMonths = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-      if (!name?.trim() || !validMonths.includes(month) || !Number.isInteger(Number(year)) || Number(year) < 2000 || Number(year) > 2100) {
+      if (!name?.trim() || !validMonths.includes(month) || !Number.isInteger(Number(year)) || Number(year) < 2000 || Number(year) > 2100 || !Number.isInteger(Number(sequence)) || Number(sequence) < 1) {
         fs.unlink(req.file.path, () => {});
-        return res.status(400).json({ success: false, message: "Enter a name, valid month, and year between 2000 and 2100." });
+        return res.status(400).json({ success: false, message: "Enter a name, valid month, year between 2000 and 2100, and sequence number of 1 or higher." });
       }
       const calendar = await UploadedCalendar.create({
-        name: name.trim(), month, year: Number(year), category: category?.trim() || "general",
+        name: name.trim(), month, year: Number(year), category: category?.trim() || "general", sequence: Number(sequence),
         fileUrl: `/uploads/calendars/${req.file.filename}`,
         originalName: req.file.originalname,
         uploadedBy: "HO",
