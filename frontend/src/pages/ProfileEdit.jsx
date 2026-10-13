@@ -14,6 +14,7 @@ import Layout from "../components/Layout";
 import { getProfile, updateProfile } from "../api/profileAPI";
 
 const ROLE_CONFIG = {
+  ho: { idField: "userId", nameField: "name", dashboard: "/ho-dashboard" },
   mr: {
     idField: "mrId",
     nameField: "mrName",
@@ -52,7 +53,7 @@ export default function ProfileEdit() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
-  const role = String(user?.role || "mr").toLowerCase();
+  const role = String(window.location.pathname.startsWith("/ho/") ? "ho" : user?.role || "mr").toLowerCase();
   const config = ROLE_CONFIG[role] || ROLE_CONFIG.mr;
   const userId = user?.[config.idField];
 
@@ -231,7 +232,7 @@ export default function ProfileEdit() {
   const goToDashboard = () => navigate(config.dashboard);
 
   return (
-    <Layout active="Profile">
+    <Layout role={role === "ho" ? "ho" : role} active="Profile">
       <div className="profile-page">
         {/* TOP NAVIGATION */}
 
