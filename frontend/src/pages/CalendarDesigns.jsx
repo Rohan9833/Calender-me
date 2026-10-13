@@ -256,7 +256,7 @@ export default function CalendarDesigns({ role: propRole }) {
       .then(data => {
         if (data.success) setUploadedDesigns((data.calendars || []).map(item => ({
           id: `uploaded-${item._id}`, label: item.name, file: item.fileUrl?.startsWith("http") ? item.fileUrl : `${API_BASE_URL}${item.fileUrl}`,
-          month: item.month, year: item.year, sequence: Number(item.sequence) || 1, category: item.category || "general", isUploaded: true,
+          month: item.month, year: item.year, sequence: Number(item.sequence) || 1, category: item.category || "general", isUploaded: true, isDeleted: item.isDeleted === true,
         })));
       })
       .catch(error => console.error("Unable to load uploaded calendars:", error));
@@ -272,7 +272,7 @@ export default function CalendarDesigns({ role: propRole }) {
       });
     });
     const monthOrder = { January: 1, February: 2, March: 3, April: 4, May: 5, June: 6, July: 7, August: 8, September: 9, October: 10, November: 11, December: 12 };
-    const uploadedByMonth = uploadedDesigns.filter((design) => Number(design.year) === currentYear);
+    const uploadedByMonth = uploadedDesigns.filter((design) => !design.isDeleted && Number(design.year) === currentYear);
     months.forEach((month) => {
       const staticDesigns = all.filter((design) => design.month === month);
       const monthUploads = uploadedByMonth.filter((design) => design.month === month).sort((a, b) => a.sequence - b.sequence);
