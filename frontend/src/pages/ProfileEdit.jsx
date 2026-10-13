@@ -14,7 +14,7 @@ import Layout from "../components/Layout";
 import { getProfile, updateProfile } from "../api/profileAPI";
 
 const ROLE_CONFIG = {
-  ho: { idField: "userId", nameField: "name", dashboard: "/ho-dashboard" },
+  ho: { idField: "HOId", nameField: "HOName", dashboard: "/ho-dashboard" },
   mr: {
     idField: "mrId",
     nameField: "mrName",
@@ -167,10 +167,10 @@ export default function ProfileEdit() {
     if (
       !form.name.trim() ||
       !form.hq.trim() ||
-      !form.region.trim() ||
+      (role !== "ho" && !form.region.trim()) ||
       !form.zone.trim()
     ) {
-      setError("Please fill in all four fields.");
+      setError(role === "ho" ? "Please fill in name, HQ and zone." : "Please fill in all four fields.");
       return;
     }
 
