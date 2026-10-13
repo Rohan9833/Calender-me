@@ -9,6 +9,7 @@ const uploadedCalendarSchema = new mongoose.Schema({
   fileUrl: { type: String, required: true },
   originalName: { type: String, required: true },
   uploadedBy: { type: String, default: "HO" },
+  isDeleted: { type: Boolean, default: false, index: true },
 }, { timestamps: true });
 
 uploadedCalendarSchema.index({ year: 1, month: 1, sequence: 1, createdAt: 1 });
