@@ -2760,9 +2760,10 @@ const CURRENT_MR_ID = searchParams.get("mrId") || storedUser.mrId || sessionStor
         const selection = selections.find((s) => s.month === month);
 
         if (selection) {
-          const designAsset = designAssets[month]?.find(
-            (d) => d.id === selection.designId
-          );
+          const designAsset = [
+            ...uploadedDesigns.filter((d) => d.month === month && Number(d.year) === CALENDAR_YEAR),
+            ...(designAssets[month] || []),
+          ].find((d) => d.id === selection.designId);
 
           if (designAsset) {
             const img = new Image();
