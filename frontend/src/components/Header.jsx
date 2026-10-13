@@ -115,6 +115,16 @@ export default function Header({
       "pending-freeze": "/manager/calendar-designs",
       "input-given-pending": "/manager/input-given",
     };
+    const hoRoutes = {
+      "pending-approvals": "/ho/approvals",
+      "pending-freeze": "/frozen-doctors",
+      "input-given-pending": "/ho/input-tracker",
+    };
+
+    if (actualRole === "ho" && hoRoutes[action.id]) {
+      navigate(hoRoutes[action.id]);
+      return;
+    }
 
     if (isManagerRole && managerRoutes[action.id]) {
       navigate(managerRoutes[action.id]);
