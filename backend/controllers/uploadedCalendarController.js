@@ -67,10 +67,12 @@ const deleteCalendar = async (req, res) => {
   try {
     const calendar = await UploadedCalendar.findById(req.params.id);
     if (!calendar) return res.status(404).json({ success: false, message: "Calendar not found." });
-    await UploadedCalendar.findByIdAndDelete(calendar._id);
-    const filePath = path.join(__dirname, "..", calendar.fileUrl.replace(/^\//, ""));
-    fs.unlink(filePath, () => {});
-    return res.json({ success: true, message: "Calendar deleted." });
+    if (!calendar.isDeleted) {
+      calendar.isDeleted = true;
+      await calendar.save();
+    }
+    // Keep the database record and image file: frozen calendars may still reference them.
+    return res.json({ success: true, message: "Calendar removed from the library. Existing frozen calendars are preserved." });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
