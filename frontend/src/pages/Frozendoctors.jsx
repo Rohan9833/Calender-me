@@ -42,7 +42,7 @@ const FrozenDoctors = () => {
   );
 
   return (
-    <Layout active="Dashboard">
+    <Layout role="ho" active="Dashboard">
       <Crumbs items={["Frozen Calendars"]} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <h1 style={{ fontSize: '18px', fontWeight: 700 }}>❄️ Frozen Calendars ({doctors.length})</h1>
