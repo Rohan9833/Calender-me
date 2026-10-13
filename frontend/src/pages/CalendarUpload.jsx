@@ -39,7 +39,7 @@ export default function CalendarUpload() {
   const submit = async (event) => {
     event.preventDefault();
     setMessage(""); setError("");
-    if (!file) return setError("Please choose a calendar image or PDF.");
+    if (!file) return setError("Please choose a calendar image.");
     const body = new FormData();
     body.append("name", name.trim());
     body.append("month", month);
@@ -86,14 +86,14 @@ export default function CalendarUpload() {
 
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: 20, alignItems: "start" }}>
       <form onSubmit={submit} style={{ background: "#fff", padding: 22, border: "1px solid #e5e7eb", borderRadius: 14, boxShadow: "0 4px 16px rgba(15,23,42,.04)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}><span style={{ background: "#eff6ff", padding: 10, borderRadius: 10, color: "#0b55f4" }}><UploadCloud size={22}/></span><div><h2 style={{ margin: 0, fontSize: 18 }}>Upload a calendar</h2><p style={{ margin: "4px 0 0", color: "#6b7280", fontSize: 12 }}>JPG, PNG, WEBP or PDF · max 15 MB</p></div></div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}><span style={{ background: "#eff6ff", padding: 10, borderRadius: 10, color: "#0b55f4" }}><UploadCloud size={22}/></span><div><h2 style={{ margin: 0, fontSize: 18 }}>Upload a calendar</h2><p style={{ margin: "4px 0 0", color: "#6b7280", fontSize: 12 }}>JPG, PNG or WEBP · max 15 MB</p></div></div>
         <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Calendar name</label><input required maxLength={100} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Cardiology Calendar V1" style={{ ...inputStyle, marginBottom: 14 }}/>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div><label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Month</label><select value={month} onChange={e => setMonth(e.target.value)} style={{ ...inputStyle, marginBottom: 14 }}>{months.map(m => <option key={m}>{m}</option>)}</select></div>
           <div><label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Year</label><input required type="number" min="2000" max="2100" value={year} onChange={e => setYear(e.target.value)} style={{ ...inputStyle, marginBottom: 14 }}/></div>
         </div>
         <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Category (optional)</label><input value={category} onChange={e => setCategory(e.target.value)} maxLength={50} placeholder="General, Festival, Health..." style={{ ...inputStyle, marginBottom: 14 }}/>
-        <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Calendar file</label><input required type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={e => setFile(e.target.files?.[0] || null)} style={{ ...inputStyle, padding: 9, marginBottom: 18 }}/>
+        <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Calendar file</label><input required type="file" accept="image/jpeg,image/png,image/webp" onChange={e => setFile(e.target.files?.[0] || null)} style={{ ...inputStyle, padding: 9, marginBottom: 18 }}/>
         {file && <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 14 }}>Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</div>}
         <button disabled={busy} type="submit" style={{ ...buttonStyle, width: "100%", opacity: busy ? .65 : 1 }}>{busy ? "Uploading..." : "Upload calendar"}</button>
       </form>
