@@ -1,5 +1,5 @@
 // pages/CalendarDesigns.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   ChevronLeft, 
@@ -16,6 +16,7 @@ import { months } from "../utils/helpers";
 import { designAssets } from "../utils/designAssets";   // ✅ imported from shared file
 
 const CALENDAR_YEAR = 2027;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // ─── Preview Modal (same as before) ───────────────────
 function PreviewModal({ design, month, onClose }) {
@@ -247,6 +248,25 @@ export default function CalendarDesigns({ role: propRole }) {
   const [previewDesign, setPreviewDesign] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("all");
+  const [uploadedDesigns, setUploadedDesigns] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/uploaded-calendars`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) setUploadedDesigns((data.calendars || []).map((item) => ({
+          id: `uploaded-${item._id}`,
+          label: item.name,
+          file: item.fileUrl?.startsWith("http") ? item.fileUrl : `${API_BASE_URL}${item.fileUrl}`,
+          month: item.month,
+          year: item.year,
+          category: item.category || "festival",
+          isUploaded: true,
+          originalName: item.originalName,
+        })).filter((item) => !item.file.toLowerCase().endsWith(".pdf")));
+      })
+      .catch((error) => console.error("Unable to load uploaded calendars:", error));
+  }, []);
 
   // Build a flat list of all designs with month info
   const getAllDesigns = () => {
