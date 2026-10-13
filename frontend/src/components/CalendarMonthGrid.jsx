@@ -6,8 +6,9 @@ import { months } from "../utils/helpers";
 import { designAssets } from "../utils/designAssets";
 
 const CALENDAR_YEAR = 2027;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const API_BASE = API_BASE_URL + "/api/calendar";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE = `${API_BASE_URL}/api/calendar`;
+const UPLOADED_CALENDARS_API = `${API_BASE_URL}/api/uploaded-calendars`;
 
 export default function CalendarMonthGrid({
   doctorId,
@@ -15,6 +16,7 @@ export default function CalendarMonthGrid({
   isFrozen = false,
 }) {
   const [selections, setSelections] = useState({});
+  const [uploadedDesigns, setUploadedDesigns] = useState([]);
   const [calendarStatus, setCalendarStatus] = useState("in_progress");
   const [loading, setLoading] = useState(true);
   const [openMonth, setOpenMonth] = useState(null);
@@ -45,6 +47,40 @@ export default function CalendarMonthGrid({
     };
   }, [openMonth, preview]);
 
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(UPLOADED_CALENDARS_API)
+      .then((response) => {
+        if (!response.ok) throw new Error("Unable to load uploaded calendars.");
+        return response.json();
+      })
+      .then((data) => {
+        if (cancelled || !data.success) return;
+        const mapped = (data.calendars || []).map((item) => ({
+          id: `uploaded-${item._id}`,
+          label: item.name,
+          file: item.fileUrl?.startsWith("http") ? item.fileUrl : `${API_BASE_URL}${item.fileUrl || ""}`,
+          month: item.month,
+          year: Number(item.year),
+          sequence: Number(item.sequence) || 1,
+          category: item.category || "general",
+          isUploaded: true,
+        })).filter((item) => item.month && item.file);
+        setUploadedDesigns(mapped);
+      })
+      .catch((err) => {
+        if (!cancelled) console.error("Unable to load uploaded calendars:", err);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  const getMonthDesigns = (month) => [
+    ...uploadedDesigns
+      .filter((design) => design.month === month && design.year === CALENDAR_YEAR)
+      .sort((a, b) => a.sequence - b.sequence),
+    ...(designAssets[month] || []),
+  ];
 
   const completedCount = Object.keys(selections).length;
   const progress = Math.round((completedCount / months.length) * 100);
@@ -96,8 +132,7 @@ export default function CalendarMonthGrid({
   const getSelectedDesign = (month) => {
     const selection = selections[month];
     return selection?.designId
-      ? (designAssets[month] || []).find((d) => d.id === selection.designId) ||
-          null
+      ? getMonthDesigns(month).find((d) => d.id === selection.designId) || null
       : null;
   };
 
@@ -221,7 +256,7 @@ export default function CalendarMonthGrid({
             const selected = getSelectedDesign(month);
             const isOpen = openMonth === month;
             const isSaving = saving === month;
-            const options = designAssets[month] || [];
+            const options = getMonthDesigns(month);
             return (
               <article
                 className={
