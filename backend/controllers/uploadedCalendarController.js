@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 });
 const uploadFile = multer({
   storage,
-  limits: { fileSize: 15 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const allowed = ["image/jpeg", "image/png", "image/webp"];
     if (!allowed.includes(file.mimetype)) return cb(new Error("Only JPG, PNG, and WEBP images are allowed."));
@@ -40,7 +40,12 @@ const listCalendars = async (_req, res) => {
 
 const createCalendar = (req, res) => {
   uploadFile(req, res, async (uploadError) => {
-    if (uploadError) return res.status(400).json({ success: false, message: uploadError.message });
+    if (uploadError) {
+      const message = uploadError.code === "LIMIT_FILE_SIZE"
+        ? "Calendar image is too large. Maximum allowed size is 50 MB."
+        : uploadError.message;
+      return res.status(400).json({ success: false, message });
+    }
     if (!req.file) return res.status(400).json({ success: false, message: "Choose a calendar image to upload." });
     try {
       const { name, month, year, category, sequence } = req.body;
