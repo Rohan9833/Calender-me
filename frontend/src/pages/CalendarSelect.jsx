@@ -2068,7 +2068,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
       .then(data => {
         if (data.success) setUploadedDesigns((data.calendars || []).map(item => ({
           id: `uploaded-${item._id}`, label: item.name, file: item.fileUrl?.startsWith("http") ? item.fileUrl : `${API_BASE_URL}${item.fileUrl}`,
-          month: item.month, year: item.year, sequence: Number(item.sequence) || 1, category: item.category || "festival", isUploaded: true,
+          month: item.month, year: item.year, sequence: Number(item.sequence) || 1, category: item.category || "festival", isUploaded: true, isDeleted: item.isDeleted === true,
         })).filter(item => item.month && !item.file.toLowerCase().endsWith(".pdf")));
       })
       .catch(error => console.error("Unable to load uploaded calendars:", error));
@@ -2077,7 +2077,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
   const designs = (() => {
     const ordered = [...(designAssets[activeMonth] || [])];
     uploadedDesigns
-      .filter(item => item.month === activeMonth && Number(item.year) === CALENDAR_YEAR)
+      .filter(item => !item.isDeleted && item.month === activeMonth && Number(item.year) === CALENDAR_YEAR)
       .sort((a, b) => a.sequence - b.sequence)
       .forEach(item => ordered.splice(Math.max(0, Math.min(ordered.length, item.sequence - 1)), 0, item));
     return ordered;
@@ -2768,7 +2768,7 @@ const CURRENT_MR_ID = searchParams.get("mrId") || storedUser.mrId || sessionStor
 
         if (selection) {
           const designAsset = [
-            ...uploadedDesigns.filter((d) => d.month === month && Number(d.year) === CALENDAR_YEAR),
+            ...uploadedDesigns.filter((d) => !d.isDeleted && d.month === month && Number(d.year) === CALENDAR_YEAR),
             ...(designAssets[month] || []),
           ].find((d) => d.id === selection.designId);
 
