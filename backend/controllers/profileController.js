@@ -26,7 +26,7 @@ const getProfile = async (req, res) => {
 
     const user = await config.Model.findOne({
       [config.idField]: userId,
-    }).select("-mrPassword -flmPassword -slmPassword -tlmPassword");
+    }).select("-password -mrPassword -flmPassword -slmPassword -tlmPassword");
 
     if (!user) {
       return res.status(404).json({
@@ -89,7 +89,7 @@ const updateProfile = async (req, res) => {
         new: true,
         runValidators: true,
       },
-    ).select("-mrPassword -flmPassword -slmPassword -tlmPassword");
+    ).select("-password -mrPassword -flmPassword -slmPassword -tlmPassword");
 
     if (!user) {
       return res.status(404).json({
