@@ -2,11 +2,35 @@
 // const FLM = require("../models/FLM");
 // const SLM = require("../models/SLM");
 // const TLM = require("../models/TLM");
+const HO = require("../models/HO");
 
 // const login = async (req, res) => {
 //   try {
 //     const { userId, password } = req.body;
-//     let user = null;
+//     // HO accounts are stored separately in the dedicated HO collection.
+    const ho = await HO.findOne({ HOId: String(userId).trim() });
+    if (ho) {
+      if (String(ho.HOPassword) !== String(password)) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid Password",
+        });
+      }
+
+      const safeHO = ho.toObject();
+      delete safeHO.HOPassword;
+      safeHO.role = "ho";
+      safeHO.userId = safeHO.HOId;
+      safeHO.name = safeHO.HOName;
+
+      return res.status(200).json({
+        success: true,
+        message: "Login Successful",
+        user: safeHO,
+      });
+    }
+
+    let user = null;
 
 //     // Check MR
 //     user = await MR.findOne({ mrId: userId });
