@@ -2,8 +2,10 @@ const MR = require("../models/MR");
 const FLM = require("../models/FLM");
 const SLM = require("../models/SLM");
 const TLM = require("../models/TLM");
+const User = require("../models/User");
 
 const ROLE_CONFIG = {
+  ho: { Model: User, idField: "userId", nameField: "name" },
   mr: { Model: MR, idField: "mrId", nameField: "mrName" },
   flm: { Model: FLM, idField: "flmId", nameField: "flmName" },
   slm: { Model: SLM, idField: "slmId", nameField: "slmName" },
