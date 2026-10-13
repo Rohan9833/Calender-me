@@ -2060,14 +2060,32 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
   const [freezing, setFreezing] = useState(false);
   const [selections, setSelections] = useState([]);
   const [doctorName, setDoctorName] = useState("");
+  const [uploadedDesigns, setUploadedDesigns] = useState([]);
 
-  const designs = designAssets[activeMonth] || [];
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/uploaded-calendars`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) setUploadedDesigns((data.calendars || []).map((item) => ({
+          id: `uploaded-${item._id}`,
+          label: item.name,
+          file: item.fileUrl?.startsWith("http") ? item.fileUrl : `${API_BASE_URL}${item.fileUrl}`,
+          month: item.month,
+          year: item.year,
+          category: item.category || "festival",
+          isUploaded: true,
+        })).filter((item) => item.month && !item.file.toLowerCase().endsWith(".pdf")));
+      })
+      .catch((error) => console.error("Unable to load uploaded calendars:", error));
+  }, []);
+
+  const designs = [...(designAssets[activeMonth] || []), ...uploadedDesigns.filter((item) => item.month === activeMonth)];
  // ✅ Define designs FIRST
 
 
 const [activeTab, setActiveTab] = useState("festival"); // ✅ singular
 const filteredDesigns = designs.filter(d => 
-  d.category && d.category.toLowerCase() === activeTab.toLowerCase()
+  d.isUploaded || (d.category && d.category.toLowerCase() === activeTab.toLowerCase())
 );
 
 // Debug logs
