@@ -7,6 +7,7 @@ const hierarchyroutes = require("./routes/hierarchyRoutes");
 const doctorroutes = require("./routes/doctorRoutes");
 const managerRoutes = require("./routes/managerRoutes");
 const calendarRoutes = require("./routes/calendarRoutes");
+const uploadedCalendarRoutes = require("./routes/uploadedCalendarRoutes");
 const path = require("path");
 
 const cors = require("cors");
@@ -34,8 +35,10 @@ app.use("/api/createdoc", doctorroutes);
 app.use("/api/doctors", doctorroutes);
 app.use("/api/manager", managerRoutes);
 app.use("/api/calendar", calendarRoutes);
+app.use("/api/uploaded-calendars", uploadedCalendarRoutes);
 
 app.use("/uploads/doctors", express.static(path.join(__dirname, "uploads/doctors")));
+app.use("/uploads/calendars", express.static(path.join(__dirname, "uploads/calendars")));
 app.get("/", (req, res) => {
   res.send("API Running...");
 });
