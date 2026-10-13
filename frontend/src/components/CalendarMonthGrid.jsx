@@ -66,6 +66,7 @@ export default function CalendarMonthGrid({
           sequence: Number(item.sequence) || 1,
           category: item.category || "general",
           isUploaded: true,
+          isDeleted: item.isDeleted === true,
         })).filter((item) => item.month && item.file);
         setUploadedDesigns(mapped);
       })
@@ -78,7 +79,7 @@ export default function CalendarMonthGrid({
   const getMonthDesigns = (month) => {
     const ordered = [...(designAssets[month] || [])];
     const uploads = uploadedDesigns
-      .filter((design) => design.month === month && design.year === CALENDAR_YEAR)
+      .filter((design) => !design.isDeleted && design.month === month && design.year === CALENDAR_YEAR)
       .sort((a, b) => a.sequence - b.sequence);
     uploads.forEach((design) => {
       const index = Math.max(0, Math.min(ordered.length, design.sequence - 1));
@@ -136,9 +137,11 @@ export default function CalendarMonthGrid({
 
   const getSelectedDesign = (month) => {
     const selection = selections[month];
-    return selection?.designId
-      ? getMonthDesigns(month).find((d) => d.id === selection.designId) || null
-      : null;
+    if (!selection?.designId) return null;
+    // Archived uploads remain resolvable for existing selections, but are not selectable again.
+    return uploadedDesigns.find((design) => design.id === selection.designId && design.month === month && design.year === CALENDAR_YEAR)
+      || (designAssets[month] || []).find((design) => design.id === selection.designId)
+      || null;
   };
 
   const selectDesign = async (month, design) => {
