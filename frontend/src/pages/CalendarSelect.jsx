@@ -2079,7 +2079,7 @@ const CURRENT_MR_ID = storedUser.mrId; // Always use the logged-in user's mrId s
       .catch((error) => console.error("Unable to load uploaded calendars:", error));
   }, []);
 
-  const designs = [...(designAssets[activeMonth] || []), ...uploadedDesigns.filter((item) => item.month === activeMonth)];
+  const designs = [...(designAssets[activeMonth] || []), ...uploadedDesigns.filter((item) => item.month === activeMonth && Number(item.year) === CALENDAR_YEAR)];
  // ✅ Define designs FIRST
 
 
